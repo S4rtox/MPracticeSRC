@@ -1,0 +1,11 @@
+# File version (do NOT edit)
+file-version: 2
+# Handled by the plugin itself
+# You can edit it here if you like, but doing it in game via /setspawn is recommended
+# Needs to be generated at least once in game.
+world: world
+x: 0
+y: 70
+z: 0
+yaw: 0
+pitch: 0

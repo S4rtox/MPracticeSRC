@@ -1,0 +1,16 @@
+##################################
+# Do not touch this setting
+file-version: 1
+##################################
+Plugin-Prefix: '&7[&aSHUB&7] '
+Plugin-Reload-Success: '&aSuccesfully reloaded the plugin'
+No-Permission-Error: '&cYou dont have the required permission to execute this command!'
+Console-Command-Executor-Error: '&cOnly players can execute this command'
+# Use %s for displaying the player
+Player-Not-Online-Error: '&cThe player %s is not online'
+Spawn-Set-Success: '&aSet the server spawn successfully'
+Spawn-Not-Set-Yet: '&cThe spawn is not set yet'
+# Use %s for displaying the seconds
+Cooldown-Message: '&cYou cant use this! Its in cooldown for %s seconds'
+Build-Mode-Toggled-Off: '&cToggled build-mode off!'
+Build-Mode-Toggled-On: '&aToggled build-mode on!'

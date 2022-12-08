@@ -1,0 +1,19 @@
+file-version: 2
+
+LobbyWorlds:
+  - "world"
+LobbyRules:
+  DisableRain: true
+  DisableDaylightCycle: true
+  DisableHunger: true
+  DisablePvP: true
+  DisableFallDamage: true
+  DisableMobSpawning: true
+  DisableMobGriefing: true
+  DisableFireSpread: true
+  KeepInventory: true
+  # Disables all block breaking/interacting/placing unless you toggle build mode on with /build (needs permission)
+  BuildMode:
+    Enabled: true
+    # Are interactions(Closing/opening doors, buttons, opening chests) dissabled with buildmode off?
+    Interactions-Disabled: true

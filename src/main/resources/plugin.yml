@@ -1,6 +1,26 @@
 name: Mskywars
 version: '${project.version}'
 main: me.s4rtox.mskywars.MSkywars
-softdepend: [ PlaceHolderApi ]
+softdepend: [ PlaceholderAPI ]
 authors: [ S4rtox ]
 description: Me la recontra pelas le voy a poner config igual.
+commands:
+  setspawn:
+    description: Sets the spawn
+    usage: /setspawn
+    permission: mskywars.admin.setspawn
+  spawn:
+    description: goes to the spawn
+    usage: /spawn
+    aliases: [ hub, home ]
+    permission: mskywars.spawn.teleport
+  mskywarsreload:
+    description: reloads the plugin
+    usage: /mskywarsreload
+    aliases: mswreload
+    premission: mskywars.admin.reload
+  build:
+    description: Toggles build mode
+    usage: /build
+    aliases: buildmode
+    permission: mskywars.admin.buildtoggle
