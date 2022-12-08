@@ -1,0 +1,6 @@
+name: Mskywars
+version: '${project.version}'
+main: me.s4rtox.mskywars.MSkywars
+softdepend: [ PlaceHolderApi ]
+authors: [ S4rtox ]
+description: Me la recontra pelas le voy a poner config igual.
