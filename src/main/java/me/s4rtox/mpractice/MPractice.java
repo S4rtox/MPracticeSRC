@@ -1,61 +1,77 @@
-package me.s4rtox.mskywars;
+package me.s4rtox.mpractice;
 
+import co.aikar.commands.PaperCommandManager;
 import dev.dejvokep.boostedyaml.YamlDocument;
 import dev.dejvokep.boostedyaml.dvs.versioning.BasicVersioning;
 import dev.dejvokep.boostedyaml.settings.dumper.DumperSettings;
 import dev.dejvokep.boostedyaml.settings.general.GeneralSettings;
 import dev.dejvokep.boostedyaml.settings.loader.LoaderSettings;
 import dev.dejvokep.boostedyaml.settings.updater.UpdaterSettings;
-import me.s4rtox.mskywars.commands.SWReload;
-import me.s4rtox.mskywars.commands.SetSpawn;
-import me.s4rtox.mskywars.commands.Spawn;
-import me.s4rtox.mskywars.handlers.BuildMode;
-import me.s4rtox.mskywars.handlers.JoinItemsHandler;
-import me.s4rtox.mskywars.handlers.LobbyHandler;
-import me.s4rtox.mskywars.util.ConfigUtil;
-import me.s4rtox.mskywars.util.PapiFormatter;
-import me.s4rtox.mskywars.util.SpawnUtil;
+import lombok.NonNull;
+import me.s4rtox.mpractice.commands.PracticeCommands;
+import me.s4rtox.mpractice.config.ConfigManager;
+import me.s4rtox.mpractice.handlers.lobbyhandlers.BuildModeHandler;
+import me.s4rtox.mpractice.handlers.lobbyhandlers.JoinItemsHandler;
+import me.s4rtox.mpractice.handlers.lobbyhandlers.LobbyHandler;
+import me.s4rtox.mpractice.util.Colorize;
+import me.s4rtox.mpractice.util.PapiFormatter;
+import me.s4rtox.mpractice.handlers.lobbyhandlers.SpawnSetter;
 import net.kyori.adventure.platform.bukkit.BukkitAudiences;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import javax.swing.plaf.basic.BasicButtonUI;
 import java.io.File;
 import java.io.IOException;
+public final class MPractice extends JavaPlugin {
 
-public final class MSkywars extends JavaPlugin {
+    public final String version = "1.0.0";
     private BukkitAudiences adventure;
-    private ConfigUtil configUtil;
-    private SpawnUtil spawnUtil;
+    private ConfigManager configManager;
+    private SpawnSetter spawnSetter;
     private YamlDocument config;
     private YamlDocument spawnConfig;
     private YamlDocument messagesConfig;
+    private PaperCommandManager commandManager;
+    private BuildModeHandler buildModeHandler;
+
+    public @NonNull BukkitAudiences adventure() {
+        if(this.adventure == null) {
+            throw new IllegalStateException("Tried to access Adventure when the plugin was disabled!");
+        }
+        return this.adventure;
+    }
 
     @Override
     public void onEnable() {
-        // Plugin startup logic
+
         //AdventureApi SetUp
         this.adventure = BukkitAudiences.create(this);
+
         //Bungeecord channel setup
+
         this.getServer().getMessenger().registerOutgoingPluginChannel(this, "BungeeCord");
+
         //PlaceholderApi Setup
+
         if (Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null) {
             PapiFormatter.setPapiStatus(true);
-            getLogger().info(ChatColor.translateAlternateColorCodes('&', "&aPlaceholderAPI detected!, enabling PAPI placeholders."));
+            getLogger().info(Colorize.format( "&aPlaceholderAPI detected!, enabling PAPI placeholders."));
         } else {
             PapiFormatter.setPapiStatus(false);
-            getLogger().warning(ChatColor.translateAlternateColorCodes('&', "&ePlaceholderAPI not detected!, disabling PAPI placeholders."));
+            getLogger().warning(Colorize.format( "&ePlaceholderAPI not detected!, disabling PAPI placeholders."));
         }
+
+        commandManager = new PaperCommandManager(this);
         configSetup();
         utilSetup();
-        commandSetup();
         handlerSetup();
+        commandSetup();
 
-        Bukkit.getLogger().info(ChatColor.translateAlternateColorCodes('&', "&a <----------------------------->"));
-        Bukkit.getLogger().info(ChatColor.translateAlternateColorCodes('&', "&a     [SHC] correctly loaded!"));
-        Bukkit.getLogger().info(ChatColor.translateAlternateColorCodes('&', "&a         made by: S4rtox"));
-        Bukkit.getLogger().info(ChatColor.translateAlternateColorCodes('&', "&a <----------------------------->"));
+
+        Bukkit.getLogger().info(Colorize.format("&a <----------------------------->"));
+        Bukkit.getLogger().info(Colorize.format("&a     [MPE] correctly loaded!"));
+        Bukkit.getLogger().info(Colorize.format("&a         made by: S4rtox"));
+        Bukkit.getLogger().info(Colorize.format("&a <----------------------------->"));
     }
 
     @Override
@@ -69,8 +85,8 @@ public final class MSkywars extends JavaPlugin {
     }
 
     public void utilSetup(){
-        configUtil = new ConfigUtil(this);
-        spawnUtil = new SpawnUtil(this);
+        configManager = new ConfigManager(this);
+        spawnSetter = new SpawnSetter(this);
     }
 
     public void configSetup(){
@@ -85,32 +101,32 @@ public final class MSkywars extends JavaPlugin {
 
     public void handlerSetup(){
         new LobbyHandler(this);
-        new BuildMode(this);
         new JoinItemsHandler(this);
+        new BuildModeHandler(this);
+        buildModeHandler = new BuildModeHandler(this);
     }
     public void commandSetup(){
-        getCommand("build").setExecutor(new BuildMode(this));
-        getCommand("setspawn").setExecutor(new SetSpawn(this));
-        getCommand("spawn").setExecutor(new Spawn(this));
-        getCommand("mskywarsreload").setExecutor(new SWReload(this));
+        commandManager.registerCommand(new PracticeCommands(this));
 
     }
 
     public YamlDocument getDefaultConfig(){
         return config;
     }
-    public ConfigUtil getConfigUtil() {
-        return configUtil;
+    public ConfigManager getConfigManager() {
+        return configManager;
     }
-    public SpawnUtil getSpawnUtil(){
-        return spawnUtil;
+    public SpawnSetter getSpawnSetter(){
+        return spawnSetter;
     }
-
     public YamlDocument getSpawnConfig() {
         return spawnConfig;
     }
-
     public YamlDocument getMessagesConfig() {
         return messagesConfig;
+    }
+
+    public BuildModeHandler getBuildModeHandler() {
+        return buildModeHandler;
     }
 }

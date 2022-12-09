@@ -1,4 +1,4 @@
-package me.s4rtox.mskywars.util;
+package me.s4rtox.mpractice.util;
 
 import me.clip.placeholderapi.PlaceholderAPI;
 import org.bukkit.entity.Player;

@@ -1,7 +1,7 @@
-package me.s4rtox.mskywars.handlers;
+package me.s4rtox.mpractice.handlers.lobbyhandlers;
 
-import me.s4rtox.mskywars.MSkywars;
-import me.s4rtox.mskywars.util.ConfigUtil;
+import me.s4rtox.mpractice.MPractice;
+import me.s4rtox.mpractice.config.ConfigManager;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
@@ -15,13 +15,13 @@ import org.bukkit.event.weather.WeatherChangeEvent;
 import org.bukkit.event.world.WorldLoadEvent;
 
 public class LobbyHandler implements Listener {
-    private final MSkywars plugin;
-    private final ConfigUtil config;
+    private final MPractice plugin;
+    private final ConfigManager config;
 
-    public LobbyHandler(MSkywars plugin) {
+    public LobbyHandler(MPractice plugin) {
         Bukkit.getPluginManager().registerEvents(this, plugin);
         this.plugin = plugin;
-        config = plugin.getConfigUtil();
+        config = plugin.getConfigManager();
         setInitalWorldsGamerules();
     }
 

@@ -1,14 +1,13 @@
-package me.s4rtox.mskywars.handlers;
+package me.s4rtox.mpractice.handlers.lobbyhandlers;
 
-import me.s4rtox.mskywars.MSkywars;
-import me.s4rtox.mskywars.util.ConfigUtil;
+import me.s4rtox.mpractice.MPractice;
+import me.s4rtox.mpractice.config.ConfigManager;
 import org.bukkit.Bukkit;
-import org.bukkit.command.Command;
-import org.bukkit.command.CommandExecutor;
-import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockMultiPlaceEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
@@ -18,63 +17,52 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import java.util.HashMap;
 import java.util.UUID;
 
-public class BuildMode implements Listener, CommandExecutor {
-    private final ConfigUtil config;
-
-
+public class BuildModeHandler implements Listener {
+    private final ConfigManager config;
     final HashMap<UUID, Boolean> buildMode = new HashMap<>();
 
-    public BuildMode(MSkywars plugin) {
+    public BuildModeHandler(MPractice plugin) {
         Bukkit.getPluginManager().registerEvents(this, plugin);
-        config = plugin.getConfigUtil();
+        config = plugin.getConfigManager();
     }
 
-    @Override
-    public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-        if(!(sender instanceof Player)){
-            sender.sendMessage(config.MS_CONSOLE_COMMAND_EXECUTOR_ERROR());
-            return true;
-        }
-        Player player = (Player) sender;
-        if(!player.hasPermission(config.P_ADMIN_BUILDMODE())) {
-            player.sendMessage(config.MS_NO_PERMISSION());
-            return true;
-        }
-
+    public void checkBuildMode(Player player){
+        if(!(config.C_LOBBYWORLD_ENABLEDWORLDS().contains(player.getWorld().getName()))) return;
         if(buildMode.containsKey(player.getUniqueId())) {
 
             if (buildMode.get(player.getUniqueId())) {
 
                 buildMode.put(player.getUniqueId(), false);
                 player.sendMessage(config.MS_BUILDMODE_OFF());
+                player.sendMessage(buildMode.get(player.getUniqueId()).toString());
 
             }
             else {
 
                 buildMode.put(player.getUniqueId(), true);
                 player.sendMessage(config.MS_BUILDMODE_ON());
+                player.sendMessage(buildMode.get(player.getUniqueId()).toString());
 
             }
         }
         else{
-            buildMode.put(((Player)sender).getUniqueId(), false);
+            buildMode.put(player.getUniqueId(), false);
         }
-        return true;
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onBlockPlace(BlockPlaceEvent event) {
         if(!config.C_LOBBYWORLD_BUILDMODE_ENABLED()) return;
         if(event.getBlockPlaced().isEmpty()) return;
         event.setCancelled(buildChecker(event.getPlayer()));
-        event.getPlayer().sendMessage(String.valueOf(buildChecker(event.getPlayer())));
         if(event.isCancelled()){
             event.getPlayer().updateInventory();
         }
 
     }
 
-    @EventHandler
+
+    @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onMultipleBlockPlace(BlockMultiPlaceEvent event) {
         if(!config.C_LOBBYWORLD_BUILDMODE_ENABLED()) return;
         if(event.getBlockPlaced().isEmpty()) return;
@@ -84,27 +72,32 @@ public class BuildMode implements Listener, CommandExecutor {
         }
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onPlayerInteract(PlayerInteractEvent event) {
         if(!config.C_LOBBYWORLD_BUILDMODE_ENABLED()) return;
         if(!config.C_LOBBYWORLD_BUILDMODE_INTERACTIONS()) return;
-        if(event.getClickedBlock() == null) return;
+        if(event.getAction() != Action.RIGHT_CLICK_BLOCK) return;
+
         event.setCancelled(buildChecker(event.getPlayer()));
+
         if(event.isCancelled()){
             event.getPlayer().updateInventory();
         }
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onPlayerBreak(BlockBreakEvent event){
         if(!config.C_LOBBYWORLD_BUILDMODE_ENABLED()) return;
         if(event.getBlock().isEmpty()) return;
+
         event.setCancelled(buildChecker(event.getPlayer()));
+        event.getPlayer().sendMessage(buildMode.get(event.getPlayer().getUniqueId()).toString());
+
         if(event.isCancelled()){
             event.getPlayer().updateInventory();
         }
     }
-    @EventHandler
+    @EventHandler(priority = EventPriority.MONITOR)
     public void onJoinRegister(PlayerJoinEvent event){
         if(!config.C_LOBBYWORLD_BUILDMODE_ENABLED()) return;
         buildMode.put(event.getPlayer().getUniqueId(), false);
@@ -112,6 +105,9 @@ public class BuildMode implements Listener, CommandExecutor {
 
     private boolean buildChecker(Player player){
         //Checks if the world is in the config, if it is checks if the player is in the hashmap, if it is it gets the value of the variable. If any of the before say false it shows true;
-        return !(buildMode.containsKey(player.getUniqueId()) && buildMode.get(player.getUniqueId()))  ;
+        player.sendMessage(String.valueOf(config.C_LOBBYWORLD_ENABLEDWORLDS().contains(player.getWorld().getName())));
+        player.sendMessage(String.valueOf((buildMode.containsKey(player.getUniqueId()))));
+        player.sendMessage(String.valueOf(buildMode.get(player.getUniqueId())));
+        return  !(config.C_LOBBYWORLD_ENABLEDWORLDS().contains(player.getWorld().getName())) || !(buildMode.containsKey(player.getUniqueId()) && buildMode.get(player.getUniqueId()));
     }
 }

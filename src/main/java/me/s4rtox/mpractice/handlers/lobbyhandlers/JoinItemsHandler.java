@@ -1,9 +1,9 @@
-package me.s4rtox.mskywars.handlers;
+package me.s4rtox.mpractice.handlers.lobbyhandlers;
 
 import de.tr7zw.changeme.nbtapi.NBTItem;
-import me.s4rtox.mskywars.MSkywars;
-import me.s4rtox.mskywars.util.ConfigUtil;
-import me.s4rtox.mskywars.util.ItemAdder;
+import me.s4rtox.mpractice.MPractice;
+import me.s4rtox.mpractice.config.ConfigManager;
+import me.s4rtox.mpractice.util.ItemBuilder;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
@@ -24,11 +24,11 @@ import java.util.List;
 
 public class JoinItemsHandler implements Listener {
 
-    private final ConfigUtil config;
+    private final ConfigManager config;
 
-    public JoinItemsHandler(MSkywars plugin){
+    public JoinItemsHandler(MPractice plugin){
         Bukkit.getPluginManager().registerEvents(this, plugin);
-        config = plugin.getConfigUtil();
+        config = plugin.getConfigManager();
     }
 
     // ---------------  ANTI MOVE CUSTOM ITEMS INVENTORY  ---------------
@@ -82,7 +82,7 @@ public class JoinItemsHandler implements Listener {
                 && human.getGameMode() != GameMode.CREATIVE
                 && item.getItemMeta() != null
                 && config.getBoolean("JoinItems.Enderbutt.Enabled", true)
-                && ChatColor.translateAlternateColorCodes('&', config.getString("JoinItems.Enderbutt.DisplayName", "&4EnderButt")).equals(item.getItemMeta().getDisplayName());
+                && Colorize.format( config.getString("JoinItems.Enderbutt.DisplayName", "&4EnderButt")).equals(item.getItemMeta().getDisplayName());
         if (flag) {
             event.setCancelled(true);
         }
@@ -112,7 +112,7 @@ public class JoinItemsHandler implements Listener {
     private void giveJoinItems(Inventory inv){
         // EnderButt Enabled
             List<String> lore = Collections.singletonList("1");
-            NBTItem enderButt = new NBTItem(ItemAdder.getItem(new ItemStack(Material.ENDER_PEARL), "Test" ,true, lore));
+            NBTItem enderButt = new NBTItem(ItemBuilder.getItem(new ItemStack(Material.ENDER_PEARL), "Test" ,true, lore));
             enderButt.setBoolean("LobbyItem", true);
             enderButt.setBoolean("EnderButt", true);
             inv.setItem(1,enderButt.getItem());

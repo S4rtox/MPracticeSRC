@@ -1,6 +1,7 @@
-package me.s4rtox.mskywars.util;
+package me.s4rtox.mpractice.handlers.lobbyhandlers;
 
-import me.s4rtox.mskywars.MSkywars;
+import me.s4rtox.mpractice.MPractice;
+import me.s4rtox.mpractice.config.ConfigManager;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -13,14 +14,14 @@ import org.bukkit.event.player.PlayerRespawnEvent;
 import java.io.IOException;
 import java.util.logging.Level;
 
-public class SpawnUtil implements Listener {
+public class SpawnSetter implements Listener {
     private Location spawn;
-    private final ConfigUtil config;
-    private final MSkywars plugin;
+    private final ConfigManager config;
+    private final MPractice plugin;
 
-    public SpawnUtil (MSkywars plugin){
+    public SpawnSetter(MPractice plugin){
         this.plugin = plugin;
-        config = plugin.getConfigUtil();
+        config = plugin.getConfigManager();
         Bukkit.getPluginManager().registerEvents(this,plugin);
         String worldName = plugin.getSpawnConfig().getString("world");
         double x = plugin.getSpawnConfig().getDouble("x");

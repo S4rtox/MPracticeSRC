@@ -1,4 +1,4 @@
-package me.s4rtox.mskywars.util;
+package me.s4rtox.mpractice.util;
 
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;

@@ -1,57 +1,80 @@
-package me.s4rtox.mskywars.util;
+package me.s4rtox.mpractice.config;
 
 import dev.dejvokep.boostedyaml.YamlDocument;
-import me.s4rtox.mskywars.MSkywars;
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
+import lombok.Getter;
+import me.s4rtox.mpractice.MPractice;
+import me.s4rtox.mpractice.util.Colorize;
 
 import java.util.Collections;
 import java.util.List;
 
-public class ConfigUtil {
-    private MSkywars plugin;
+public class ConfigManager {
+    private final MPractice plugin;
     private final YamlDocument config;
     private final YamlDocument messages;
 
     /* Config Settings */
     //World Section
+    @Getter
     private boolean C_LOBBYWORLD_DISABLE_RAIN;
+    @Getter
     private boolean C_LOBBYWORLD_DISABLE_DAYLIGHTCYCLE;
+    @Getter
     private boolean C_LOBBYWORLD_DISABLE_PVP;
+    @Getter
     private boolean C_LOBBYWORLD_DISABLE_HUNGER;
+    @Getter
     private boolean C_LOBBYWORLD_DISABLE_MOBSPAWNING;
+    @Getter
     private boolean C_LOBBYWORLD_DISABLE_MOBGRIEFING;
+    @Getter
     private boolean C_LOBBYWORLD_DISABLE_FIRE;
+    @Getter
     private boolean C_LOBBYWORLD_KEEPINVENTORY;
+    @Getter
     private boolean C_LOBBYWORLD_DISABLE_FALLDAMAGE;
+    @Getter
     private boolean C_LOBBYWORLD_BUILDMODE_ENABLED;
+    @Getter
     private boolean C_LOBBYWORLD_BUILDMODE_INTERACTIONS;
-
+    @Getter
     private List<String> C_LOBBYWORLD_ENABLEDWORLDS;
 
     /* End of Config */
 
     /* Messages */
     private String MS_PREFIX;
+    @Getter
     private String MS_RELOAD_SUCCESS;
+    @Getter
     private String MS_CONSOLE_COMMAND_EXECUTOR_ERROR;
+    @Getter
     private String MS_NO_PERMISSION;
+    @Getter
     private String MS_COOLDOWN;
+    @Getter
     private String MS_PLAYER_NOTONLINE;
+    @Getter
     private String MS_SPAWN_SETSPAWN;
+    @Getter
     private String MS_SPAWN_NOT_SET_YET;
+    @Getter
     private String MS_BUILDMODE_OFF;
+    @Getter
     private String MS_BUILDMODE_ON;
 
     /* End of Messages */
 
     /* Permissions */
+    @Getter
     private String P_ADMIN_RELOAD;
+    @Getter
     private String P_ADMIN_SPAWN_SET;
+    @Getter
     private String P_ADMIN_BUILDMODE;
     /* End of Permissions */
 
-    public ConfigUtil(MSkywars plugin){
+    public ConfigManager(MPractice plugin){
         this.plugin = plugin;
         this.config = plugin.getDefaultConfig();
         this.messages = plugin.getMessagesConfig();
@@ -82,9 +105,6 @@ public class ConfigUtil {
         
         /* Sets up the config */
         C_LOBBYWORLD_ENABLEDWORLDS = config.getStringList("LobbyWorlds", Collections.singletonList(" "));
-        for(String s : C_LOBBYWORLD_ENABLEDWORLDS){
-            Bukkit.getLogger().info(s);
-        }
         C_LOBBYWORLD_DISABLE_RAIN = config.getBoolean("LobbyRules.DisableRain", false);
         C_LOBBYWORLD_DISABLE_DAYLIGHTCYCLE = config.getBoolean("LobbyRules.DisableDaylightCycle", false);
         C_LOBBYWORLD_DISABLE_PVP = config.getBoolean("LobbyRules.DisablePvP", false);
@@ -99,103 +119,6 @@ public class ConfigUtil {
     }
 
     public String getMessage(String path){
-        return ChatColor.translateAlternateColorCodes('&', MS_PREFIX + messages.getString(path,""));
-    }
-
-
-    public boolean C_LOBBYWORLD_DISABLE_RAIN() {
-        return C_LOBBYWORLD_DISABLE_RAIN;
-    }
-
-    public boolean C_LOBBYWORLD_DISABLE_DAYLIGHTCYCLE() {
-        return C_LOBBYWORLD_DISABLE_DAYLIGHTCYCLE;
-    }
-
-    public boolean C_LOBBYWORLD_DISABLE_PVP() {
-        return C_LOBBYWORLD_DISABLE_PVP;
-    }
-
-    public boolean C_LOBBYWORLD_DISABLE_HUNGER() {
-        return C_LOBBYWORLD_DISABLE_HUNGER;
-    }
-
-    public boolean C_LOBBYWORLD_DISABLE_MOBSPAWNING() {
-        return C_LOBBYWORLD_DISABLE_MOBSPAWNING;
-    }
-
-    public boolean C_LOBBYWORLD_DISABLE_MOBGRIEFING() {
-        return C_LOBBYWORLD_DISABLE_MOBGRIEFING;
-    }
-
-    public boolean C_LOBBYWORLD_DISABLE_FIRE() {
-        return C_LOBBYWORLD_DISABLE_FIRE;
-    }
-
-    public boolean C_LOBBYWORLD_KEEPINVENTORY() {
-        return C_LOBBYWORLD_KEEPINVENTORY;
-    }
-
-    public boolean C_LOBBYWORLD_BUILDMODE_ENABLED() {
-        return C_LOBBYWORLD_BUILDMODE_ENABLED;
-    }
-
-    public boolean C_LOBBYWORLD_BUILDMODE_INTERACTIONS() {
-        return C_LOBBYWORLD_BUILDMODE_INTERACTIONS;
-    }
-
-    public List<String> C_LOBBYWORLD_ENABLEDWORLDS() {
-        return C_LOBBYWORLD_ENABLEDWORLDS;
-    }
-
-    public String MS_RELOAD_SUCCESS() {
-        return MS_RELOAD_SUCCESS;
-    }
-
-    public String MS_CONSOLE_COMMAND_EXECUTOR_ERROR() {
-        return MS_CONSOLE_COMMAND_EXECUTOR_ERROR;
-    }
-
-    public String MS_NO_PERMISSION() {
-        return MS_NO_PERMISSION;
-    }
-
-    public String MS_COOLDOWN() {
-        return MS_COOLDOWN;
-    }
-
-    public String MS_PLAYER_NOTONLINE() {
-        return MS_PLAYER_NOTONLINE;
-    }
-
-    public String MS_SPAWN_SETSPAWN() {
-        return MS_SPAWN_SETSPAWN;
-    }
-
-    public String MS_SPAWN_NOT_SET_YET() {
-        return MS_SPAWN_NOT_SET_YET;
-    }
-
-    public String MS_BUILDMODE_OFF() {
-        return MS_BUILDMODE_OFF;
-    }
-
-    public String MS_BUILDMODE_ON() {
-        return MS_BUILDMODE_ON;
-    }
-
-    public String P_ADMIN_RELOAD() {
-        return P_ADMIN_RELOAD;
-    }
-
-    public String P_ADMIN_SPAWN_SET() {
-        return P_ADMIN_SPAWN_SET;
-    }
-
-    public String P_ADMIN_BUILDMODE() {
-        return P_ADMIN_BUILDMODE;
-    }
-
-    public boolean C_LOBBYWORLD_DISABLE_FALLDAMAGE() {
-        return C_LOBBYWORLD_DISABLE_FALLDAMAGE;
+        return Colorize.format(MS_PREFIX + messages.getString(path,""));
     }
 }
