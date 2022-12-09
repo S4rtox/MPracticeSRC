@@ -102,7 +102,6 @@ public final class MPractice extends JavaPlugin {
     public void handlerSetup(){
         new LobbyHandler(this);
         new JoinItemsHandler(this);
-        new BuildModeHandler(this);
         buildModeHandler = new BuildModeHandler(this);
     }
     public void commandSetup(){

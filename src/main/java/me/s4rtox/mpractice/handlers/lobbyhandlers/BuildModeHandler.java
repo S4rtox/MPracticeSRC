@@ -16,7 +16,6 @@ import org.bukkit.event.player.PlayerJoinEvent;
 
 import java.util.HashMap;
 import java.util.UUID;
-
 public class BuildModeHandler implements Listener {
     private final ConfigManager config;
     final HashMap<UUID, Boolean> buildMode = new HashMap<>();
@@ -34,14 +33,12 @@ public class BuildModeHandler implements Listener {
 
                 buildMode.put(player.getUniqueId(), false);
                 player.sendMessage(config.MS_BUILDMODE_OFF());
-                player.sendMessage(buildMode.get(player.getUniqueId()).toString());
 
             }
             else {
 
                 buildMode.put(player.getUniqueId(), true);
                 player.sendMessage(config.MS_BUILDMODE_ON());
-                player.sendMessage(buildMode.get(player.getUniqueId()).toString());
 
             }
         }
@@ -79,7 +76,6 @@ public class BuildModeHandler implements Listener {
         if(event.getAction() != Action.RIGHT_CLICK_BLOCK) return;
 
         event.setCancelled(buildChecker(event.getPlayer()));
-
         if(event.isCancelled()){
             event.getPlayer().updateInventory();
         }
@@ -89,14 +85,9 @@ public class BuildModeHandler implements Listener {
     public void onPlayerBreak(BlockBreakEvent event){
         if(!config.C_LOBBYWORLD_BUILDMODE_ENABLED()) return;
         if(event.getBlock().isEmpty()) return;
-
         event.setCancelled(buildChecker(event.getPlayer()));
-        event.getPlayer().sendMessage(buildMode.get(event.getPlayer().getUniqueId()).toString());
-
-        if(event.isCancelled()){
-            event.getPlayer().updateInventory();
-        }
     }
+
     @EventHandler(priority = EventPriority.MONITOR)
     public void onJoinRegister(PlayerJoinEvent event){
         if(!config.C_LOBBYWORLD_BUILDMODE_ENABLED()) return;
@@ -105,9 +96,6 @@ public class BuildModeHandler implements Listener {
 
     private boolean buildChecker(Player player){
         //Checks if the world is in the config, if it is checks if the player is in the hashmap, if it is it gets the value of the variable. If any of the before say false it shows true;
-        player.sendMessage(String.valueOf(config.C_LOBBYWORLD_ENABLEDWORLDS().contains(player.getWorld().getName())));
-        player.sendMessage(String.valueOf((buildMode.containsKey(player.getUniqueId()))));
-        player.sendMessage(String.valueOf(buildMode.get(player.getUniqueId())));
         return  !(config.C_LOBBYWORLD_ENABLEDWORLDS().contains(player.getWorld().getName())) || !(buildMode.containsKey(player.getUniqueId()) && buildMode.get(player.getUniqueId()));
     }
 }
