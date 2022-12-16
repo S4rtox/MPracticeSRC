@@ -1,0 +1,17 @@
+file-version: 1
+ArenaExample:
+  DisplayName: '&cExampleName'
+  World: 'world'
+  ArenaCenter: 'x,y,z'
+  ArenaCorner: 'x,y,z'
+  ArenaCorner2: 'x,y,z'
+  SpectatorSpawn: 'x,y,z,pitch,yaw'
+  PlayerSpawns:
+    - 'x,y,z,pitch,yaw'
+    - 'x,y,z,pitch,yaw'
+  IslandChests:
+    - 'x,y,z,pitch,yaw'
+    - 'x,y,z,pitch,yaw'
+  MiddleChests:
+    - 'x,y,z,pitch,yaw'
+    - 'x,y,z,pitch,yaw'

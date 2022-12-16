@@ -10,6 +10,7 @@ import dev.dejvokep.boostedyaml.settings.updater.UpdaterSettings;
 import lombok.NonNull;
 import me.s4rtox.mpractice.commands.PracticeCommands;
 import me.s4rtox.mpractice.config.ConfigManager;
+import me.s4rtox.mpractice.handlers.gamehandlers.ArenaManager;
 import me.s4rtox.mpractice.handlers.lobbyhandlers.BuildModeHandler;
 import me.s4rtox.mpractice.handlers.lobbyhandlers.JoinItemsHandler;
 import me.s4rtox.mpractice.handlers.lobbyhandlers.LobbyHandler;
@@ -31,8 +32,11 @@ public final class MPractice extends JavaPlugin {
     private YamlDocument config;
     private YamlDocument spawnConfig;
     private YamlDocument messagesConfig;
+    private YamlDocument arenaConfig;
     private PaperCommandManager commandManager;
     private BuildModeHandler buildModeHandler;
+
+    private ArenaManager arenaManager;
 
     public @NonNull BukkitAudiences adventure() {
         if(this.adventure == null) {
@@ -94,6 +98,7 @@ public final class MPractice extends JavaPlugin {
             config = YamlDocument.create(new File(getDataFolder(), "config.yml"), getResource("config.yml"), GeneralSettings.DEFAULT, LoaderSettings.builder().setAutoUpdate(true).build(), DumperSettings.DEFAULT, UpdaterSettings.builder().setVersioning(new BasicVersioning("file-version")).build());
             spawnConfig = YamlDocument.create(new File(getDataFolder(), "spawn.yml"), getResource("spawn.yml"), GeneralSettings.DEFAULT, LoaderSettings.builder().setAutoUpdate(true).build(), DumperSettings.DEFAULT, UpdaterSettings.builder().setVersioning(new BasicVersioning("file-version")).build());
             messagesConfig = YamlDocument.create(new File(getDataFolder(), "messages.yml"), getResource("messages.yml"), GeneralSettings.DEFAULT, LoaderSettings.builder().setAutoUpdate(true).build(), DumperSettings.DEFAULT, UpdaterSettings.builder().setVersioning(new BasicVersioning("file-version")).build());
+            arenaConfig = YamlDocument.create(new File(getDataFolder(), "arenas.yml"), getResource("arenas.yml"), GeneralSettings.DEFAULT, LoaderSettings.builder().setAutoUpdate(true).build(), DumperSettings.DEFAULT, UpdaterSettings.builder().setVersioning(new BasicVersioning("file-version")).build());
         } catch (IOException ex) {
             ex.printStackTrace();
         }
@@ -127,5 +132,13 @@ public final class MPractice extends JavaPlugin {
 
     public BuildModeHandler getBuildModeHandler() {
         return buildModeHandler;
+    }
+
+    public ArenaManager getArenaManager() {
+        return arenaManager;
+    }
+
+    public YamlDocument getArenaConfig() {
+        return arenaConfig;
     }
 }

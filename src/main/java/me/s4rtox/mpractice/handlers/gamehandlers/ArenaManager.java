@@ -7,4 +7,8 @@ public class ArenaManager {
 
     private final List<Arena> arenalist = new ArrayList<>();
 
+    public List<Arena> getArenas(){
+        return arenalist;
+    }
+
 }

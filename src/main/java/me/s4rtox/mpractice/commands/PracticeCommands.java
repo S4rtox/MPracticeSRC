@@ -3,6 +3,8 @@ package me.s4rtox.mpractice.commands;
 import co.aikar.commands.BaseCommand;
 import co.aikar.commands.annotation.*;
 import me.s4rtox.mpractice.MPractice;
+import me.s4rtox.mpractice.handlers.gamehandlers.Arena;
+import me.s4rtox.mpractice.handlers.gamehandlers.ArenaManager;
 import me.s4rtox.mpractice.handlers.lobbyhandlers.BuildModeHandler;
 import me.s4rtox.mpractice.util.Colorize;
 import me.s4rtox.mpractice.config.ConfigManager;
@@ -139,13 +141,28 @@ public class PracticeCommands extends BaseCommand {
 
         @Subcommand("arena")
         public class ArenaCommands extends BaseCommand{
+            private final ArenaManager arenaManager;
+
+            public ArenaCommands(MPractice plugin){
+                this.arenaManager = plugin.getArenaManager();
+            }
 
             @Subcommand("list")
             @Description("Sets the lobby spawn")
             public void onListArenas(Player player){
-                player.sendMessage(Colorize.format("&cTest for arena commands"));
+                if(arenaManager.getArenas().isEmpty()){
+                    player.sendMessage(Colorize.format("&cThere are no disponible arenas."));
+                }
+                for(Arena arena : arenaManager.getArenas()){
+                    player.sendMessage(Colorize.format("&a" + arena.name()));
+                }
             }
 
+            @Subcommand("create")
+            @Description("Attempts to create a new arena")
+            public void onArenaCreate(Player player, String[] args){
+
+            }
         }
     }
 }

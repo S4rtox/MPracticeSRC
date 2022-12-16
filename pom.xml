@@ -36,6 +36,7 @@
                 <artifactId>maven-shade-plugin</artifactId>
                 <version>3.3.0</version>
                 <configuration>
+                    <outputFile>C:\Users\juand\OneDrive\Escritorio\TestServer\plugins\MPE.jar</outputFile>
                     <dependencyReducedPomLocation>${project.build.directory}/dependency-reduced-pom.xml</dependencyReducedPomLocation>
                     <relocations>
                         <relocation>
