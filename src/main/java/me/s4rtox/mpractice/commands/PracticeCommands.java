@@ -3,15 +3,16 @@ package me.s4rtox.mpractice.commands;
 import co.aikar.commands.BaseCommand;
 import co.aikar.commands.annotation.*;
 import me.s4rtox.mpractice.MPractice;
+import me.s4rtox.mpractice.config.ConfigManager;
 import me.s4rtox.mpractice.handlers.gamehandlers.Arena;
-import me.s4rtox.mpractice.handlers.gamehandlers.ArenaManager;
+import me.s4rtox.mpractice.handlers.gamehandlers.GameManager;
 import me.s4rtox.mpractice.handlers.lobbyhandlers.BuildModeHandler;
 import me.s4rtox.mpractice.util.Colorize;
-import me.s4rtox.mpractice.config.ConfigManager;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import java.io.IOException;
+import java.util.Arrays;
 
 @SuppressWarnings("unused")
 @CommandAlias("mpe|mpractice")
@@ -20,10 +21,14 @@ public class PracticeCommands extends BaseCommand {
     private final MPractice plugin;
     private final ConfigManager config;
     private final BuildModeHandler buildModeHandler;
+
+    private final GameManager gameManager;
+
     public PracticeCommands(MPractice plugin){
         this.plugin = plugin;
         this.config = plugin.getConfigManager();
         this.buildModeHandler = plugin.getBuildModeHandler();
+        this.gameManager = plugin.getGameManager();
     }
 
     /////////////////////////////////////////////////////////////////
@@ -89,14 +94,13 @@ public class PracticeCommands extends BaseCommand {
     @Subcommand("admin")
     @CommandPermission("mpractice.admin")
     public class AdminCommands extends BaseCommand{
-
         @Default
         public void onDefault(Player player){
             player.sendMessage(Colorize.format("&cUSAGE: /MPE ADMIN <START|FORCESTART|CANCEL|ARENA|RELOAD|SETSPAWN>"));
         }
 
         @Subcommand("reload")
-        @Description("Reloads a plugin")
+        @Description("Reloads the plugin")
         public void onReloadCommand(CommandSender sender){
             try {
                 plugin.getDefaultConfig().reload();
@@ -109,7 +113,7 @@ public class PracticeCommands extends BaseCommand {
                 throw new RuntimeException(e);
             }
         }
-        @Subcommand("setspawn")
+        @Subcommand("setlobby")
         @Description("Sets the lobby spawn")
         public void onSetSpawnCommand(Player player){
             plugin.getSpawnSetter().set(player.getLocation());
@@ -141,27 +145,37 @@ public class PracticeCommands extends BaseCommand {
 
         @Subcommand("arena")
         public class ArenaCommands extends BaseCommand{
-            private final ArenaManager arenaManager;
 
-            public ArenaCommands(MPractice plugin){
-                this.arenaManager = plugin.getArenaManager();
-            }
 
             @Subcommand("list")
             @Description("Sets the lobby spawn")
             public void onListArenas(Player player){
-                if(arenaManager.getArenas().isEmpty()){
+                if(gameManager.arenaManager().getArenas().isEmpty()){
                     player.sendMessage(Colorize.format("&cThere are no disponible arenas."));
                 }
-                for(Arena arena : arenaManager.getArenas()){
+                for(Arena arena : gameManager.arenaManager().getArenas()){
                     player.sendMessage(Colorize.format("&a" + arena.name()));
                 }
             }
 
             @Subcommand("create")
             @Description("Attempts to create a new arena")
-            public void onArenaCreate(Player player, String[] args){
+            public void onArenaCreate(Player player){
+                gameManager.setupWizardManager().startWizard(player,null);
+            }
 
+
+            //TODO: Edit subcommand
+            @Subcommand("edit")
+            @Description("Attempts to edit an arena")
+            public void onArenaEdit(Player player, String[] args){
+                player.sendMessage("Editing" + Arrays.toString(args));
+            }
+
+            @Subcommand("delete")
+            @Description("Attempts to delete an arena")
+            public void onArenaDelete(Player player, String[] args){
+                player.sendMessage("Editing" + Arrays.toString(args));
             }
         }
     }

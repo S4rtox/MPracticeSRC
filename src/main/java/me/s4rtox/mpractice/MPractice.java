@@ -10,13 +10,13 @@ import dev.dejvokep.boostedyaml.settings.updater.UpdaterSettings;
 import lombok.NonNull;
 import me.s4rtox.mpractice.commands.PracticeCommands;
 import me.s4rtox.mpractice.config.ConfigManager;
-import me.s4rtox.mpractice.handlers.gamehandlers.ArenaManager;
+import me.s4rtox.mpractice.handlers.gamehandlers.GameManager;
 import me.s4rtox.mpractice.handlers.lobbyhandlers.BuildModeHandler;
 import me.s4rtox.mpractice.handlers.lobbyhandlers.JoinItemsHandler;
 import me.s4rtox.mpractice.handlers.lobbyhandlers.LobbyHandler;
+import me.s4rtox.mpractice.handlers.lobbyhandlers.SpawnSetter;
 import me.s4rtox.mpractice.util.Colorize;
 import me.s4rtox.mpractice.util.PapiFormatter;
-import me.s4rtox.mpractice.handlers.lobbyhandlers.SpawnSetter;
 import net.kyori.adventure.platform.bukkit.BukkitAudiences;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -36,7 +36,7 @@ public final class MPractice extends JavaPlugin {
     private PaperCommandManager commandManager;
     private BuildModeHandler buildModeHandler;
 
-    private ArenaManager arenaManager;
+    private GameManager gameManager;
 
     public @NonNull BukkitAudiences adventure() {
         if(this.adventure == null) {
@@ -98,7 +98,7 @@ public final class MPractice extends JavaPlugin {
             config = YamlDocument.create(new File(getDataFolder(), "config.yml"), getResource("config.yml"), GeneralSettings.DEFAULT, LoaderSettings.builder().setAutoUpdate(true).build(), DumperSettings.DEFAULT, UpdaterSettings.builder().setVersioning(new BasicVersioning("file-version")).build());
             spawnConfig = YamlDocument.create(new File(getDataFolder(), "spawn.yml"), getResource("spawn.yml"), GeneralSettings.DEFAULT, LoaderSettings.builder().setAutoUpdate(true).build(), DumperSettings.DEFAULT, UpdaterSettings.builder().setVersioning(new BasicVersioning("file-version")).build());
             messagesConfig = YamlDocument.create(new File(getDataFolder(), "messages.yml"), getResource("messages.yml"), GeneralSettings.DEFAULT, LoaderSettings.builder().setAutoUpdate(true).build(), DumperSettings.DEFAULT, UpdaterSettings.builder().setVersioning(new BasicVersioning("file-version")).build());
-            arenaConfig = YamlDocument.create(new File(getDataFolder(), "arenas.yml"), getResource("arenas.yml"), GeneralSettings.DEFAULT, LoaderSettings.builder().setAutoUpdate(true).build(), DumperSettings.DEFAULT, UpdaterSettings.builder().setVersioning(new BasicVersioning("file-version")).build());
+            arenaConfig = YamlDocument.create(new File(getDataFolder(), "arenas.yml"));
         } catch (IOException ex) {
             ex.printStackTrace();
         }
@@ -108,6 +108,7 @@ public final class MPractice extends JavaPlugin {
         new LobbyHandler(this);
         new JoinItemsHandler(this);
         buildModeHandler = new BuildModeHandler(this);
+        gameManager = new GameManager(this);
     }
     public void commandSetup(){
         commandManager.registerCommand(new PracticeCommands(this));
@@ -134,8 +135,8 @@ public final class MPractice extends JavaPlugin {
         return buildModeHandler;
     }
 
-    public ArenaManager getArenaManager() {
-        return arenaManager;
+    public GameManager getGameManager() {
+        return gameManager;
     }
 
     public YamlDocument getArenaConfig() {
