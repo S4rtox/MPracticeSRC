@@ -53,7 +53,7 @@ public class Arena {
     }
 
     public void removePlayer(Player player){
-        activePlayers.add(player.getUniqueId());
+        activePlayers.remove(player.getUniqueId());
     }
 
     public boolean isPlaying(Player player){

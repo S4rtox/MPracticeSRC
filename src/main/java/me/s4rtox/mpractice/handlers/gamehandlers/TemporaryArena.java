@@ -46,6 +46,27 @@ public class TemporaryArena {
         this.middleChests.add(location);
     }
 
+    public void removeLastSpawnLocation(){
+        if(spawnLocations.isEmpty()){
+            return;
+        }
+        this.spawnLocations.remove(spawnLocations.size() - 1);
+    }
+
+    public void removeLastIslandChest(){
+        if(islandChests.isEmpty()){
+            return;
+        }
+        this.islandChests.remove(islandChests.size() -1);
+    }
+
+    public void removeLastMiddleChest(){
+        if(middleChests.isEmpty()){
+            return;
+        }
+        this.middleChests.remove(middleChests.size() -1);
+    }
+
 
     public Arena toArena(){
         return new Arena(name,displayName,centerLocation,corner1Location,corner2Location,spectatorSpawnLocation,spawnLocations,islandChests,middleChests);
