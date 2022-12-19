@@ -9,7 +9,6 @@ import java.util.Collections;
 import java.util.List;
 
 public class ConfigManager {
-    private final MPractice plugin;
     private final YamlDocument config;
     private final YamlDocument messages;
 
@@ -75,7 +74,6 @@ public class ConfigManager {
     /* End of Permissions */
 
     public ConfigManager(MPractice plugin){
-        this.plugin = plugin;
         this.config = plugin.getDefaultConfig();
         this.messages = plugin.getMessagesConfig();
         loadConfig();

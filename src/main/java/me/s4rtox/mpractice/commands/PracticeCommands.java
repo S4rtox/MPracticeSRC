@@ -43,28 +43,28 @@ public class PracticeCommands extends BaseCommand {
             sender.sendMessage(Colorize.format("             &aMade by &eS4rtox"));
             sender.sendMessage(Colorize.format("&e---------------------------------------------"));
             sender.sendMessage("");
-            sender.sendMessage(Colorize.format("&cUSAGE: /MPE <JOIN|LEAVE|ADMIN>"));
+            sender.sendMessage(Colorize.format("&cUSAGE: /MPE <JOIN|LEAVE|SPAWN|BUILD|SPECTATE|ADMIN>"));
         }else{
-            sender.sendMessage(Colorize.format("&cUSAGE: /MPE <JOIN|LEAVE>"));
+            sender.sendMessage(Colorize.format("&cUSAGE: /MPE <JOIN|LEAVE|SPAWN|SPECTATE>"));
         }
 
     }
     @Subcommand("spectate")
     @Description("Attempts to join a game as spectator")
     public void onSpectateCommand(Player player){
-
+        player.sendMessage("WIP");
     }
 
     @Subcommand("join")
     @Description("Attempts to join a game")
     public void onJoinCommand(Player player){
-
+        player.sendMessage("WIP");
     }
 
     @Subcommand("leave")
     @Description("Attempts to leave a running game")
     public void onLeaveCommand(Player player){
-        plugin.getSpawnSetter().teleport(player);
+        player.sendMessage("WIP");
     }
 
     @Subcommand("spawn")
@@ -107,6 +107,7 @@ public class PracticeCommands extends BaseCommand {
                 plugin.getSpawnConfig().reload();
                 plugin.getMessagesConfig().reload();
                 plugin.getConfigManager().loadConfig();
+                plugin.getArenaConfig().reload();
                 sender.sendMessage(plugin.getConfigManager().MS_RELOAD_SUCCESS());
             } catch (IOException e) {
                 sender.sendMessage(Colorize.format( "&cThere has been an error reloading the plugin, check the console for details"));
@@ -123,19 +124,19 @@ public class PracticeCommands extends BaseCommand {
         @Subcommand("start")
         @Description("Forces the start of the countdown for the game")
         public void onStartCommand(Player player){
-
+            player.sendMessage("WIP");
         }
 
         @Subcommand("forcestart")
         @Description("Forces the start of a game, SKIPPING the countdown")
         public void onForceStartCommand(Player player){
-
+            player.sendMessage("WIP");
         }
 
         @Subcommand("cancel")
         @Description("Cancels the countdown of the game")
         public void onForceCancelComamnd(Player player){
-
+            player.sendMessage("WIP");
         }
 
 
@@ -146,16 +147,22 @@ public class PracticeCommands extends BaseCommand {
         @Subcommand("arena")
         public class ArenaCommands extends BaseCommand{
 
-
+            @Default
+            public void onDefault(Player player){
+            player.sendMessage(Colorize.format("&cUSAGE: /MPE ADMIN ARENA <CREATE|DELETE|LIST|EDIT>"));
+            }
             @Subcommand("list")
             @Description("Sets the lobby spawn")
             public void onListArenas(Player player){
                 if(gameManager.arenaManager().getArenas().isEmpty()){
                     player.sendMessage(Colorize.format("&cThere are no disponible arenas."));
+                }else{
+                    player.sendMessage(Colorize.format("&aThe disponible arenas are:"));
+                    for(Arena arena : gameManager.arenaManager().getArenas()){
+                        player.sendMessage(Colorize.format("&a - " + arena.name()));
+                    }
                 }
-                for(Arena arena : gameManager.arenaManager().getArenas()){
-                    player.sendMessage(Colorize.format("&a" + arena.name()));
-                }
+                
             }
 
             @Subcommand("create")
@@ -170,12 +177,14 @@ public class PracticeCommands extends BaseCommand {
             @Description("Attempts to edit an arena")
             public void onArenaEdit(Player player, String[] args){
                 player.sendMessage("Editing" + Arrays.toString(args));
+                player.sendMessage("WIP");
             }
 
             @Subcommand("delete")
             @Description("Attempts to delete an arena")
             public void onArenaDelete(Player player, String[] args){
                 player.sendMessage("Editing" + Arrays.toString(args));
+                player.sendMessage("WIP");
             }
         }
     }

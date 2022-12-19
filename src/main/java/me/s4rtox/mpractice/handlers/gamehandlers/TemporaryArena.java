@@ -18,6 +18,7 @@ public class TemporaryArena {
     private List<Location> spawnLocations = new ArrayList<>();
     private List<Location> islandChests = new ArrayList<>();
     private List<Location> middleChests = new ArrayList<>();
+
     public TemporaryArena(){
 
     }
@@ -69,6 +70,6 @@ public class TemporaryArena {
 
 
     public Arena toArena(){
-        return new Arena(name,displayName,centerLocation,corner1Location,corner2Location,spectatorSpawnLocation,spawnLocations,islandChests,middleChests);
+        return new Arena(this.name,this.displayName,this.centerLocation,this.corner1Location,this.corner2Location,this.spectatorSpawnLocation,this.spawnLocations,this.islandChests,this.middleChests);
     }
 }

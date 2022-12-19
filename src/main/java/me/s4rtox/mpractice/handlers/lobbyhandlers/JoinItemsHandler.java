@@ -48,7 +48,7 @@ public class JoinItemsHandler implements Listener {
                 && item.getType() != Material.AIR
                 && player.getGameMode() != GameMode.CREATIVE
                 && (nbtItem = new NBTItem(item)).hasCustomNbtData()
-                && nbtItem.hasKey("LobbyItem")
+                && nbtItem.hasTag("LobbyItem")
                 && nbtItem.getBoolean("LobbyItem");
         if (flag) {
             event.setCancelled(true);
@@ -65,7 +65,7 @@ public class JoinItemsHandler implements Listener {
                 && event.getItemDrop().getItemStack() != null
                 && event.getItemDrop().getItemStack().getType() != Material.AIR
                 && (nbtItem = new NBTItem(event.getItemDrop().getItemStack())).hasCustomNbtData()
-                && nbtItem.hasKey("LobbyItem")
+                && nbtItem.hasTag("LobbyItem")
                 && nbtItem.getBoolean("LobbyItem");
         if (flag) {
             event.setCancelled(true);

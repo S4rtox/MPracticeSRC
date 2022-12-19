@@ -2,7 +2,7 @@
 # Do not touch this setting
 file-version: 1
 ##################################
-Plugin-Prefix: '&7[&aSHUB&7] '
+Plugin-Prefix: '&7[&aMPE&7] '
 Plugin-Reload-Success: '&aSuccesfully reloaded the plugin'
 No-Permission-Error: '&cYou dont have the required permission to execute this command!'
 Console-Command-Executor-Error: '&cOnly players can execute this command'

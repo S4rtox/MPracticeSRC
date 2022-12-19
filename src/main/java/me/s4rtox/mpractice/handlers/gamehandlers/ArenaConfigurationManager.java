@@ -6,6 +6,7 @@ import me.s4rtox.mpractice.MPractice;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -23,8 +24,7 @@ public class ArenaConfigurationManager {
       if(arenasConfig.isSection(arena.name())){
           arenasConfig.set(arena.name(), null);
       }
-
-      Section arenaSection = arenasConfig.getSection(arena.name());
+      Section arenaSection = arenasConfig.createSection(arena.name());
       arenaSection.set("DisplayName", arena.displayName());
       arenaSection.set("World", arena.centerLocation().getWorld().getName());
       arenaSection.set("ArenaCenter", getLocationString(arena.centerLocation(), false));
@@ -49,6 +49,11 @@ public class ArenaConfigurationManager {
           middleChests.add(getLocationString(chest, false));
       }
       arenaSection.set("MiddleChests", middleChests);
+      try {
+        arenasConfig.save();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
     public List<Arena> loadArenas(){
         List<Arena> arenas = new ArrayList<>();
