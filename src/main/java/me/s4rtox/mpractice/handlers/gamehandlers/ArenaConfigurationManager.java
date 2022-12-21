@@ -3,6 +3,7 @@ package me.s4rtox.mpractice.handlers.gamehandlers;
 import dev.dejvokep.boostedyaml.YamlDocument;
 import dev.dejvokep.boostedyaml.block.implementation.Section;
 import me.s4rtox.mpractice.MPractice;
+import me.s4rtox.mpractice.handlers.gamehandlers.arena.Arena;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 

@@ -17,6 +17,7 @@ public class GameManager {
         this.arenaManager = new ArenaManager(configManager.loadArenas());
         this.setupWizardManager = new SetupWizardManager(this);
 
+
         plugin.getServer().getPluginManager().registerEvents(setupWizardManager,plugin);
     }
 

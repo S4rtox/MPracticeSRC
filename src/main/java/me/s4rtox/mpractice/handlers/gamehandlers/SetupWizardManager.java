@@ -1,6 +1,8 @@
 package me.s4rtox.mpractice.handlers.gamehandlers;
 
 import de.tr7zw.changeme.nbtapi.NBTItem;
+import me.s4rtox.mpractice.handlers.gamehandlers.arena.Arena;
+import me.s4rtox.mpractice.handlers.gamehandlers.arena.TemporaryArena;
 import me.s4rtox.mpractice.util.Colorize;
 import me.s4rtox.mpractice.util.ItemBuilder;
 import net.wesjd.anvilgui.AnvilGUI;
@@ -33,34 +35,41 @@ public class SetupWizardManager implements Listener {
 
     public void startWizard(Player player, Arena arena){
         TemporaryArena temporaryArena;
+        boolean teleportPlayer = false;
         if(arena == null){
             temporaryArena = new TemporaryArena();
         }else{
             temporaryArena = new TemporaryArena(arena);
+            teleportPlayer = true;
         }
         inWizard.put(player.getUniqueId(), temporaryArena);
+        PlayerRollbackManager.save(player);
         player.setGameMode(GameMode.CREATIVE);
         player.getInventory().clear();
+        if(teleportPlayer){
+            player.teleport(temporaryArena.centerLocation().add(0,1,0));
+        }
+        setWizardItems(player);
+    }
 
+    private void setWizardItems(Player player){
         Inventory inventory = player.getInventory();
 
-        inventory.addItem(ItemBuilder.getSpecialItem(new ItemStack(Material.SIGN), "&5Set Name/DisplayName &7{Left Click | Right Click}", true, "SetArenaName", "Right click to set name"));
-        inventory.addItem(ItemBuilder.getSpecialItem(new ItemStack(Material.ANVIL), "&2Set ArenaCenter &7{Right Click}", true, "SetArenaCenter", "Right click to set spawn"));
-        inventory.addItem(ItemBuilder.getSpecialItem(new ItemStack(Material.DIAMOND_AXE), "&6Set ArenaCorners &7{Left Click | Right Click}", true, "SetArenaCorner", "Right click to set spawn"));
-        inventory.addItem(ItemBuilder.getSpecialItem(new ItemStack(Material.SKULL_ITEM), "&bSet SpectatorSpawns &7{Right Click}", true, "SetSpectatorSpawn", "Right click to set spawn"));
-        inventory.addItem(ItemBuilder.getSpecialItem(new ItemStack(Material.ARROW), "&4Set Spawns &7{Left Click | Right Click}", true, "SetArenaSpawns", "Right click to set spawn"));
-        inventory.addItem(ItemBuilder.getSpecialItem(new ItemStack(Material.STICK), "&eSet IslandChests &7{Left Click | Right Click}", true, "SetIslandChests", "Right click to set spawn"));
-        inventory.addItem(ItemBuilder.getSpecialItem(new ItemStack(Material.BLAZE_ROD), "&eSet MiddleChests &7{Left Click | Right Click}", true, "SetMiddleChests", "Right click to set spawn"));
-        inventory.addItem(ItemBuilder.getSpecialItem(new ItemStack(Material.EMERALD_BLOCK), "&aSave Arena &7{Right Click}", true, "SaveArena", "Right click to save arena"));
-        inventory.addItem(ItemBuilder.getSpecialItem(new ItemStack(Material.BARRIER), "&cCancel &7{Right Click}", true, "CancelArena", "Right click to set cancel the setup"));
-        
+        inventory.addItem(ItemBuilder.getSpecialItem(new ItemStack(Material.SIGN), "&5Set Name/DisplayName &7{Left Click | Right Click}", true, "SetArenaName", "&7Left click to set name", "&7Right Click to set displayname"));
+        inventory.addItem(ItemBuilder.getSpecialItem(new ItemStack(Material.ANVIL), "&2Set ArenaCenter &7{Right Click}", true, "SetArenaCenter", "&7Right click to set the arena center"));
+        inventory.addItem(ItemBuilder.getSpecialItem(new ItemStack(Material.DIAMOND_AXE), "&6Set ArenaCorners &7{Left Click | Right Click}", true, "SetArenaCorner", "&7Left click to set corner 1", "&7Right Click to set corner 2"));
+        inventory.addItem(ItemBuilder.getSpecialItem(new ItemStack(Material.SKULL_ITEM), "&bSet SpectatorSpawns &7{Right Click}", true, "SetSpectatorSpawn", "&7Right click to set the spectator spawn"));
+        inventory.addItem(ItemBuilder.getSpecialItem(new ItemStack(Material.ARROW), "&4Set Spawns &7{Left Click | Right Click}", true, "SetArenaSpawns", "&7Right click to &aADD &7 a spawn", "&7Left click to &cREMOVE &7 a spawn"));
+        inventory.addItem(ItemBuilder.getSpecialItem(new ItemStack(Material.STICK), "&eSet IslandChests &7{Left Click | Right Click}", true, "SetIslandChests", "&7Right click to &aADD &7 a island chest", "&7Left click to &cREMOVE &7 a island chest"));
+        inventory.addItem(ItemBuilder.getSpecialItem(new ItemStack(Material.BLAZE_ROD), "&eSet MiddleChests &7{Left Click | Right Click}", true, "SetMiddleChests", "&7Right click to &aADD &7 a middle chest", "&7Left click to &cREMOVE &7 a middle chest"));
+        inventory.addItem(ItemBuilder.getSpecialItem(new ItemStack(Material.EMERALD_BLOCK), "&aSave Arena &7{Right Click}", true, "SaveArena", "&7Right click to &asave arena"));
+        inventory.addItem(ItemBuilder.getSpecialItem(new ItemStack(Material.BARRIER), "&cCancel &7{Right Click}", true, "CancelArena", "&7Right click to &ccancel the setup"));
+
     }
 
     public void stopWizard(Player player){
         inWizard.remove(player.getUniqueId());
-        player.setGameMode(GameMode.CREATIVE);
-        player.getInventory().clear();
-
+        PlayerRollbackManager.restore(player);
     }
 
     public boolean inWizard(Player player){
@@ -93,8 +102,8 @@ public class SetupWizardManager implements Listener {
 
     @EventHandler(priority = EventPriority.MONITOR)
     public void whileSetupModeDeath(PlayerDeathEvent event){
-        if(inWizard((Player)event.getEntity())){
-            Player player = (Player) event.getEntity();
+        if(inWizard(event.getEntity())){
+            Player player = event.getEntity();
             stopWizard(player);
             player.sendMessage(Colorize.format("&cYou've died while in setup mode!, forcefully cancelled operation"));
         }
@@ -227,7 +236,6 @@ public class SetupWizardManager implements Listener {
                 player.sendMessage(Colorize.format("&a&lArena succesfully created!"));
                 stopWizard(player);
             }else if (itemFlag.getBoolean("CancelArena")){
-                 
                 stopWizard(player);
             }
             //else if the action is any of the left clicks.
@@ -242,8 +250,8 @@ public class SetupWizardManager implements Listener {
                  
              new AnvilGUI.Builder()
                         .plugin(gameManager.plugin())
-                        .title("Enter the arena name")
                         .itemLeft(new ItemStack(Material.PAPER))
+                        .title("Enter the arena name")
                         .onComplete((player1, text) -> {
                             if(gameManager.arenaManager().getArenas().stream().anyMatch(allArenas -> allArenas.name().equalsIgnoreCase(text))){
                                 player.sendMessage(Colorize.format("&cAn arena with that name already exists!"));

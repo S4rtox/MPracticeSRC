@@ -1,6 +1,10 @@
 package me.s4rtox.mpractice.handlers.gamehandlers;
 
+import me.s4rtox.mpractice.handlers.gamehandlers.arena.Arena;
+import org.bukkit.entity.Player;
+
 import java.util.List;
+import java.util.Optional;
 
 public class ArenaManager {
 
@@ -17,8 +21,16 @@ public class ArenaManager {
         this.arenalist.add(arena);
     }
 
-    public void removeArena(Arena arena){
+    public void deleteArena(Arena arena){
         this.arenalist.remove(arena);
+    }
+
+    public Optional<Arena> findArena(String name){
+        return arenalist.stream().filter(arena -> arena.name().equals(name)).findAny();
+    }
+
+    public Optional<Arena> findPlayerArena(Player player){
+        return arenalist.stream().filter(arena -> arena.isPlaying(player)).findAny();
     }
 
 }

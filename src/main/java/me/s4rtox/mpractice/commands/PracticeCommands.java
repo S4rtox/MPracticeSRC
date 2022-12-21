@@ -4,7 +4,8 @@ import co.aikar.commands.BaseCommand;
 import co.aikar.commands.annotation.*;
 import me.s4rtox.mpractice.MPractice;
 import me.s4rtox.mpractice.config.ConfigManager;
-import me.s4rtox.mpractice.handlers.gamehandlers.Arena;
+import me.s4rtox.mpractice.handlers.gamehandlers.arena.Arena;
+import me.s4rtox.mpractice.handlers.gamehandlers.ArenaManager;
 import me.s4rtox.mpractice.handlers.gamehandlers.GameManager;
 import me.s4rtox.mpractice.handlers.lobbyhandlers.BuildModeHandler;
 import me.s4rtox.mpractice.util.Colorize;
@@ -13,6 +14,7 @@ import org.bukkit.entity.Player;
 
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Optional;
 
 @SuppressWarnings("unused")
 @CommandAlias("mpe|mpractice")
@@ -23,12 +25,14 @@ public class PracticeCommands extends BaseCommand {
     private final BuildModeHandler buildModeHandler;
 
     private final GameManager gameManager;
+    private final ArenaManager arenaManager;
 
     public PracticeCommands(MPractice plugin){
         this.plugin = plugin;
         this.config = plugin.getConfigManager();
         this.buildModeHandler = plugin.getBuildModeHandler();
         this.gameManager = plugin.getGameManager();
+        this.arenaManager = gameManager.arenaManager();
     }
 
     /////////////////////////////////////////////////////////////////
@@ -43,9 +47,9 @@ public class PracticeCommands extends BaseCommand {
             sender.sendMessage(Colorize.format("             &aMade by &eS4rtox"));
             sender.sendMessage(Colorize.format("&e---------------------------------------------"));
             sender.sendMessage("");
-            sender.sendMessage(Colorize.format("&cUSAGE: /MPE <JOIN|LEAVE|SPAWN|BUILD|SPECTATE|ADMIN>"));
+            sender.sendMessage(Colorize.format("&cUSAGE: /MPE <Join|Leave|Spectate|Spawn|Build|Admin>"));
         }else{
-            sender.sendMessage(Colorize.format("&cUSAGE: /MPE <JOIN|LEAVE|SPAWN|SPECTATE>"));
+            sender.sendMessage(Colorize.format("&cUSAGE: /MPE <Join|Leave|Spawn|Spectate>"));
         }
 
     }
@@ -57,14 +61,42 @@ public class PracticeCommands extends BaseCommand {
 
     @Subcommand("join")
     @Description("Attempts to join a game")
-    public void onJoinCommand(Player player){
-        player.sendMessage("WIP");
+    public void onJoinCommand(Player player, String[] args){
+        if(arenaManager.getArenas().size() == 0){
+            player.sendMessage(Colorize.format("&cThere are no arenas available"));
+            return;
+        }
+
+        Optional<Arena> currentArena = arenaManager.findPlayerArena(player);
+        if(currentArena.isPresent()){
+            player.sendMessage(Colorize.format("&cYou're already in a game!"));
+            return;
+        }
+
+        if(arenaManager.getArenas().size() == 1){
+            Arena arena = arenaManager.getArenas().get(0);
+            arena.addPlayer(player);
+            return;
+        }
+
+        Optional<Arena> optionalArena = arenaManager.findArena(args[0]);
+        if(!optionalArena.isPresent()){
+            player.sendMessage(Colorize.format("&cThat arena doesn't exist"));
+            return;
+        }
+
+        optionalArena.get().addPlayer(player);
     }
 
     @Subcommand("leave")
     @Description("Attempts to leave a running game")
     public void onLeaveCommand(Player player){
-        player.sendMessage("WIP");
+        Optional<Arena> currentArena = arenaManager.findPlayerArena(player);
+        if(!currentArena.isPresent()){
+            player.sendMessage(Colorize.format("&cYou're not in a game!"));
+            return;
+        }
+        currentArena.get().removePlayer(player);
     }
 
     @Subcommand("spawn")
@@ -96,7 +128,7 @@ public class PracticeCommands extends BaseCommand {
     public class AdminCommands extends BaseCommand{
         @Default
         public void onDefault(Player player){
-            player.sendMessage(Colorize.format("&cUSAGE: /MPE ADMIN <START|FORCESTART|CANCEL|ARENA|RELOAD|SETSPAWN>"));
+            player.sendMessage(Colorize.format("&cUSAGE: /mpe admin <Start|Forcestart|Cancel|Arena|Reload|Setspawn>"));
         }
 
         @Subcommand("reload")
@@ -149,7 +181,7 @@ public class PracticeCommands extends BaseCommand {
 
             @Default
             public void onDefault(Player player){
-            player.sendMessage(Colorize.format("&cUSAGE: /MPE ADMIN ARENA <CREATE|DELETE|LIST|EDIT>"));
+            player.sendMessage(Colorize.format("&cUSAGE: /mpe admin arena <Create|Delete|List|Edit>"));
             }
             @Subcommand("list")
             @Description("Sets the lobby spawn")
@@ -176,15 +208,29 @@ public class PracticeCommands extends BaseCommand {
             @Subcommand("edit")
             @Description("Attempts to edit an arena")
             public void onArenaEdit(Player player, String[] args){
-                player.sendMessage("Editing" + Arrays.toString(args));
-                player.sendMessage("WIP");
+                String arenaInput = args[0];
+                Optional<Arena> optionalArena = gameManager.arenaManager().findArena(arenaInput);
+                if(!optionalArena.isPresent()){
+                    player.sendMessage(Colorize.format("&4No arenas with that name were found"));
+                }else{
+                    //TODO: Restore and tp in case of an edit.
+                    player.teleport(optionalArena.get().centerLocation());
+                    gameManager.setupWizardManager().startWizard(player,optionalArena.get());
+                }
             }
 
             @Subcommand("delete")
             @Description("Attempts to delete an arena")
             public void onArenaDelete(Player player, String[] args){
                 player.sendMessage("Editing" + Arrays.toString(args));
-                player.sendMessage("WIP");
+                String arenaInput = args[0];
+                Optional<Arena> optionalArena = gameManager.arenaManager().findArena(arenaInput);
+                if(!optionalArena.isPresent()){
+                    player.sendMessage(Colorize.format("&4No arenas with that name were found"));
+                }else{
+                    gameManager.arenaManager().deleteArena(optionalArena.get());
+                    gameManager.configManager().deleteArena(optionalArena.get());
+                }
             }
         }
     }

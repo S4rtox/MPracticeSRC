@@ -1,4 +1,4 @@
-package me.s4rtox.mpractice.handlers.gamehandlers;
+package me.s4rtox.mpractice.handlers.gamehandlers.arena;
 
 import lombok.Data;
 import org.bukkit.Location;
