@@ -7,23 +7,23 @@ public class DelayedTask {
     private static Plugin plugin = null;
     private int id = -1;
 
-    public DelayedTask(Plugin instance){
+    public DelayedTask(Plugin instance) {
         plugin = instance;
     }
 
-    public DelayedTask(Runnable runnable){
+    public DelayedTask(Runnable runnable) {
         this(runnable, 0);
     }
 
-    public DelayedTask(Runnable runnable, long delay){
-        if(plugin.isEnabled()){
-            id = Bukkit.getScheduler().scheduleSyncDelayedTask(plugin,runnable,delay);
-        }else{
+    public DelayedTask(Runnable runnable, long delay) {
+        if (plugin.isEnabled()) {
+            id = Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, runnable, delay);
+        } else {
             runnable.run();
         }
     }
 
-    public int getId(){
+    public int getId() {
         return id;
     }
 }

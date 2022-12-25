@@ -10,15 +10,15 @@ public class GameManager {
     private final ArenaConfigurationManager configManager;
     private final SetupWizardManager setupWizardManager;
 
-    public GameManager(MPractice plugin){
+    public GameManager(MPractice plugin) {
         this.plugin = plugin;
 
-        this.configManager = new ArenaConfigurationManager(plugin);
+        this.configManager = new ArenaConfigurationManager(this);
         this.arenaManager = new ArenaManager(configManager.loadArenas());
         this.setupWizardManager = new SetupWizardManager(this);
 
 
-        plugin.getServer().getPluginManager().registerEvents(setupWizardManager,plugin);
+        plugin.getServer().getPluginManager().registerEvents(setupWizardManager, plugin);
     }
 
 }

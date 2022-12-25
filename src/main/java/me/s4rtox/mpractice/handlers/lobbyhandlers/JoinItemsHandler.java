@@ -26,7 +26,7 @@ public class JoinItemsHandler implements Listener {
 
     private final ConfigManager config;
 
-    public JoinItemsHandler(MPractice plugin){
+    public JoinItemsHandler(MPractice plugin) {
         Bukkit.getPluginManager().registerEvents(this, plugin);
         config = plugin.getConfigManager();
     }
@@ -35,16 +35,18 @@ public class JoinItemsHandler implements Listener {
     @EventHandler
     public void onInventoryClick(InventoryClickEvent event) {
         if (!tryCancelMoveEvent(event, event.getCurrentItem())) {
-            if(event.getHotbarButton() == -1) return;
+            if (event.getHotbarButton() == -1) return;
             tryCancelMoveEvent(event, event.getClickedInventory().getItem(event.getHotbarButton()));
         }
     }
+
     private boolean tryCancelMoveEvent(InventoryClickEvent event, ItemStack item) {
         //Tries to check most items moves on the inventory (of the custom items)
         HumanEntity player;
         NBTItem nbtItem;
         boolean flag = (player = event.getWhoClicked()) instanceof Player
                 && item != null
+                && item.getAmount() != 0
                 && item.getType() != Material.AIR
                 && player.getGameMode() != GameMode.CREATIVE
                 && (nbtItem = new NBTItem(item)).hasCustomNbtData()
@@ -57,13 +59,15 @@ public class JoinItemsHandler implements Listener {
     }
 
     @EventHandler
-    public void onPlayerDrop(PlayerDropItemEvent event){
+    public void onPlayerDrop(PlayerDropItemEvent event) {
         //Blocks Dropping Custom Items
         Player human = event.getPlayer();
         NBTItem nbtItem;
+        ItemStack item = event.getItemDrop().getItemStack();
         boolean flag = human.getGameMode() != GameMode.CREATIVE
-                && event.getItemDrop().getItemStack() != null
-                && event.getItemDrop().getItemStack().getType() != Material.AIR
+                && item != null
+                && item.getType() != Material.AIR
+                && item.getAmount() != 0
                 && (nbtItem = new NBTItem(event.getItemDrop().getItemStack())).hasCustomNbtData()
                 && nbtItem.hasTag("LobbyItem")
                 && nbtItem.getBoolean("LobbyItem");
@@ -92,32 +96,31 @@ public class JoinItemsHandler implements Listener {
     // --------------- END ANTI MOVE CUSTOM ITEMS INVENTORY  ---------------
 
 
-
     // --------------- JOIN/RESPAWN CUSTOM ITEM GIVER  ---------------
     @EventHandler(priority = EventPriority.LOW)
-    public void joinWorld(PlayerChangedWorldEvent event){
-        if(!config.C_LOBBYWORLD_ENABLEDWORLDS().contains(event.getPlayer().getWorld().getName())) return;
+    public void joinWorld(PlayerChangedWorldEvent event) {
+        if (!config.C_LOBBYWORLD_ENABLEDWORLDS().contains(event.getPlayer().getWorld().getName())) return;
         event.getPlayer().getInventory().clear();
         giveJoinItems(event.getPlayer().getInventory());
     }
 
     @EventHandler(priority = EventPriority.LOW)
-    public void joinInvItems(PlayerJoinEvent event){
-        if(!config.C_LOBBYWORLD_ENABLEDWORLDS().contains(event.getPlayer().getWorld().getName())) return;
+    public void joinInvItems(PlayerJoinEvent event) {
+        if (!config.C_LOBBYWORLD_ENABLEDWORLDS().contains(event.getPlayer().getWorld().getName())) return;
         event.getPlayer().getInventory().clear();
         giveJoinItems(event.getPlayer().getInventory());
 
     }
 
-    private void giveJoinItems(Inventory inv){
+    private void giveJoinItems(Inventory inv) {
         // EnderButt Enabled
-            List<String> lore = Collections.singletonList("1");
-            NBTItem enderButt = new NBTItem(ItemBuilder.getItem(new ItemStack(Material.ENDER_PEARL), "Test" ,true, lore));
-            enderButt.setBoolean("LobbyItem", true);
-            enderButt.setBoolean("EnderButt", true);
-            inv.setItem(1,enderButt.getItem());
+        List<String> lore = Collections.singletonList("1");
+        NBTItem enderButt = new NBTItem(ItemBuilder.getItem(new ItemStack(Material.ENDER_PEARL), "Test", true, lore));
+        enderButt.setBoolean("LobbyItem", true);
+        enderButt.setBoolean("EnderButt", true);
+        inv.setItem(1, enderButt.getItem());
     }
 
 }
-    // --------------- END JOIN/RESPAWN CUSTOM ITEM GIVER  ---------------
+// --------------- END JOIN/RESPAWN CUSTOM ITEM GIVER  ---------------
 

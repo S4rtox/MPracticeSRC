@@ -44,11 +44,11 @@ public class LobbyHandler implements Listener {
     }
 
     @EventHandler
-    public void disableFallDamage(EntityDamageEvent event){
+    public void disableFallDamage(EntityDamageEvent event) {
         if (!config.C_LOBBYWORLD_ENABLEDWORLDS().contains(event.getEntity().getWorld().getName())) return;
         if (!config.C_LOBBYWORLD_DISABLE_FALLDAMAGE()) return;
-        if(!(event.getEntity() instanceof Player)) return;
-        if(event.getCause() == EntityDamageEvent.DamageCause.FALL){
+        if (!(event.getEntity() instanceof Player)) return;
+        if (event.getCause() == EntityDamageEvent.DamageCause.FALL) {
             event.setCancelled(true);
         }
     }

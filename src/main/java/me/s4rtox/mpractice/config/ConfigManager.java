@@ -73,14 +73,14 @@ public class ConfigManager {
     private String P_ADMIN_BUILDMODE;
     /* End of Permissions */
 
-    public ConfigManager(MPractice plugin){
+    public ConfigManager(MPractice plugin) {
         this.config = plugin.getDefaultConfig();
         this.messages = plugin.getMessagesConfig();
         loadConfig();
 
     }
 
-    public void loadConfig(){
+    public void loadConfig() {
         /* Sets up the messages */
         MS_PREFIX = messages.getString("Plugin-Prefix", "");
 
@@ -100,13 +100,13 @@ public class ConfigManager {
         P_ADMIN_RELOAD = "shc.admin.reload";
         P_ADMIN_SPAWN_SET = "shc.admin.spawn.set";
         /* End of Permissions */
-        
+
         /* Sets up the config */
         C_LOBBYWORLD_ENABLEDWORLDS = config.getStringList("LobbyWorlds", Collections.singletonList(" "));
         C_LOBBYWORLD_DISABLE_RAIN = config.getBoolean("LobbyRules.DisableRain", false);
         C_LOBBYWORLD_DISABLE_DAYLIGHTCYCLE = config.getBoolean("LobbyRules.DisableDaylightCycle", false);
         C_LOBBYWORLD_DISABLE_PVP = config.getBoolean("LobbyRules.DisablePvP", false);
-        C_LOBBYWORLD_DISABLE_HUNGER = config.getBoolean("LobbyRules.DisableHunger",false);
+        C_LOBBYWORLD_DISABLE_HUNGER = config.getBoolean("LobbyRules.DisableHunger", false);
         C_LOBBYWORLD_DISABLE_MOBSPAWNING = config.getBoolean("LobbyRules.DisableMobSpawning", false);
         C_LOBBYWORLD_DISABLE_MOBGRIEFING = config.getBoolean("LobbyRules.DisableMobGriefing", false);
         C_LOBBYWORLD_DISABLE_FIRE = config.getBoolean("LobbyRules.DisableFireSpread", false);
@@ -116,7 +116,7 @@ public class ConfigManager {
         C_LOBBYWORLD_BUILDMODE_INTERACTIONS = config.getBoolean("LobbyRules.BuildMode.Interactions-Disabled", false);
     }
 
-    public String getMessage(String path){
-        return Colorize.format(MS_PREFIX + messages.getString(path,""));
+    public String getMessage(String path) {
+        return Colorize.format(MS_PREFIX + messages.getString(path, ""));
     }
 }

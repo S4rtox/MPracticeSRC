@@ -36,7 +36,7 @@
                 <artifactId>maven-shade-plugin</artifactId>
                 <version>3.3.0</version>
                 <configuration>
-                    <outputFile>C:\Users\Ultim\OneDrive\Escritorio\TestServer\Main Server\plugins\MPE.jar</outputFile>
+                    <outputFile>C:\Users\juand\OneDrive\Escritorio\TestServer\plugins\MPE.jar</outputFile>
                     <dependencyReducedPomLocation>${project.build.directory}/dependency-reduced-pom.xml</dependencyReducedPomLocation>
                     <relocations>
                         <relocation>
@@ -142,7 +142,7 @@
         <dependency>
             <groupId>net.kyori</groupId>
             <artifactId>adventure-platform-bukkit</artifactId>
-            <version>4.1.2</version>
+            <version>4.2.0</version>
         </dependency>
         <dependency>
             <groupId>dev.dejvokep</groupId>

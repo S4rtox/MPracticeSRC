@@ -27,32 +27,36 @@ import java.util.UUID;
 
 public class SetupWizardManager implements Listener {
     private final GameManager gameManager;
-    public Map<UUID, TemporaryArena> inWizard = new HashMap<>();
+    private final Map<UUID, TemporaryArena> inWizard = new HashMap<>();
 
-   public SetupWizardManager(GameManager gameManager){
-       this.gameManager = gameManager;
-   }
+    public SetupWizardManager(GameManager gameManager) {
+        this.gameManager = gameManager;
+    }
 
-    public void startWizard(Player player, Arena arena){
+    public void startWizard(Player player, Arena arena) {
+        if (gameManager.arenaManager().findPlayerArena(player).isPresent()) {
+            player.sendMessage(Colorize.format("&4You cant start the arena setup ingame!"));
+            return;
+        }
         TemporaryArena temporaryArena;
-        boolean teleportPlayer = false;
-        if(arena == null){
-            temporaryArena = new TemporaryArena();
-        }else{
-            temporaryArena = new TemporaryArena(arena);
-            teleportPlayer = true;
+        boolean existingArena = false;
+        if (arena == null) {
+            temporaryArena = new TemporaryArena(gameManager);
+        } else {
+            temporaryArena = new TemporaryArena(gameManager, arena);
+            existingArena = true;
         }
         inWizard.put(player.getUniqueId(), temporaryArena);
         PlayerRollbackManager.save(player);
         player.setGameMode(GameMode.CREATIVE);
         player.getInventory().clear();
-        if(teleportPlayer){
-            player.teleport(temporaryArena.centerLocation().add(0,1,0));
+        if (existingArena) {
+            player.teleport(temporaryArena.centerLocation().add(0, 1, 0));
         }
         setWizardItems(player);
     }
 
-    private void setWizardItems(Player player){
+    private void setWizardItems(Player player) {
         Inventory inventory = player.getInventory();
 
         inventory.addItem(ItemBuilder.getSpecialItem(new ItemStack(Material.SIGN), "&5Set Name/DisplayName &7{Left Click | Right Click}", true, "SetArenaName", "&7Left click to set name", "&7Right Click to set displayname"));
@@ -67,42 +71,42 @@ public class SetupWizardManager implements Listener {
 
     }
 
-    public void stopWizard(Player player){
+    public void stopWizard(Player player) {
         inWizard.remove(player.getUniqueId());
-        PlayerRollbackManager.restore(player);
+        PlayerRollbackManager.restore(player, false);
     }
 
-    public boolean inWizard(Player player){
+    public boolean inWizard(Player player) {
         return inWizard.containsKey(player.getUniqueId());
     }
 
     @EventHandler
-    public void onSetupModeInteract(PlayerInteractEvent event){
-        if(inWizard(event.getPlayer())){
+    public void onSetupModeInteract(PlayerInteractEvent event) {
+        if (inWizard(event.getPlayer())) {
             event.setCancelled(true);
         }
     }
 
     @EventHandler
-    public void onSetupModeDrop(PlayerDropItemEvent event){
-        if(inWizard(event.getPlayer())){
+    public void onSetupModeDrop(PlayerDropItemEvent event) {
+        if (inWizard(event.getPlayer())) {
             event.setCancelled(true);
         }
     }
 
     @EventHandler
-    public void onSetupModeInventoryInteract(InventoryCreativeEvent event){
-        if(inWizard((Player)event.getWhoClicked())){
+    public void onSetupModeInventoryInteract(InventoryCreativeEvent event) {
+        if (inWizard((Player) event.getWhoClicked())) {
             event.setCancelled(true);
             Player player = (Player) event.getWhoClicked();
             player.updateInventory();
         }
     }
-    
+
 
     @EventHandler(priority = EventPriority.MONITOR)
-    public void whileSetupModeDeath(PlayerDeathEvent event){
-        if(inWizard(event.getEntity())){
+    public void whileSetupModeDeath(PlayerDeathEvent event) {
+        if (inWizard(event.getEntity())) {
             Player player = event.getEntity();
             stopWizard(player);
             player.sendMessage(Colorize.format("&cYou've died while in setup mode!, forcefully cancelled operation"));
@@ -110,8 +114,8 @@ public class SetupWizardManager implements Listener {
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
-    public void whileSetupChangeWorld(PlayerChangedWorldEvent event){
-        if(inWizard(event.getPlayer())){
+    public void whileSetupChangeWorld(PlayerChangedWorldEvent event) {
+        if (inWizard(event.getPlayer())) {
             Player player = event.getPlayer();
             stopWizard(player);
             player.sendMessage(Colorize.format("&cYou've changed worlds while in setup mode!, forcefully cancelled operation"));
@@ -119,21 +123,20 @@ public class SetupWizardManager implements Listener {
     }
 
     @EventHandler
-    public void onSetupItemInteract(PlayerInteractEvent event){
+    public void onSetupItemInteract(PlayerInteractEvent event) {
         Player player = event.getPlayer();
-        if(!inWizard(player)) return;
-        if(!event.hasItem()) return;
-        if(!event.getItem().hasItemMeta()) return;
+        if (!inWizard(player)) return;
+        if (!event.hasItem()) return;
+        if (!event.getItem().hasItemMeta()) return;
 
         NBTItem itemFlag = new NBTItem(event.getItem());
 
         TemporaryArena arena = inWizard.get(player.getUniqueId());
 
 
-        if(event.getAction() == Action.RIGHT_CLICK_AIR || event.getAction() == Action.RIGHT_CLICK_BLOCK){
+        if (event.getAction() == Action.RIGHT_CLICK_AIR || event.getAction() == Action.RIGHT_CLICK_BLOCK) {
             // Arena displayname setter 
-            if (itemFlag.getBoolean("SetArenaName")){
-                 
+            if (itemFlag.getBoolean("SetArenaName")) {
                 new AnvilGUI.Builder()
                         .title("Enter the arena displayname")
                         .itemLeft(new ItemStack(Material.PAPER))
@@ -143,90 +146,92 @@ public class SetupWizardManager implements Listener {
                             player.sendMessage(Colorize.format("&aSet the arena display name to: &e" + arena.displayName()));
                             return AnvilGUI.Response.close();
                         }).open(player);
-            // Island Chest remover                   
-            }else if(itemFlag.getBoolean("SetArenaCenter")){
-                 
-                if(event.getAction() == Action.RIGHT_CLICK_BLOCK){
+                // Island Chest remover
+            } else if (itemFlag.getBoolean("SetArenaCenter")) {
+
+                if (event.getAction() == Action.RIGHT_CLICK_BLOCK) {
                     arena.centerLocation(event.getClickedBlock().getLocation());
-                }else{
+                } else {
                     arena.centerLocation(player.getLocation());
                 }
                 player.sendMessage(Colorize.format("&aSet the &ecenter &afor the arena"));
-            
-            // Arena Corner1 setter 
-            }else if(itemFlag.getBoolean("SetArenaCorner")){
-                 
-                if(event.getAction() == Action.RIGHT_CLICK_BLOCK){
+
+                // Arena Corner1 setter
+            } else if (itemFlag.getBoolean("SetArenaCorner")) {
+
+                if (event.getAction() == Action.RIGHT_CLICK_BLOCK) {
                     arena.corner1Location(event.getClickedBlock().getLocation());
-                }else{
+                } else {
                     arena.corner1Location(player.getLocation());
                 }
                 player.sendMessage(Colorize.format("&aSet the &ecorner1 &afor the arena"));
-            
-            // Arena Island Chests setters 
-            }else if(itemFlag.getBoolean("SetSpectatorSpawn")){
-                 
-                if(event.getAction() == Action.RIGHT_CLICK_BLOCK){
+
+                // Arena Island Chests setters
+            } else if (itemFlag.getBoolean("SetSpectatorSpawn")) {
+
+                if (event.getAction() == Action.RIGHT_CLICK_BLOCK) {
                     arena.spectatorSpawnLocation(event.getClickedBlock().getLocation());
-                }else{
+                } else {
                     arena.spectatorSpawnLocation(player.getLocation());
                 }
                 player.sendMessage(Colorize.format("&aSet the &espectator spawn &afor the arena"));
-            
-            // Arena Island Chests setters 
-            }else if(itemFlag.getBoolean("SetArenaSpawns")){
-                 
+
+                // Arena Island Chests setters
+            } else if (itemFlag.getBoolean("SetArenaSpawns")) {
+
                 arena.addSpawnLocation(player.getLocation());
                 player.sendMessage(Colorize.format("&aSet the &espawn &afor the player number: &6" + arena.spawnLocations().size()));
-            
-            // Arena Island Chests setters 
-            }else if(itemFlag.getBoolean("SetIslandChests")){
-                 
-                if(event.getAction() != Action.RIGHT_CLICK_BLOCK) return;
-                if((event.getClickedBlock().getType() != Material.CHEST && event.getClickedBlock().getType() != Material.TRAPPED_CHEST))  return;  
+
+                // Arena Island Chests setters
+            } else if (itemFlag.getBoolean("SetIslandChests")) {
+
+                if (event.getAction() != Action.RIGHT_CLICK_BLOCK) return;
+                if ((event.getClickedBlock().getType() != Material.CHEST && event.getClickedBlock().getType() != Material.TRAPPED_CHEST))
+                    return;
                 arena.addIslandChest(event.getClickedBlock().getLocation());
                 player.sendMessage(Colorize.format("&aAdded &eisland chest &anumber: &6" + arena.islandChests().size()));
 
-            // Arena Middle Chests Setter 
-            }else if(itemFlag.getBoolean("SetMiddleChests")){
-                 
-                if(event.getAction() != Action.RIGHT_CLICK_BLOCK) return;
-                if(event.getClickedBlock().getType() != Material.CHEST && event.getClickedBlock().getType() != Material.TRAPPED_CHEST)  return;  
+                // Arena Middle Chests Setter
+            } else if (itemFlag.getBoolean("SetMiddleChests")) {
+
+                if (event.getAction() != Action.RIGHT_CLICK_BLOCK) return;
+                if (event.getClickedBlock().getType() != Material.CHEST && event.getClickedBlock().getType() != Material.TRAPPED_CHEST)
+                    return;
                 arena.addMiddleChest(event.getClickedBlock().getLocation());
                 player.sendMessage(Colorize.format("&aAdded &emiddle chest &anumber: &6" + arena.middleChests().size()));
 
-            // Arena saver 
-            }else if (itemFlag.getBoolean("SaveArena")){
-                 
-                if(arena.name() == null || arena.name().isEmpty()){
+                // Arena saver
+            } else if (itemFlag.getBoolean("SaveArena")) {
+
+                if (arena.name() == null || arena.name().isEmpty()) {
                     player.sendMessage(Colorize.format("&cPlease set the name of the arena"));
                     return;
                 }
-                if(arena.displayName() == null || arena.displayName().isEmpty()){
+                if (arena.displayName() == null || arena.displayName().isEmpty()) {
                     player.sendMessage(Colorize.format("&cPlease set the displayname of the arena"));
                     return;
                 }
-                if(arena.centerLocation() == null){
+                if (arena.centerLocation() == null) {
                     player.sendMessage(Colorize.format("&cPlease set the center of the arena"));
                     return;
                 }
-                if(arena.corner1Location() == null || arena.corner2Location() == null){
+                if (arena.corner1Location() == null || arena.corner2Location() == null) {
                     player.sendMessage(Colorize.format("&cPlease set the corners of the arena"));
                     return;
                 }
-                if(arena.spectatorSpawnLocation() == null){
+                if (arena.spectatorSpawnLocation() == null) {
                     player.sendMessage(Colorize.format("&cPlease set the spectator spawn of the arena"));
                     return;
                 }
-                if(arena.spawnLocations().isEmpty() || arena.spawnLocations().size() < 2){
+                if (arena.spawnLocations().isEmpty() || arena.spawnLocations().size() < 2) {
                     player.sendMessage(Colorize.format("&cPlease set at least 2 player spawns on the arena"));
                     return;
                 }
-                if(arena.islandChests().isEmpty()){
+                if (arena.islandChests().isEmpty()) {
                     player.sendMessage(Colorize.format("&eThe current arena has no &6island chests&e, the arena will work but there wont be any island chests"));
                     player.sendMessage(Colorize.format("&eConsider editing the arena to add the chests, or just ignore this warning"));
                 }
-                if(arena.middleChests().isEmpty()){
+                if (arena.middleChests().isEmpty()) {
                     player.sendMessage(Colorize.format("&eThe current arena has no &6middle chests&e, the arena will work but there wont be any middle chests"));
                     player.sendMessage(Colorize.format("&eConsider editing the arena to add the chests, or just ignore this warning"));
                 }
@@ -235,25 +240,25 @@ public class SetupWizardManager implements Listener {
                 gameManager.configManager().saveArena(saved);
                 player.sendMessage(Colorize.format("&a&lArena succesfully created!"));
                 stopWizard(player);
-            }else if (itemFlag.getBoolean("CancelArena")){
+            } else if (itemFlag.getBoolean("CancelArena")) {
                 stopWizard(player);
             }
             //else if the action is any of the left clicks.
-        }else if(event.getAction() != Action.PHYSICAL){
+        } else if (event.getAction() != Action.PHYSICAL) {
             //  Removes the last Spawns/Chests if the item is left clicked instead of rightClicked
-            if(itemFlag.getBoolean("SetArenaSpawns")){
-                 
+            if (itemFlag.getBoolean("SetArenaSpawns")) {
+
                 arena.removeLastSpawnLocation();
                 player.sendMessage(Colorize.format("&cRemoved the &espawn &cfor the player number: &6" + (arena.spawnLocations().size() + 1)));
-            // displayname setter
-            }else if (itemFlag.getBoolean("SetArenaName")){
-                 
-             new AnvilGUI.Builder()
+                // displayname setter
+            } else if (itemFlag.getBoolean("SetArenaName")) {
+
+                new AnvilGUI.Builder()
                         .plugin(gameManager.plugin())
                         .itemLeft(new ItemStack(Material.PAPER))
                         .title("Enter the arena name")
                         .onComplete((player1, text) -> {
-                            if(gameManager.arenaManager().getArenas().stream().anyMatch(allArenas -> allArenas.name().equalsIgnoreCase(text))){
+                            if (gameManager.arenaManager().getArenas().stream().anyMatch(allArenas -> allArenas.name().equalsIgnoreCase(text))) {
                                 player.sendMessage(Colorize.format("&cAn arena with that name already exists!"));
                                 return AnvilGUI.Response.text("Invalid name");
                             }
@@ -261,26 +266,26 @@ public class SetupWizardManager implements Listener {
                             player.sendMessage(Colorize.format("&aSet the arena name to: &e") + arena.name());
                             return AnvilGUI.Response.close();
                         }).open(player);
-            // Arena centerLocation        
-            } else if(itemFlag.getBoolean("SetIslandChests")){
-                  
+                // Arena centerLocation
+            } else if (itemFlag.getBoolean("SetIslandChests")) {
+
                 arena.removeLastIslandChest();
-                player.sendMessage(Colorize.format("&cRemoved &eisland chest &cnumber: &6" + (arena.islandChests().size() + 1 )));
-            // Middle Chest Remover
-            }else if(itemFlag.getBoolean("SetMiddleChests")){
-                  
+                player.sendMessage(Colorize.format("&cRemoved &eisland chest &cnumber: &6" + (arena.islandChests().size() + 1)));
+                // Middle Chest Remover
+            } else if (itemFlag.getBoolean("SetMiddleChests")) {
+
                 arena.removeLastMiddleChest();
-                player.sendMessage(Colorize.format("&cRemoved &emiddle chest &cnumber: &6" + (arena.middleChests().size() + 1 )));
-            // Arena Corner2 Setter
-            }else if(itemFlag.getBoolean("SetArenaCorner")){
-                 
-                if(event.getAction() == Action.LEFT_CLICK_BLOCK){
+                player.sendMessage(Colorize.format("&cRemoved &emiddle chest &cnumber: &6" + (arena.middleChests().size() + 1)));
+                // Arena Corner2 Setter
+            } else if (itemFlag.getBoolean("SetArenaCorner")) {
+
+                if (event.getAction() == Action.LEFT_CLICK_BLOCK) {
                     arena.corner2Location(event.getClickedBlock().getLocation());
-                }else{
+                } else {
                     arena.corner2Location(player.getLocation());
                 }
                 player.sendMessage(Colorize.format("&aSet the &ecorner2 &afor the arena"));
-             
+
             }
         }
 

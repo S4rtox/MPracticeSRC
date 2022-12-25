@@ -19,10 +19,10 @@ public class SpawnSetter implements Listener {
     private final ConfigManager config;
     private final MPractice plugin;
 
-    public SpawnSetter(MPractice plugin){
+    public SpawnSetter(MPractice plugin) {
         this.plugin = plugin;
         config = plugin.getConfigManager();
-        Bukkit.getPluginManager().registerEvents(this,plugin);
+        Bukkit.getPluginManager().registerEvents(this, plugin);
         String worldName = plugin.getSpawnConfig().getString("world");
         double x = plugin.getSpawnConfig().getDouble("x");
         double y = plugin.getSpawnConfig().getDouble("y");
@@ -30,34 +30,35 @@ public class SpawnSetter implements Listener {
         float yaw = plugin.getSpawnConfig().getFloat("yaw");
         float pitch = plugin.getSpawnConfig().getFloat("pitch");
         //Checa si hay un valor en la config de el nombre de mundo
-        if(worldName != null){
+        if (worldName != null) {
             //Pone una variable de tipo world(Tiene todos los datos de el mundo, y utiliza el nombre del mundo para almacenarlo (El nombre lo saca de la config))
             World world = Bukkit.getWorld(worldName);
             //Checa si hay un mundo con el nombre de la config, si no tira lo de abajo.
-            if(world == null){
+            if (world == null) {
                 Bukkit.getLogger().log(Level.SEVERE, "The world \"" + worldName + "\" does not exist.");
                 return;
             }
 
-            spawn = new Location(world,x,y,z,yaw,pitch);
+            spawn = new Location(world, x, y, z, yaw, pitch);
 
         }
     }
 
     @EventHandler
-    public void onPlayerRespawn(PlayerRespawnEvent event){
-        if(spawn != null){
+    public void onPlayerRespawn(PlayerRespawnEvent event) {
+        if (spawn != null) {
             event.setRespawnLocation(spawn);
         }
     }
+
     @EventHandler
-    public void onPlayerJoin(PlayerJoinEvent event){
+    public void onPlayerJoin(PlayerJoinEvent event) {
         Player player = event.getPlayer();
         player.teleport(spawn);
     }
 
-    public void teleport(Player player){
-        if(spawn == null){
+    public void teleport(Player player) {
+        if (spawn == null) {
             player.sendMessage(config.MS_SPAWN_NOT_SET_YET());
             return;
         }
@@ -65,7 +66,7 @@ public class SpawnSetter implements Listener {
         player.teleport(spawn);
     }
 
-    public void set(Location Spawn){
+    public void set(Location Spawn) {
         this.spawn = Spawn;
 
         String worldName = spawn.getWorld().getName();

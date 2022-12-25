@@ -23,6 +23,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
 import java.io.IOException;
+
 public final class MPractice extends JavaPlugin {
 
     public final String version = "1.0.0";
@@ -39,7 +40,7 @@ public final class MPractice extends JavaPlugin {
     private GameManager gameManager;
 
     public @NonNull BukkitAudiences adventure() {
-        if(this.adventure == null) {
+        if (this.adventure == null) {
             throw new IllegalStateException("Tried to access Adventure when the plugin was disabled!");
         }
         return this.adventure;
@@ -59,10 +60,10 @@ public final class MPractice extends JavaPlugin {
 
         if (Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null) {
             PapiFormatter.setPapiStatus(true);
-            getLogger().info(Colorize.format( "&aPlaceholderAPI detected!, enabling PAPI placeholders."));
+            getLogger().info(Colorize.format("&aPlaceholderAPI detected!, enabling PAPI placeholders."));
         } else {
             PapiFormatter.setPapiStatus(false);
-            getLogger().warning(Colorize.format( "&ePlaceholderAPI not detected!, disabling PAPI placeholders."));
+            getLogger().warning(Colorize.format("&ePlaceholderAPI not detected!, disabling PAPI placeholders."));
         }
 
         commandManager = new PaperCommandManager(this);
@@ -81,19 +82,19 @@ public final class MPractice extends JavaPlugin {
     @Override
     public void onDisable() {
         // Plugin shutdown logic
-        if(this.adventure != null) {
+        if (this.adventure != null) {
             this.adventure.close();
             this.adventure = null;
         }
         this.getServer().getMessenger().unregisterOutgoingPluginChannel(this);
     }
 
-    public void utilSetup(){
+    public void utilSetup() {
         configManager = new ConfigManager(this);
         spawnSetter = new SpawnSetter(this);
     }
 
-    public void configSetup(){
+    public void configSetup() {
         try {
             config = YamlDocument.create(new File(getDataFolder(), "config.yml"), getResource("config.yml"), GeneralSettings.DEFAULT, LoaderSettings.builder().setAutoUpdate(true).build(), DumperSettings.DEFAULT, UpdaterSettings.builder().setVersioning(new BasicVersioning("file-version")).build());
             spawnConfig = YamlDocument.create(new File(getDataFolder(), "spawn.yml"), getResource("spawn.yml"), GeneralSettings.DEFAULT, LoaderSettings.builder().setAutoUpdate(true).build(), DumperSettings.DEFAULT, UpdaterSettings.builder().setVersioning(new BasicVersioning("file-version")).build());
@@ -104,29 +105,34 @@ public final class MPractice extends JavaPlugin {
         }
     }
 
-    public void handlerSetup(){
+    public void handlerSetup() {
         new LobbyHandler(this);
         new JoinItemsHandler(this);
         buildModeHandler = new BuildModeHandler(this);
         gameManager = new GameManager(this);
     }
-    public void commandSetup(){
+
+    public void commandSetup() {
         commandManager.registerCommand(new PracticeCommands(this));
 
     }
 
-    public YamlDocument getDefaultConfig(){
+    public YamlDocument getDefaultConfig() {
         return config;
     }
+
     public ConfigManager getConfigManager() {
         return configManager;
     }
-    public SpawnSetter getSpawnSetter(){
+
+    public SpawnSetter getSpawnSetter() {
         return spawnSetter;
     }
+
     public YamlDocument getSpawnConfig() {
         return spawnConfig;
     }
+
     public YamlDocument getMessagesConfig() {
         return messagesConfig;
     }

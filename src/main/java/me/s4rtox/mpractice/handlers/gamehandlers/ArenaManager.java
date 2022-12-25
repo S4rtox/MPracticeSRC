@@ -10,26 +10,27 @@ public class ArenaManager {
 
     private final List<Arena> arenalist;
 
-    public ArenaManager(List<Arena> arenalist){
+    public ArenaManager(List<Arena> arenalist) {
         this.arenalist = arenalist;
     }
 
-    public List<Arena> getArenas(){
+    public List<Arena> getArenas() {
         return arenalist;
     }
-    public void addArena(Arena arena){
+
+    public void addArena(Arena arena) {
         this.arenalist.add(arena);
     }
 
-    public void deleteArena(Arena arena){
+    public void deleteArena(Arena arena) {
         this.arenalist.remove(arena);
     }
 
-    public Optional<Arena> findArena(String name){
+    public Optional<Arena> findArena(String name) {
         return arenalist.stream().filter(arena -> arena.name().equals(name)).findAny();
     }
 
-    public Optional<Arena> findPlayerArena(Player player){
+    public Optional<Arena> findPlayerArena(Player player) {
         return arenalist.stream().filter(arena -> arena.isPlaying(player)).findAny();
     }
 
