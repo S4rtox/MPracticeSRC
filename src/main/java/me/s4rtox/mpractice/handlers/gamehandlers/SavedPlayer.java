@@ -23,6 +23,5 @@ public class SavedPlayer {
         this.foodLevel = player.getFoodLevel();
         this.totalXP = player.getTotalExperience();
         this.location = player.getLocation().clone();
-
     }
 }

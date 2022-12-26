@@ -3,6 +3,7 @@ package me.s4rtox.mpractice.handlers.gamehandlers.arena.states;
 import me.s4rtox.mpractice.handlers.gamehandlers.GameManager;
 import me.s4rtox.mpractice.handlers.gamehandlers.arena.Arena;
 import me.s4rtox.mpractice.util.Colorize;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.block.BlockBreakEvent;
@@ -52,16 +53,21 @@ public class WaitingArenaState extends ArenaState {
         Player player = event.getPlayer();
         if (arena.isPlaying(player)) {
             event.setCancelled(true);
-            player.sendMessage("Waiting state");
         }
     }
 
     @EventHandler
-    protected void activeChatFormat(AsyncPlayerChatEvent event) {
+    private void WaitingChatFormat(AsyncPlayerChatEvent event) {
         Player player = event.getPlayer();
         if (arena.isInGame(player)) {
-            event.setCancelled(true);
-            arena.sendAllPlayersMessage(Colorize.format("&7[&7Waiting]&f  " + player.getDisplayName() + "&7: ") + event.getMessage());
+            event.getRecipients().clear();
+            arena.allPlayers().forEach(playerUUID -> {
+                Player arenaPlayer = Bukkit.getPlayer(playerUUID);
+                if(arenaPlayer != null){
+                    event.getRecipients().add(arenaPlayer);
+                }
+            });
+            event.setFormat(Colorize.format("&7[&eWaiting]&f " + player.getDisplayName() + "&7:&f ") + event.getMessage());
         }
     }
 

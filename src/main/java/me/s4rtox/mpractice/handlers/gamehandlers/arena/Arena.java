@@ -23,9 +23,9 @@ public class Arena {
     @Setter
     private String displayName;
     @Getter
-    private int maxPlayers;
+    private final int maxPlayers;
     @Getter
-    private World world;
+    private final World world;
     @Getter
     @Setter
     private Location centerLocation;
@@ -56,7 +56,6 @@ public class Arena {
     @Getter
     private final List<UUID> allPlayers;
 
-    @Getter
     private ArenaState arenaState;
 
     public Arena(
@@ -135,6 +134,7 @@ public class Arena {
         player.setGameMode(GameMode.SURVIVAL);
         player.setFoodLevel(20);
         sendAllPlayersMessage("&7[&a+&7] &f" + player.getDisplayName());
+        gameManager.plugin().getLobbyHandler().removeLobbyPlayer(player);
         //Condition to start the countdown (Currently if its half its maximum)
         if (players.size() > (maxPlayers / 2) && (arenaState instanceof WaitingArenaState)) {
             setArenaState(new StartingArenaState(gameManager, this));
@@ -155,6 +155,7 @@ public class Arena {
         spectators.remove(player.getUniqueId());
         allPlayers.remove(player.getUniqueId());
         PlayerRollbackManager.restore(player, false);
+        gameManager.plugin().getLobbyHandler().addLobbyPlayer(player);
         //Condition to cancell the countdown
         if (players.size() < (maxPlayers / 2) && arenaState instanceof StartingArenaState) {
             StartingArenaState startingArenaState = (StartingArenaState) arenaState;
@@ -246,7 +247,7 @@ public class Arena {
     }
 
     public boolean forceStartArena() {
-        if (this.arenaState() instanceof WaitingArenaState || this.arenaState() instanceof StartingArenaState) {
+        if (this.arenaState instanceof WaitingArenaState || this.arenaState instanceof StartingArenaState) {
             if (this.arenaState() instanceof StartingArenaState) {
                 StartingArenaState state = (StartingArenaState) this.arenaState();
                 state.arenaStartingTask().cancel();
@@ -260,7 +261,7 @@ public class Arena {
     }
 
     public boolean startArena() {
-        if (this.arenaState() instanceof WaitingArenaState) {
+        if (this.arenaState instanceof WaitingArenaState) {
             this.setArenaState(new StartingArenaState(gameManager, this));
             sendPlayersMessage("&c&lCOUNTDOWN FORCEFULLY STARTED BY AN ADMINISTRATOR");
             return true;
@@ -269,5 +270,15 @@ public class Arena {
         }
     }
 
+    public int getCurrentPlayers(){
+        if(this.arenaState instanceof ActiveArenaState){
+            ActiveArenaState activeArenaState = (ActiveArenaState) this.arenaState;
+            return activeArenaState.getAlivePlayers().size();
+        }else if(this.arenaState instanceof FinishingArenaState){
+            return 1;
+        }else{
+            return this.players.size();
+        }
+    }
 
 }

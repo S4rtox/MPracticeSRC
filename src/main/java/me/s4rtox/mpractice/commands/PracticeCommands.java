@@ -2,13 +2,13 @@ package me.s4rtox.mpractice.commands;
 
 import co.aikar.commands.BaseCommand;
 import co.aikar.commands.annotation.*;
+import co.aikar.commands.bukkit.contexts.OnlinePlayer;
 import me.s4rtox.mpractice.MPractice;
 import me.s4rtox.mpractice.config.ConfigManager;
 import me.s4rtox.mpractice.handlers.gamehandlers.ArenaManager;
 import me.s4rtox.mpractice.handlers.gamehandlers.GameManager;
 import me.s4rtox.mpractice.handlers.gamehandlers.arena.Arena;
 import me.s4rtox.mpractice.handlers.gamehandlers.arena.states.ActiveArenaState;
-import me.s4rtox.mpractice.handlers.lobbyhandlers.BuildModeHandler;
 import me.s4rtox.mpractice.util.Colorize;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -22,7 +22,6 @@ import java.util.Optional;
 public class PracticeCommands extends BaseCommand {
     private final MPractice plugin;
     private final ConfigManager config;
-    private final BuildModeHandler buildModeHandler;
 
     private final GameManager gameManager;
     private final ArenaManager arenaManager;
@@ -30,7 +29,6 @@ public class PracticeCommands extends BaseCommand {
     public PracticeCommands(MPractice plugin) {
         this.plugin = plugin;
         this.config = plugin.getConfigManager();
-        this.buildModeHandler = plugin.getBuildModeHandler();
         this.gameManager = plugin.getGameManager();
         this.arenaManager = gameManager.arenaManager();
     }
@@ -39,6 +37,7 @@ public class PracticeCommands extends BaseCommand {
     // ---------------------- Player Commands --------------------- //
     /////////////////////////////////////////////////////////////////
 
+    @CatchUnknown
     @Default
     public void onDefault(CommandSender sender) {
         if (sender.hasPermission("mpractice.admin")) {
@@ -57,27 +56,48 @@ public class PracticeCommands extends BaseCommand {
     @Subcommand("spectate")
     @Description("Attempts to join a game as spectator")
     public class SpectateCommand extends BaseCommand {
+        @Default
+        public void defaultSpectateCommand(Player player){
+            player.sendMessage(Colorize.format("&cUSAGE: /mpe spectate <arena|player>"));
+        }
         @Subcommand("arena")
         @Description("Attempts to join an ongoing game as spectator")
-        public void onSpectateArenaCommand(Player player, String[] args) {
+        public void onSpectateArenaCommand(Player player, @co.aikar.commands.annotation.Optional String[] args) {
+            if (arenaManager.getArenas().isEmpty()) {
+                player.sendMessage(Colorize.format("&cThere are no arenas available"));
+                return;
+            }
+            if (arenaManager.getArenas().size() == 1) {
+                Arena arena = arenaManager.getArenas().get(0);
+                arena.addSpectator(player);
+                return;
+            }
+            if(args == null || args.length == 0){
+                player.sendMessage(Colorize.format("&cUSAGE: /mpe spectate arena <Arena>"));
+                return;
+            }
             Optional<Arena> targetArena = arenaManager.findArena(args[0]);
             if (targetArena.isPresent() && targetArena.get().arenaState() instanceof ActiveArenaState) {
                 player.sendMessage(Colorize.format("&aSpectating: " + targetArena.get().displayName()));
                 targetArena.get().addSpectator(player);
+            }else{
+                player.sendMessage(Colorize.format("&cThis arena is not a valid arena!"));
             }
         }
 
         @Subcommand("player")
         @Description("Attempts to join an ongoing game as spectator")
-        public void onSpectatePlayer(Player player, Player target) {
-            if (!target.isOnline()) {
-                player.sendMessage(Colorize.format("&cThis player isn't online"));
-                return;
+        @Syntax("&cUSAGE: /mpe spectate player <target>")
+        public void onSpectatePlayer(Player player, OnlinePlayer target) {
+            if(player.equals(target.getPlayer())){
+                player.sendMessage(Colorize.format("&cYou cant spectate yourself!"));
             }
             Optional<Arena> targetArena = arenaManager.findPlayerArena(target.getPlayer());
             if (targetArena.isPresent() && targetArena.get().arenaState() instanceof ActiveArenaState) {
-                player.sendMessage(Colorize.format("&aSpectating: " + target.getName()));
+                player.sendMessage(Colorize.format("&aSpectating: " + target.getPlayer().getName()));
                 targetArena.get().addSpectator(player);
+            }else{
+                player.sendMessage(Colorize.format("&cThe player " + target.getPlayer().getName() + " &cis not in a running game!"));
             }
 
         }
@@ -87,17 +107,19 @@ public class PracticeCommands extends BaseCommand {
     @Subcommand("join")
     @Description("Attempts to join a game")
     public void onJoinCommand(Player player, String[] args) {
-        if (arenaManager.getArenas().size() == 0) {
+        if (arenaManager.getArenas().isEmpty()) {
             player.sendMessage(Colorize.format("&cThere are no arenas available"));
             return;
         }
-
         if (arenaManager.getArenas().size() == 1) {
             Arena arena = arenaManager.getArenas().get(0);
             arena.addPlayer(player);
             return;
         }
-
+        if(args == null || args.length == 0){
+            player.sendMessage(Colorize.format("&cUSAGE: /mpe join <Arena>"));
+            return;
+        }
         Optional<Arena> optionalArena = arenaManager.findArena(args[0]);
         if (!optionalArena.isPresent()) {
             player.sendMessage(Colorize.format("&cThat arena doesn't exist"));
@@ -122,21 +144,16 @@ public class PracticeCommands extends BaseCommand {
     @CommandAlias("spawn")
     @Description("Teleports to spawn")
     public void onSpawnCommand(Player player) {
+        Optional<Arena> currentArena = arenaManager.findPlayerArena(player);
+        if (currentArena.isPresent()) {
+            currentArena.get().sendToLobby(player);
+            player.sendMessage(Colorize.format("&aSuccesfully teleported to spawn"));
+            return;
+        }
         plugin.getSpawnSetter().teleport(player);
-        player.sendMessage("&aSuccessfully teleported to spawn");
+        player.sendMessage(Colorize.format("&aSuccesfully teleported to spawn"));
     }
 
-    /////////////////////////////////////////////////////////////////
-    // ---------------------- Build Commands --------------------- //
-    /////////////////////////////////////////////////////////////////
-
-    @Subcommand("build")
-    @CommandAlias("build")
-    @CommandPermission("mpractice.builder.buildmodetoggle")
-    @Description("Toggles buildmode")
-    public void onBuildModeToggle(Player player) {
-        buildModeHandler.checkBuildMode(player);
-    }
 
     /////////////////////////////////////////////////////////////////
     // ---------------------- Admin Commands --------------------- //
@@ -281,13 +298,13 @@ public class PracticeCommands extends BaseCommand {
 
             @Subcommand("list")
             @Description("Sets the lobby spawn")
-            public void onListArenas(Player player) {
+            public void onListArenas(CommandSender commandSender) {
                 if (gameManager.arenaManager().getArenas().isEmpty()) {
-                    player.sendMessage(Colorize.format("&cThere are no disponible arenas."));
+                    commandSender.sendMessage(Colorize.format("&cThere are no disponible arenas."));
                 } else {
-                    player.sendMessage(Colorize.format("&aThe disponible arenas are:"));
+                    commandSender.sendMessage(Colorize.format("&aThe disponible arenas are:"));
                     for (Arena arena : gameManager.arenaManager().getArenas()) {
-                        player.sendMessage(Colorize.format("&a - " + arena.name() + " - &aState: " + Colorize.formatArenaState(arena.arenaState())));
+                        commandSender.sendMessage(Colorize.format("&a - " + arena.name() + " - &aState: " + Colorize.formatArenaState(arena.arenaState()) + " &a- " + "&a" + arena.getCurrentPlayers() + "&7/&a" + arena.maxPlayers()));
                     }
                 }
 

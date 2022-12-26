@@ -3,8 +3,7 @@ package me.s4rtox.mpractice.handlers.gamehandlers;
 import dev.dejvokep.boostedyaml.YamlDocument;
 import dev.dejvokep.boostedyaml.block.implementation.Section;
 import me.s4rtox.mpractice.handlers.gamehandlers.arena.Arena;
-import org.bukkit.Bukkit;
-import org.bukkit.Location;
+import org.bukkit.*;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -60,43 +59,44 @@ public class ArenaConfigurationManager {
         List<Arena> arenas = new ArrayList<>();
 
         for (String arena : arenasConfig.getRoutesAsStrings(false)) {
-            Bukkit.getLogger().info(arena);
-            Bukkit.getLogger().info(arenasConfig.getSection(arena).toString());
             Section arenaSection = arenasConfig.getSection(arena);
             String displayName = arenaSection.getString("DisplayName");
             String worldArena = arenaSection.getString("World");
-
+            World world = Bukkit.getWorld(worldArena);
+            if (world == null) {
+                world = new WorldCreator(worldArena).generateStructures(false).type(WorldType.FLAT).generatorSettings("2;0;1;").createWorld();
+            }
             String[] centerloc = arenaSection.getString("ArenaCenter").split(",");
-            Location arenaCenter = new Location(Bukkit.getWorld(worldArena), Double.parseDouble(centerloc[0]), Double.parseDouble(centerloc[1]), Double.parseDouble(centerloc[2]));
+            Location arenaCenter = new Location(world, Double.parseDouble(centerloc[0]), Double.parseDouble(centerloc[1]), Double.parseDouble(centerloc[2]));
 
             String[] cornerloc = arenaSection.getString("ArenaCorner1").split(",");
-            Location arenaCorner = new Location(Bukkit.getWorld(worldArena), Double.parseDouble(cornerloc[0]), Double.parseDouble(cornerloc[1]), Double.parseDouble(cornerloc[2]));
+            Location arenaCorner = new Location(world, Double.parseDouble(cornerloc[0]), Double.parseDouble(cornerloc[1]), Double.parseDouble(cornerloc[2]));
 
             String[] cornerloc2 = arenaSection.getString("ArenaCorner2").split(",");
-            Location arenaCorner2 = new Location(Bukkit.getWorld(worldArena), Double.parseDouble(cornerloc2[0]), Double.parseDouble(cornerloc2[1]), Double.parseDouble(cornerloc2[2]));
+            Location arenaCorner2 = new Location(world, Double.parseDouble(cornerloc2[0]), Double.parseDouble(cornerloc2[1]), Double.parseDouble(cornerloc2[2]));
 
             String[] spectatorloc = arenaSection.getString("SpectatorSpawn").split(",");
-            Location spectatorSpawn = new Location(Bukkit.getWorld(worldArena), Double.parseDouble(spectatorloc[0]), Double.parseDouble(spectatorloc[1]), Double.parseDouble(spectatorloc[2]), Float.parseFloat(spectatorloc[3]), Float.parseFloat(spectatorloc[4]));
+            Location spectatorSpawn = new Location(world, Double.parseDouble(spectatorloc[0]), Double.parseDouble(spectatorloc[1]), Double.parseDouble(spectatorloc[2]), Float.parseFloat(spectatorloc[3]), Float.parseFloat(spectatorloc[4]));
 
             List<String> spawnList = arenaSection.getStringList("PlayerSpawns");
             List<Location> playerSpawns = new ArrayList<>();
             for (String spawnString : spawnList) {
                 String[] spawn = spawnString.split(",");
-                playerSpawns.add(new Location(Bukkit.getWorld(worldArena), Double.parseDouble(spawn[0]), Double.parseDouble(spawn[1]), Double.parseDouble(spawn[2]), Float.parseFloat(spawn[3]), Float.parseFloat(spawn[4])));
+                playerSpawns.add(new Location(world, Double.parseDouble(spawn[0]), Double.parseDouble(spawn[1]), Double.parseDouble(spawn[2]), Float.parseFloat(spawn[3]), Float.parseFloat(spawn[4])));
             }
 
             List<String> islandCList = arenaSection.getStringList("IslandChests");
             List<Location> islandChests = new ArrayList<>();
             for (String chestLoc : islandCList) {
                 String[] chest = chestLoc.split(",");
-                islandChests.add(new Location(Bukkit.getWorld(worldArena), Double.parseDouble(chest[0]), Double.parseDouble(chest[1]), Double.parseDouble(chest[2])));
+                islandChests.add(new Location(world, Double.parseDouble(chest[0]), Double.parseDouble(chest[1]), Double.parseDouble(chest[2])));
             }
 
             List<String> middleCList = arenaSection.getStringList("MiddleChests");
             List<Location> middleChests = new ArrayList<>();
             for (String chestLoc : middleCList) {
                 String[] chest = chestLoc.split(",");
-                middleChests.add(new Location(Bukkit.getWorld(worldArena), Double.parseDouble(chest[0]), Double.parseDouble(chest[1]), Double.parseDouble(chest[2])));
+                middleChests.add(new Location(world, Double.parseDouble(chest[0]), Double.parseDouble(chest[1]), Double.parseDouble(chest[2])));
             }
 
             arenas.add(new Arena(gameManager, arena, displayName, arenaCenter, arenaCorner, arenaCorner2, spectatorSpawn, playerSpawns, islandChests, middleChests));

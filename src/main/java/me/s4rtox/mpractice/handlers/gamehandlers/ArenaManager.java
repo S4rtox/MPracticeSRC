@@ -27,6 +27,9 @@ public class ArenaManager {
     }
 
     public Optional<Arena> findArena(String name) {
+        if(arenalist.isEmpty() || name == null){
+            return Optional.empty();
+        }
         return arenalist.stream().filter(arena -> arena.name().equals(name)).findAny();
     }
 

@@ -11,7 +11,6 @@ import lombok.NonNull;
 import me.s4rtox.mpractice.commands.PracticeCommands;
 import me.s4rtox.mpractice.config.ConfigManager;
 import me.s4rtox.mpractice.handlers.gamehandlers.GameManager;
-import me.s4rtox.mpractice.handlers.lobbyhandlers.BuildModeHandler;
 import me.s4rtox.mpractice.handlers.lobbyhandlers.JoinItemsHandler;
 import me.s4rtox.mpractice.handlers.lobbyhandlers.LobbyHandler;
 import me.s4rtox.mpractice.handlers.lobbyhandlers.SpawnSetter;
@@ -35,9 +34,9 @@ public final class MPractice extends JavaPlugin {
     private YamlDocument messagesConfig;
     private YamlDocument arenaConfig;
     private PaperCommandManager commandManager;
-    private BuildModeHandler buildModeHandler;
 
     private GameManager gameManager;
+    private LobbyHandler lobbyHandler;
 
     public @NonNull BukkitAudiences adventure() {
         if (this.adventure == null) {
@@ -106,9 +105,8 @@ public final class MPractice extends JavaPlugin {
     }
 
     public void handlerSetup() {
-        new LobbyHandler(this);
+        lobbyHandler = new LobbyHandler(this);
         new JoinItemsHandler(this);
-        buildModeHandler = new BuildModeHandler(this);
         gameManager = new GameManager(this);
     }
 
@@ -137,9 +135,6 @@ public final class MPractice extends JavaPlugin {
         return messagesConfig;
     }
 
-    public BuildModeHandler getBuildModeHandler() {
-        return buildModeHandler;
-    }
 
     public GameManager getGameManager() {
         return gameManager;
@@ -148,4 +143,8 @@ public final class MPractice extends JavaPlugin {
     public YamlDocument getArenaConfig() {
         return arenaConfig;
     }
+    public LobbyHandler getLobbyHandler() {
+        return lobbyHandler;
+    }
+
 }

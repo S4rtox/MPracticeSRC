@@ -2,6 +2,7 @@ package me.s4rtox.mpractice.handlers.lobbyhandlers;
 
 import me.s4rtox.mpractice.MPractice;
 import me.s4rtox.mpractice.config.ConfigManager;
+import me.s4rtox.mpractice.util.Colorize;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
@@ -11,12 +12,18 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.FoodLevelChangeEvent;
+import org.bukkit.event.player.*;
 import org.bukkit.event.weather.WeatherChangeEvent;
 import org.bukkit.event.world.WorldLoadEvent;
+
+import java.util.HashSet;
+import java.util.Set;
+import java.util.UUID;
 
 public class LobbyHandler implements Listener {
     private final MPractice plugin;
     private final ConfigManager config;
+    private final Set<UUID> lobbyPlayers = new HashSet<>();
 
     public LobbyHandler(MPractice plugin) {
         Bukkit.getPluginManager().registerEvents(this, plugin);
@@ -106,4 +113,65 @@ public class LobbyHandler implements Listener {
         if (!(event.getDamager() instanceof Player)) return;
         event.setCancelled(true);
     }
+
+    @EventHandler(priority = EventPriority.MONITOR)
+    public void onPlayerJoin(PlayerJoinEvent event){
+        lobbyPlayers.add(event.getPlayer().getUniqueId());
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR)
+    public void onPlayerLeave(PlayerQuitEvent event){
+        lobbyPlayers.remove(event.getPlayer().getUniqueId());
+    }
+
+    //OPTIONAL
+    @EventHandler(priority = EventPriority.MONITOR)
+    public void onPlayerWorldChange(PlayerChangedWorldEvent event){
+        if(config.C_LOBBYWORLD_ENABLEDWORLDS().contains(event.getPlayer().getWorld().getName())){
+            lobbyPlayers.add(event.getPlayer().getUniqueId());
+        }else{
+            lobbyPlayers.remove(event.getPlayer().getUniqueId());
+        }
+    }
+
+    @EventHandler
+    private void LobbyChatHandler(AsyncPlayerChatEvent event) {
+        Player player = event.getPlayer();
+        if (lobbyPlayers.contains(player.getUniqueId())) {
+            event.getRecipients().clear();
+            lobbyPlayers.forEach(playerUUID -> {
+                Player arenaPlayer = Bukkit.getPlayer(playerUUID);
+                if(arenaPlayer != null){
+                    event.getRecipients().add(arenaPlayer);
+                }
+            });
+            event.setFormat(Colorize.format("&f" + player.getDisplayName() + "&7:&f ") + event.getMessage());
+        }
+    }
+
+    @EventHandler
+    public void disableJoinMessage(PlayerJoinEvent event){
+        event.setJoinMessage("");
+    }
+    @EventHandler
+    public void disableQuitMessage(PlayerQuitEvent event){
+        event.setQuitMessage("");
+    }
+
+    @EventHandler
+    public void disableKickMessage(PlayerKickEvent event){
+        event.setLeaveMessage("");
+    }
+
+    public Set<UUID> getLobbyPlayers(){
+        return lobbyPlayers;
+    }
+    public void removeLobbyPlayer(Player player){
+        lobbyPlayers.remove(player.getUniqueId());
+    }
+
+    public void addLobbyPlayer(Player player){
+        lobbyPlayers.add(player.getUniqueId());
+    }
+
 }

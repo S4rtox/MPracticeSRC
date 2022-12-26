@@ -61,7 +61,7 @@ public class ActiveArenaState extends ArenaState {
     }
 
     @EventHandler
-    protected void onPlayerDeath(PlayerDeathEvent event) {
+    private void onPlayerDeath(PlayerDeathEvent event) {
         Player player = event.getEntity();
         player.spigot().respawn();
         killPlayer(player);
@@ -83,7 +83,7 @@ public class ActiveArenaState extends ArenaState {
     }
 
     @EventHandler
-    protected void onQuit(PlayerQuitEvent event) {
+    private void onQuit(PlayerQuitEvent event) {
         killPlayer(event.getPlayer());
         arena.sendPlayersMessage("&6" + event.getPlayer().getName() + " &cwas killed by mystical events.");
         if (arena.isPlaying(event.getPlayer())) {
@@ -92,7 +92,7 @@ public class ActiveArenaState extends ArenaState {
     }
 
     @EventHandler
-    protected void onWorldChange(PlayerChangedWorldEvent event) {
+    private void onWorldChange(PlayerChangedWorldEvent event) {
         killPlayer(event.getPlayer());
         arena.sendPlayersMessage("&6" + event.getPlayer().getName() + " &cwas killed by mystical events.");
         if (arena.isPlaying(event.getPlayer())) {
@@ -103,20 +103,24 @@ public class ActiveArenaState extends ArenaState {
     }
 
     @EventHandler
-    protected void activeChatFormat(AsyncPlayerChatEvent event) {
+    private void activeChatFormat(AsyncPlayerChatEvent event) {
         Player player = event.getPlayer();
         if (arena.isInGame(player)) {
-            event.setCancelled(true);
+            event.getRecipients().clear();
+            arena.allPlayers().forEach(playerUUID -> {
+                Player arenaPlayer = Bukkit.getPlayer(playerUUID);
+                if(arenaPlayer != null){
+                    event.getRecipients().add(arenaPlayer);
+                }
+            });
+            if (alivePlayers.contains(player.getUniqueId())) {
+                event.setFormat(Colorize.format("&7[&aALIVE&7]&f " + player.getDisplayName() + "&7:&f ") + event.getMessage());
+            } else if (arena.isPlaying(player)) {
+                event.setFormat(Colorize.format("&7[DEAD]&f  " + player.getDisplayName() + "&7:&f ") + event.getMessage());
+            } else if (arena.isSpectating(player)) {
+                event.setFormat(Colorize.format("&7[SPECTATING]&f  " + player.getDisplayName() + "&7:&f ") + event.getMessage());
+            }
         }
-        player.sendMessage("This changed");
-        if (alivePlayers.contains(player.getUniqueId())) {
-            arena.sendAllPlayersMessage(Colorize.format("&7[&aALIVE&7]&f " + player.getDisplayName() + "&7: ") + event.getMessage());
-        } else if (arena.isPlaying(player)) {
-            arena.sendAllPlayersMessage(Colorize.format("&7[DEAD]&f  " + player.getDisplayName() + "&7: ") + event.getMessage());
-        } else if (arena.isSpectating(player)) {
-            arena.sendAllPlayersMessage(Colorize.format("&7[SPECTATING]&f  " + player.getDisplayName() + "&7: ") + event.getMessage());
-        }
-
     }
 
     public void killPlayer(Player player) {
@@ -127,5 +131,9 @@ public class ActiveArenaState extends ArenaState {
                 player.teleport(arena.spectatorSpawnLocation());
             }
         }
+    }
+
+    public List<UUID> getAlivePlayers() {
+        return alivePlayers;
     }
 }

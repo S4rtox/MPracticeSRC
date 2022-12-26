@@ -5,12 +5,15 @@ import me.s4rtox.mpractice.MPractice;
 import me.s4rtox.mpractice.handlers.gamehandlers.GameManager;
 import me.s4rtox.mpractice.handlers.gamehandlers.arena.Arena;
 import me.s4rtox.mpractice.handlers.gamehandlers.tasks.ArenaStartingTask;
+import me.s4rtox.mpractice.util.Colorize;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.FoodLevelChangeEvent;
+import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.event.player.PlayerChangedWorldEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
@@ -61,7 +64,6 @@ public class StartingArenaState extends ArenaState {
         Player player = event.getPlayer();
         if (arena.isPlaying(player)) {
             event.setCancelled(true);
-            player.sendMessage("Starting state");
         }
 
     }
@@ -84,7 +86,20 @@ public class StartingArenaState extends ArenaState {
             }
         }
     }
-
+    @EventHandler
+    private void StartingChatFormat(AsyncPlayerChatEvent event) {
+        Player player = event.getPlayer();
+        if (arena.isInGame(player)) {
+            event.getRecipients().clear();
+            arena.allPlayers().forEach(playerUUID -> {
+                Player arenaPlayer = Bukkit.getPlayer(playerUUID);
+                if(arenaPlayer != null){
+                    event.getRecipients().add(arenaPlayer);
+                }
+            });
+            event.setFormat(Colorize.format("&7[&eWaiting]&f " + player.getDisplayName() + "&7:&f ") + event.getMessage());
+        }
+    }
     @EventHandler
     public void freezePlayersInplace(PlayerMoveEvent event) {
         Player player = event.getPlayer();

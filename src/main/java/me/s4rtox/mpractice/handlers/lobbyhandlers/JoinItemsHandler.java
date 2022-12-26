@@ -13,7 +13,6 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.event.player.PlayerChangedWorldEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.inventory.Inventory;
@@ -97,12 +96,14 @@ public class JoinItemsHandler implements Listener {
 
 
     // --------------- JOIN/RESPAWN CUSTOM ITEM GIVER  ---------------
+    /*
     @EventHandler(priority = EventPriority.LOW)
     public void joinWorld(PlayerChangedWorldEvent event) {
         if (!config.C_LOBBYWORLD_ENABLEDWORLDS().contains(event.getPlayer().getWorld().getName())) return;
         event.getPlayer().getInventory().clear();
         giveJoinItems(event.getPlayer().getInventory());
     }
+     */
 
     @EventHandler(priority = EventPriority.LOW)
     public void joinInvItems(PlayerJoinEvent event) {
