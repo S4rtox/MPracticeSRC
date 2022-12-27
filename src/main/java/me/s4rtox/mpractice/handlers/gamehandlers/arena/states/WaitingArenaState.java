@@ -67,7 +67,7 @@ public class WaitingArenaState extends ArenaState {
                     event.getRecipients().add(arenaPlayer);
                 }
             });
-            event.setFormat(Colorize.format("&7[&eWaiting]&f " + player.getDisplayName() + "&7:&f ") + event.getMessage());
+            event.setFormat(Colorize.format("&7[&eWaiting&7]&f " + player.getDisplayName() + "&7:&f ") + event.getMessage());
         }
     }
 

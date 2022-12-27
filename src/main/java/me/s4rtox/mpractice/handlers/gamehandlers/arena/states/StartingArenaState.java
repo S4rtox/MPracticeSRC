@@ -7,6 +7,8 @@ import me.s4rtox.mpractice.handlers.gamehandlers.arena.Arena;
 import me.s4rtox.mpractice.handlers.gamehandlers.tasks.ArenaStartingTask;
 import me.s4rtox.mpractice.util.Colorize;
 import org.bukkit.Bukkit;
+import org.bukkit.Material;
+import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.block.BlockBreakEvent;
@@ -29,7 +31,18 @@ public class StartingArenaState extends ArenaState {
     @Override
     public void onEnable(MPractice plugin) {
         super.onEnable(plugin);
-        arenaStartingTask = new ArenaStartingTask(arena, () -> arena.setArenaState(new ActiveArenaState(gameManager, arena)), 10);
+        arenaStartingTask = new ArenaStartingTask(arena, () -> {
+            arena.players().forEach(playerUUID -> {
+                Player player = Bukkit.getPlayer(playerUUID);
+                if(player != null){
+                    Block block = player.getLocation().clone().add(0,-1,0).getBlock();
+                    if(block.getType() == Material.GLASS){
+                        block.setType(Material.AIR);
+                    }
+                }
+            });
+            arena.setArenaState(new ActiveArenaState(gameManager, arena));
+        }, 10);
         arenaStartingTask.runTaskTimer(plugin, 0, 20);
     }
 
@@ -97,7 +110,7 @@ public class StartingArenaState extends ArenaState {
                     event.getRecipients().add(arenaPlayer);
                 }
             });
-            event.setFormat(Colorize.format("&7[&eWaiting]&f " + player.getDisplayName() + "&7:&f ") + event.getMessage());
+            event.setFormat(Colorize.format("&7[&eWaiting&7]&f " + player.getDisplayName() + "&7:&f ") + event.getMessage());
         }
     }
     @EventHandler

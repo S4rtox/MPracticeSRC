@@ -1,7 +1,6 @@
 package me.s4rtox.mpractice.handlers.gamehandlers;
 
 import lombok.Getter;
-import lombok.NonNull;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
@@ -16,7 +15,7 @@ public class SavedPlayer {
     private final int foodLevel;
     private final int totalXP;
 
-    public SavedPlayer(@NonNull Player player) {
+    public SavedPlayer(Player player) {
         this.inventoryItems = player.getInventory().getContents();
         this.inventoryArmor = player.getInventory().getArmorContents();
         this.gameMode = player.getGameMode();

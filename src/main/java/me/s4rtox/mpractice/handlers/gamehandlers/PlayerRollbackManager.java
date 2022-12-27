@@ -9,9 +9,13 @@ import java.util.UUID;
 
 public class PlayerRollbackManager {
 
-    private static final Map<UUID, SavedPlayer> savedPlayers = new HashMap<>();
+    private final Map<UUID, SavedPlayer> savedPlayers;
 
-    public static void save(Player player) {
+    public PlayerRollbackManager(){
+        savedPlayers = new HashMap<>();
+    }
+
+    public void save(Player player) {
         if (savedPlayers.containsKey(player.getUniqueId())) {
             savedPlayers.replace(player.getUniqueId(), new SavedPlayer(player));
         } else {
@@ -19,10 +23,13 @@ public class PlayerRollbackManager {
         }
     }
 
-    public static void restore(Player player, boolean restoreLocation) {
+    public void restore(Player player, boolean restoreLocation) {
+        if (!savedPlayers.containsKey(player.getUniqueId())){
+            return;
+        }
         SavedPlayer savedPlayer = savedPlayers.get(player.getUniqueId());
-        if (savedPlayer == null) {
-            player.sendMessage(Colorize.format("&cError restoring your last state"));
+        if(savedPlayer == null){
+            player.sendMessage("&cError restoring your last state!");
             savedPlayers.remove(player.getUniqueId());
             return;
         }

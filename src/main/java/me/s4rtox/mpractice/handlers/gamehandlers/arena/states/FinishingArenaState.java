@@ -49,16 +49,23 @@ public class FinishingArenaState extends ArenaState {
             }.runTaskTimer(plugin, 0, 8);
         }
         //Start the task to make it go to arena
-        List<UUID> allPlayers = new ArrayList<>(arena.players());
-        allPlayers.addAll(arena.spectators());
         new ArenaFinishingTask(arena, () -> {
-            for (UUID playerUUID : allPlayers) {
+            //Ugly unregister event as if it gets teleported it just pulls a iterator error as the list gets
+            //Shortenned
+            //TODO: CHange this to a normal for each with a null check? that way iterator error is avoided and I can just
+            //do this normally instead of this ugly aproach
+            //Will do tomorrow
+            // Probably
+            PlayerChangedWorldEvent.getHandlerList().unregister(this);
+            arena.allPlayers().forEach(playerUUID -> {
                 Player player = Bukkit.getPlayer(playerUUID);
                 if (player != null) {
+                    Bukkit.getLogger().info(player.getName());
                     plugin.getSpawnSetter().teleport(player);
-                    PlayerRollbackManager.restore(player, false);
+                    gameManager.rollbackManager().restore(player, false);
+                    gameManager.plugin().getLobbyHandler().addLobbyPlayer(player);
                 }
-            }
+            });
             arena.players().clear();
             arena.spectators().clear();
             arena.allPlayers().clear();

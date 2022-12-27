@@ -47,7 +47,6 @@ public final class MPractice extends JavaPlugin {
 
     @Override
     public void onEnable() {
-
         //AdventureApi SetUp
         this.adventure = BukkitAudiences.create(this);
 

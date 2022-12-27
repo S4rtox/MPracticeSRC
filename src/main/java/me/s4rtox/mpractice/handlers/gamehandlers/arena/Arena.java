@@ -7,6 +7,8 @@ import me.s4rtox.mpractice.handlers.gamehandlers.GameManager;
 import me.s4rtox.mpractice.handlers.gamehandlers.PlayerRollbackManager;
 import me.s4rtox.mpractice.handlers.gamehandlers.arena.states.*;
 import me.s4rtox.mpractice.util.Colorize;
+import me.s4rtox.mpractice.util.TitleBuilder;
+import net.kyori.adventure.audience.Audience;
 import org.bukkit.*;
 import org.bukkit.entity.Player;
 
@@ -101,7 +103,7 @@ public class Arena {
         }
         spectators.add(player.getUniqueId());
         allPlayers.add(player.getUniqueId());
-        PlayerRollbackManager.save(player);
+        gameManager.rollbackManager().save(player);
         player.teleport(spectatorSpawnLocation);
         player.getInventory().clear();
         player.getEquipment().clear();
@@ -126,7 +128,7 @@ public class Arena {
         }
         players.add(player.getUniqueId());
         allPlayers.add(player.getUniqueId());
-        PlayerRollbackManager.save(player);
+        gameManager.rollbackManager().save(player);
         player.teleport(spawnLocations.get(players.indexOf(player.getUniqueId())));
         player.getInventory().clear();
         player.getInventory();
@@ -154,8 +156,7 @@ public class Arena {
         players.remove(player.getUniqueId());
         spectators.remove(player.getUniqueId());
         allPlayers.remove(player.getUniqueId());
-        PlayerRollbackManager.restore(player, false);
-        gameManager.plugin().getLobbyHandler().addLobbyPlayer(player);
+        gameManager.rollbackManager().restore(player, false);
         //Condition to cancell the countdown
         if (players.size() < (maxPlayers / 2) && arenaState instanceof StartingArenaState) {
             StartingArenaState startingArenaState = (StartingArenaState) arenaState;
@@ -169,6 +170,7 @@ public class Arena {
     public void sendToLobby(Player player) {
         removePlayer(player);
         gameManager.plugin().getSpawnSetter().teleport(player);
+        gameManager.plugin().getLobbyHandler().addLobbyPlayer(player);
     }
 
     public boolean isPlaying(Player player) {
@@ -200,12 +202,10 @@ public class Arena {
         }
     }
 
-    public void sendArenaTitle(String Title, double fadein, double fadeout) {
+    public void sendArenaTitle(String title, String subTitle, long fadein, long stayin ,long fadeout) {
         for (UUID playerUUID : this.players) {
-            Player player = Bukkit.getPlayer(playerUUID);
-            if (player != null) {
-
-            }
+            Audience audience = gameManager.plugin().adventure().player(playerUUID);
+            TitleBuilder.showTitle(audience,title,subTitle,fadein,stayin,fadeout);
         }
     }
 

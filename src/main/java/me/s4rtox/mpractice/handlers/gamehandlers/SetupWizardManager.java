@@ -7,6 +7,7 @@ import me.s4rtox.mpractice.util.Colorize;
 import me.s4rtox.mpractice.util.ItemBuilder;
 import net.wesjd.anvilgui.AnvilGUI;
 import org.bukkit.GameMode;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -20,6 +21,7 @@ import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.util.Vector;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -47,7 +49,7 @@ public class SetupWizardManager implements Listener {
             existingArena = true;
         }
         inWizard.put(player.getUniqueId(), temporaryArena);
-        PlayerRollbackManager.save(player);
+        gameManager.rollbackManager().save(player);
         player.setGameMode(GameMode.CREATIVE);
         player.getInventory().clear();
         if (existingArena) {
@@ -73,7 +75,7 @@ public class SetupWizardManager implements Listener {
 
     public void stopWizard(Player player) {
         inWizard.remove(player.getUniqueId());
-        PlayerRollbackManager.restore(player, false);
+        gameManager.rollbackManager().restore(player, false);
     }
 
     public boolean inWizard(Player player) {
@@ -178,8 +180,8 @@ public class SetupWizardManager implements Listener {
 
                 // Arena Island Chests setters
             } else if (itemFlag.getBoolean("SetArenaSpawns")) {
-
-                arena.addSpawnLocation(player.getLocation());
+                Vector lookingAt = player.getLocation().getDirection();
+                arena.addSpawnLocation(player.getLocation().getBlock().getLocation().setDirection(lookingAt));
                 player.sendMessage(Colorize.format("&aSet the &espawn &afor the player number: &6" + arena.spawnLocations().size()));
 
                 // Arena Island Chests setters

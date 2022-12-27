@@ -26,18 +26,16 @@ public class ArenaFinishingTask extends BukkitRunnable {
             //It hurts me to deal with this this way but I think better than making another runnable.
             if (firstRun) {
                 //Code to be executed only ONCE with a winner
-                arena.sendPlayersMessage("&a&l" + winner.getName() + "&6&l has won!!");
+                arena.sendAllPlayersMessage("&a&l" + winner.getName() + "&6&l has won!!");
                 firstRun = false;
             }
             //Code to be executed EVERY SECOND with a winner
         } else {
             if (firstRun) {
                 //Code to be executed only ONCE without a winner(Tie)
-
                 firstRun = false;
             }
             //Code to be executed EVERY SECOND without a winner(Tie)
-
         }
         //Code to be executed allways every second
         if (duration <= 0) {
