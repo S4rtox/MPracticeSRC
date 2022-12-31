@@ -2,9 +2,7 @@ package me.s4rtox.mpractice.handlers.lobbyhandlers;
 
 import me.s4rtox.mpractice.MPractice;
 import me.s4rtox.mpractice.config.ConfigManager;
-import org.bukkit.Bukkit;
-import org.bukkit.Location;
-import org.bukkit.World;
+import org.bukkit.*;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -35,6 +33,7 @@ public class SpawnSetter implements Listener {
             World world = Bukkit.getWorld(worldName);
             //Checa si hay un mundo con el nombre de la config, si no tira lo de abajo.
             if (world == null) {
+                world = new WorldCreator(worldName).generateStructures(false).type(WorldType.FLAT).generatorSettings("2;0;1;").createWorld();
                 Bukkit.getLogger().log(Level.SEVERE, "The world \"" + worldName + "\" does not exist.");
                 return;
             }
@@ -53,8 +52,11 @@ public class SpawnSetter implements Listener {
 
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent event) {
-        Player player = event.getPlayer();
-        player.teleport(spawn);
+        if (spawn != null){
+            Player player = event.getPlayer();
+            player.teleport(spawn);
+        }
+        Bukkit.getLogger().info("This executed " + spawn.toString());
     }
 
     public void teleport(Player player) {
@@ -62,7 +64,6 @@ public class SpawnSetter implements Listener {
             player.sendMessage(config.MS_SPAWN_NOT_SET_YET());
             return;
         }
-
         player.teleport(spawn);
     }
 

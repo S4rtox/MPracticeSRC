@@ -15,6 +15,7 @@ import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.FoodLevelChangeEvent;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.event.player.PlayerChangedWorldEvent;
+import org.bukkit.event.player.PlayerKickEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 
@@ -50,29 +51,38 @@ public class FinishingArenaState extends ArenaState {
         }
         //Start the task to make it go to arena
         new ArenaFinishingTask(arena, () -> {
-            //Ugly unregister event as if it gets teleported it just pulls a iterator error as the list gets
-            //Shortenned
-            //TODO: CHange this to a normal for each with a null check? that way iterator error is avoided and I can just
-            //do this normally instead of this ugly aproach
-            //Will do tomorrow
+            // Ugly unregister event as if it gets teleported it just pulls a iterator error as the list gets
+            // Shortenned
+            // CHange this to a normal for each with a null check? that way iterator error is avoided and I can just
+            // do this normally instead of this ugly aproach
+            // Will do tomorrow
             // Probably
-            PlayerChangedWorldEvent.getHandlerList().unregister(this);
-            arena.allPlayers().forEach(playerUUID -> {
-                Player player = Bukkit.getPlayer(playerUUID);
+            // Yeah probably not happening :)
+            PlayerQuitEvent.getHandlerList().unregister(this);
+            PlayerKickEvent.getHandlerList().unregister(this);
+            for (int i = arena.allPlayers().size() - 1; i >= 0 ; --i) {
+                Player player = Bukkit.getPlayer(arena.allPlayers().get(i));
                 if (player != null) {
-                    Bukkit.getLogger().info(player.getName());
-                    plugin.getSpawnSetter().teleport(player);
-                    gameManager.rollbackManager().restore(player, false);
-                    gameManager.plugin().getLobbyHandler().addLobbyPlayer(player);
+                    arena.sendToLobby(player);
                 }
-            });
+            }
             arena.players().clear();
             arena.spectators().clear();
             arena.allPlayers().clear();
+            arena.clearChests();
             arena.setArenaState(new WaitingArenaState(gameManager, arena));
         }, 10, winningPlayer).runTaskTimer(plugin, 0, 20);
     }
 
+    @Override
+    public void onPlayerJoin(Player player) {
+        player.sendMessage(Colorize.format("&cError sending you to the game!, this arena has already started!"));
+    }
+
+    @Override
+    public void onSpectatorJoin(Player player) {
+        player.sendMessage(Colorize.format("&cError sending you to the game!, this arena hasn't started yet!"));
+    }
 
     @EventHandler
     private void onQuit(PlayerQuitEvent event) {
@@ -82,13 +92,12 @@ public class FinishingArenaState extends ArenaState {
     }
 
     @EventHandler
-    private void onWorldChange(PlayerChangedWorldEvent event) {
+    private void onKick (PlayerKickEvent event) {
         if (arena.isPlaying(event.getPlayer())) {
-            if (!event.getPlayer().getWorld().getName().equals(arena.world().getName())) {
-                arena.removePlayer(event.getPlayer());
-            }
+            arena.sendToLobby(event.getPlayer());
         }
     }
+
     @EventHandler
     private void finishingChatFormat(AsyncPlayerChatEvent event) {
         Player player = event.getPlayer();
@@ -103,9 +112,9 @@ public class FinishingArenaState extends ArenaState {
             if (winningPlayer.equals(player)) {
                 event.setFormat(Colorize.format("&7[&6WINNER&7]&f " + player.getDisplayName() + "&7:&f ") + event.getMessage());
             } else if (arena.isPlaying(player)) {
-                event.setFormat(Colorize.format("&7[DEAD]&f  " + player.getDisplayName() + "&7:&f ") + event.getMessage());
+                event.setFormat(Colorize.format("&7[DEAD]&f " + player.getDisplayName() + "&7:&f ") + event.getMessage());
             } else if (arena.isSpectating(player)) {
-                event.setFormat(Colorize.format("&7[SPECTATING]&f  " + player.getDisplayName() + "&7:&f ") + event.getMessage());
+                event.setFormat(Colorize.format("&7[SPECTATING]&f "+ player.getDisplayName() + "&7:&f ") + event.getMessage());
             }
         }
     }

@@ -1,6 +1,7 @@
 name: MPractice
 version: '${project.version}'
 main: me.s4rtox.mpractice.MPractice
-softdepend: [ PlaceholderAPI ]
+softdepend: [ PlaceholderAPI , Multiverse-Core]
+depend: [SlimeWorldManager]
 authors: [ S4rtox ]
 description: Me la recontra pelas le voy a poner config igual.

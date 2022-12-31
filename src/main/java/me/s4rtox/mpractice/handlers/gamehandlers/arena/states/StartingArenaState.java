@@ -9,18 +9,17 @@ import me.s4rtox.mpractice.util.Colorize;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.FoodLevelChangeEvent;
-import org.bukkit.event.player.AsyncPlayerChatEvent;
-import org.bukkit.event.player.PlayerChangedWorldEvent;
-import org.bukkit.event.player.PlayerMoveEvent;
-import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.event.player.*;
 
 public class StartingArenaState extends ArenaState {
+
     @Getter
     private ArenaStartingTask arenaStartingTask;
 
@@ -32,18 +31,38 @@ public class StartingArenaState extends ArenaState {
     public void onEnable(MPractice plugin) {
         super.onEnable(plugin);
         arenaStartingTask = new ArenaStartingTask(arena, () -> {
-            arena.players().forEach(playerUUID -> {
-                Player player = Bukkit.getPlayer(playerUUID);
-                if(player != null){
-                    Block block = player.getLocation().clone().add(0,-1,0).getBlock();
-                    if(block.getType() == Material.GLASS){
-                        block.setType(Material.AIR);
-                    }
+            arena.spawnLocations().forEach(location -> {
+                Block floor = location.clone().subtract(0,1,0).getBlock();
+                if(floor != null && floor.getType() == Material.GLASS){
+                    floor.setType(Material.AIR);
                 }
             });
             arena.setArenaState(new ActiveArenaState(gameManager, arena));
         }, 10);
         arenaStartingTask.runTaskTimer(plugin, 0, 20);
+    }
+
+    @Override
+    public void onPlayerJoin(Player player) {
+        super.onPlayerJoin(player);
+        arena.sendAllPlayersMessage("&7[&a+&7] &f" + player.getDisplayName());
+    }
+
+    @Override
+    public void onSpectatorJoin(Player player) {
+        player.sendMessage(Colorize.format("&cError sending you to the game!, this arena hasn't started yet!"));
+    }
+
+    @Override
+    public void onPlayerLeave(Player player) {
+        super.onPlayerLeave(player);
+        arena.sendAllPlayersMessage("&7[&c-&7] &f" + player.getDisplayName());
+        //Condition to cancell the countdown
+        if (arena.players().size() < (arena.maxPlayers() / 2)) {
+            this.arenaStartingTask.cancel();
+            arena.sendPlayersMessage("&cNot enough players!, Start cancelled");
+            arena.setArenaState(new WaitingArenaState(gameManager, arena));
+        }
     }
 
     @EventHandler
@@ -54,11 +73,9 @@ public class StartingArenaState extends ArenaState {
     }
 
     @EventHandler
-    private void onWorldChange(PlayerChangedWorldEvent event) {
+    private void onKick (PlayerKickEvent event) {
         if (arena.isPlaying(event.getPlayer())) {
-            if (!event.getPlayer().getWorld().getName().equals(arena.world().getName())) {
-                arena.removePlayer(event.getPlayer());
-            }
+            arena.sendToLobby(event.getPlayer());
         }
     }
 

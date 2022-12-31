@@ -1,0 +1,41 @@
+file-version: 2
+
+chestItems:
+  islandChest:
+    0:
+      material: IRON_SWORD
+      name: '&cFire sword'
+      enchantments:
+        - 'FIRE_ASPECT:1'
+      chance: 0.1
+      minAmount: 1
+      maxAmount: 1
+      allowDuplicates: false
+    1:
+      material: IRON_SWORD
+      name: '&cFire sword'
+      enchantments:
+        - 'FIRE_ASPECT:1'
+      chance: 0.1
+      minAmount: 1
+      maxAmount: 1
+      allowDuplicates: false
+  middleChest:
+    0:
+      material: IRON_SWORD
+      name: '&cFire sword'
+      enchantments:
+        - 'FIRE_ASPECT:1'
+      chance: 0.1
+      minAmount: 1
+      maxAmount: 1
+      allowDuplicates: false
+    1:
+      material: IRON_SWORD
+      name: '&cFire sword'
+      enchantments:
+        - 'FIRE_ASPECT:1'
+      chance: 0.1
+      minAmount: 1
+      maxAmount: 1
+      allowDuplicates: false

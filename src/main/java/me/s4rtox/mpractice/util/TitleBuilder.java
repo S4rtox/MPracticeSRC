@@ -40,7 +40,7 @@ public class TitleBuilder {
         }else{
             mainTitle = Component.empty();
         }
-        if(subtitle.length() !=  0 || subtitle == null){
+        if(subtitle.length() != 0){
             mainSubtitle = Component.text(Colorize.format(subtitle));
         }else{
             mainSubtitle = Component.empty();

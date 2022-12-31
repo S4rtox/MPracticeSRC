@@ -1,6 +1,7 @@
 package me.s4rtox.mpractice;
 
 import co.aikar.commands.PaperCommandManager;
+import com.grinderwolf.swm.api.SlimePlugin;
 import dev.dejvokep.boostedyaml.YamlDocument;
 import dev.dejvokep.boostedyaml.dvs.versioning.BasicVersioning;
 import dev.dejvokep.boostedyaml.settings.dumper.DumperSettings;
@@ -10,6 +11,7 @@ import dev.dejvokep.boostedyaml.settings.updater.UpdaterSettings;
 import lombok.NonNull;
 import me.s4rtox.mpractice.commands.PracticeCommands;
 import me.s4rtox.mpractice.config.ConfigManager;
+import me.s4rtox.mpractice.handlers.ScoreboardManager;
 import me.s4rtox.mpractice.handlers.gamehandlers.GameManager;
 import me.s4rtox.mpractice.handlers.lobbyhandlers.JoinItemsHandler;
 import me.s4rtox.mpractice.handlers.lobbyhandlers.LobbyHandler;
@@ -33,8 +35,9 @@ public final class MPractice extends JavaPlugin {
     private YamlDocument spawnConfig;
     private YamlDocument messagesConfig;
     private YamlDocument arenaConfig;
+    private YamlDocument chestConfig;
     private PaperCommandManager commandManager;
-
+    private ScoreboardManager scoreboardManager;
     private GameManager gameManager;
     private LobbyHandler lobbyHandler;
 
@@ -64,7 +67,10 @@ public final class MPractice extends JavaPlugin {
             getLogger().warning(Colorize.format("&ePlaceholderAPI not detected!, disabling PAPI placeholders."));
         }
 
+        SlimePlugin slimeWorldManager = (SlimePlugin) Bukkit.getPluginManager().getPlugin("SlimeWorldManager");
+
         commandManager = new PaperCommandManager(this);
+
         configSetup();
         utilSetup();
         handlerSetup();
@@ -88,6 +94,7 @@ public final class MPractice extends JavaPlugin {
     }
 
     public void utilSetup() {
+        scoreboardManager = new ScoreboardManager(this);
         configManager = new ConfigManager(this);
         spawnSetter = new SpawnSetter(this);
     }
@@ -98,12 +105,14 @@ public final class MPractice extends JavaPlugin {
             spawnConfig = YamlDocument.create(new File(getDataFolder(), "spawn.yml"), getResource("spawn.yml"), GeneralSettings.DEFAULT, LoaderSettings.builder().setAutoUpdate(true).build(), DumperSettings.DEFAULT, UpdaterSettings.builder().setVersioning(new BasicVersioning("file-version")).build());
             messagesConfig = YamlDocument.create(new File(getDataFolder(), "messages.yml"), getResource("messages.yml"), GeneralSettings.DEFAULT, LoaderSettings.builder().setAutoUpdate(true).build(), DumperSettings.DEFAULT, UpdaterSettings.builder().setVersioning(new BasicVersioning("file-version")).build());
             arenaConfig = YamlDocument.create(new File(getDataFolder(), "arenas.yml"));
+            chestConfig = YamlDocument.create(new File(getDataFolder(), "chests.yml"), getResource("chests.yml"), GeneralSettings.DEFAULT, LoaderSettings.builder().setAutoUpdate(true).build(), DumperSettings.DEFAULT, UpdaterSettings.builder().setVersioning(new BasicVersioning("file-version")).build());
         } catch (IOException ex) {
             ex.printStackTrace();
         }
     }
 
     public void handlerSetup() {
+
         lobbyHandler = new LobbyHandler(this);
         new JoinItemsHandler(this);
         gameManager = new GameManager(this);
@@ -146,4 +155,11 @@ public final class MPractice extends JavaPlugin {
         return lobbyHandler;
     }
 
+    public YamlDocument getChestConfig() {
+        return chestConfig;
+    }
+
+    public ScoreboardManager getScoreboardManager() {
+        return scoreboardManager;
+    }
 }

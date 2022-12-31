@@ -53,7 +53,7 @@ public class SetupWizardManager implements Listener {
         player.setGameMode(GameMode.CREATIVE);
         player.getInventory().clear();
         if (existingArena) {
-            player.teleport(temporaryArena.centerLocation().add(0, 1, 0));
+            player.teleport(temporaryArena.centerLocation().clone().add(0, 1, 0));
         }
         setWizardItems(player);
     }
@@ -181,7 +181,7 @@ public class SetupWizardManager implements Listener {
                 // Arena Island Chests setters
             } else if (itemFlag.getBoolean("SetArenaSpawns")) {
                 Vector lookingAt = player.getLocation().getDirection();
-                arena.addSpawnLocation(player.getLocation().getBlock().getLocation().setDirection(lookingAt));
+                arena.addSpawnLocation(player.getLocation().clone().getBlock().getLocation().add(0.5,0,0.5).setDirection(lookingAt));
                 player.sendMessage(Colorize.format("&aSet the &espawn &afor the player number: &6" + arena.spawnLocations().size()));
 
                 // Arena Island Chests setters

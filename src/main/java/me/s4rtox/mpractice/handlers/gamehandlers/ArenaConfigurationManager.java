@@ -107,6 +107,11 @@ public class ArenaConfigurationManager {
     public void deleteArena(Arena arena) {
         if (arenasConfig.isSection(arena.name())) {
             arenasConfig.remove(arena.name());
+            try {
+                arenasConfig.save();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
     }
 

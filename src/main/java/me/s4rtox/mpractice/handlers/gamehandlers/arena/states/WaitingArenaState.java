@@ -10,15 +10,40 @@ import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.FoodLevelChangeEvent;
-import org.bukkit.event.player.AsyncPlayerChatEvent;
-import org.bukkit.event.player.PlayerChangedWorldEvent;
-import org.bukkit.event.player.PlayerMoveEvent;
-import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.event.player.*;
 
 public class WaitingArenaState extends ArenaState {
 
     public WaitingArenaState(GameManager gameManager, Arena arena) {
         super(gameManager, arena);
+    }
+
+    @Override
+    public void onPlayerJoin(Player player) {
+        super.onPlayerJoin(player);
+        arena.sendAllPlayersMessage("&7[&a+&7] &f" + player.getDisplayName());
+        arena.updateScoreboards(Colorize.format("&e&lMSkywars"),
+                Colorize.format("&fPlayers: &a" + arena.getCurrentPlayers() + "&7/" + arena.maxPlayers()),
+                "",
+                Colorize.format("&fStarting in: &e&lWAITING"),
+                "",
+                Colorize.format("&fArena: &a" + arena.displayName()),
+                Colorize.format("&fip.example.com"));
+        if (arena.players().size() > (arena.maxPlayers() / 2)) {
+            arena.setArenaState(new StartingArenaState(gameManager, arena));
+        }
+    }
+
+
+    @Override
+    public void onSpectatorJoin(Player player) {
+        player.sendMessage(Colorize.format("&cError sending you to the game!, this arena hasn't started yet!"));
+    }
+
+    @Override
+    public void onPlayerLeave(Player player) {
+        super.onPlayerLeave(player);
+        arena.sendAllPlayersMessage("&7[&c-&7] &f" + player.getDisplayName());
     }
 
     @EventHandler
@@ -28,13 +53,10 @@ public class WaitingArenaState extends ArenaState {
         }
     }
 
-    //TODO:EXPERIMENTAL, REQUIRES TESTING. ITS ON EVERY STATE
     @EventHandler
-    private void onWorldChange(PlayerChangedWorldEvent event) {
+    private void onKick (PlayerKickEvent event) {
         if (arena.isPlaying(event.getPlayer())) {
-            if (!event.getPlayer().getWorld().getName().equals(arena.world().getName())) {
-                arena.removePlayer(event.getPlayer());
-            }
+            arena.sendToLobby(event.getPlayer());
         }
     }
 

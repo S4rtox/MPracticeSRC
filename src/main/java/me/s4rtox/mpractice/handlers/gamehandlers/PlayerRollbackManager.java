@@ -27,6 +27,7 @@ public class PlayerRollbackManager {
         if (!savedPlayers.containsKey(player.getUniqueId())){
             return;
         }
+        player.setFireTicks(0);
         SavedPlayer savedPlayer = savedPlayers.get(player.getUniqueId());
         if(savedPlayer == null){
             player.sendMessage("&cError restoring your last state!");
