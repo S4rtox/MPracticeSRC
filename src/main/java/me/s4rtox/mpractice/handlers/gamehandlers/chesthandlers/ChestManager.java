@@ -20,11 +20,16 @@ public class ChestManager {
 
     public ChestManager(MPractice plugin) {
         this.chestConfig = plugin.getChestConfig();
+        loadChests();
+    }
+
+    public void loadChests(){
+        this.chestItems.clear();
         Section itemConfig = chestConfig.getSection("chestItems");
-        for (String chestType : itemConfig.getRoutesAsStrings(false)){
+        for (String chestType : itemConfig.getRoutesAsStrings(false)) {
             this.chestItems.put(chestType, new ArrayList<>());
             Section chestSection = itemConfig.getSection(chestType);
-            for (String itemSection : chestSection.getRoutesAsStrings(false)){
+            for (String itemSection : chestSection.getRoutesAsStrings(false)) {
                 Section itemChests = chestSection.getSection(itemSection);
                 this.chestItems.get(chestType).add(new LootItem(itemChests));
             }
@@ -46,7 +51,7 @@ public class ChestManager {
             ItemStack previousItem = inventory.getItem(slotIndex);
             //Checks if there is an item in the slot already, if there is it continues
             if(previousItem != null && previousItem.getType() != Material.AIR) continue;
-            LootItem randomItem = chestItems.get(chestType).get(random.nextInt(chestItems.size()));
+            LootItem randomItem = chestItems.get(chestType).get(random.nextInt(chestItems.get(chestType).size()));
             //Checks if the item has already been put
             if(usedItem.contains(randomItem)) continue;
             if(randomItem.shouldFill(random)){

@@ -2,6 +2,7 @@ package me.s4rtox.mpractice.handlers.gamehandlers.arena.states;
 
 import lombok.Getter;
 import me.s4rtox.mpractice.MPractice;
+import me.s4rtox.mpractice.handlers.ScoreboardManager;
 import me.s4rtox.mpractice.handlers.gamehandlers.GameManager;
 import me.s4rtox.mpractice.handlers.gamehandlers.arena.Arena;
 import me.s4rtox.mpractice.handlers.gamehandlers.tasks.ArenaStartingTask;
@@ -30,6 +31,7 @@ public class StartingArenaState extends ArenaState {
     @Override
     public void onEnable(MPractice plugin) {
         super.onEnable(plugin);
+        arena.allPlayers().forEach(playerUUID -> gameManager.plugin().getScoreboardManager().setDefaultScoreboard(Bukkit.getPlayer(playerUUID)));
         arenaStartingTask = new ArenaStartingTask(arena, () -> {
             arena.spawnLocations().forEach(location -> {
                 Block floor = location.clone().subtract(0,1,0).getBlock();
@@ -41,7 +43,6 @@ public class StartingArenaState extends ArenaState {
         }, 10);
         arenaStartingTask.runTaskTimer(plugin, 0, 20);
     }
-
     @Override
     public void onPlayerJoin(Player player) {
         super.onPlayerJoin(player);

@@ -174,9 +174,12 @@ public class PracticeCommands extends BaseCommand {
                 plugin.getDefaultConfig().reload();
                 plugin.getSpawnConfig().reload();
                 plugin.getMessagesConfig().reload();
+                plugin.getChestConfig().reload();
                 plugin.getConfigManager().loadConfig();
                 plugin.getArenaConfig().reload();
+                plugin.getGameManager().chestManager().loadChests();
                 sender.sendMessage(plugin.getConfigManager().MS_RELOAD_SUCCESS());
+                sender.sendMessage(Colorize.format("Remember to restart the server if you made changes to any arena"));
             } catch (IOException e) {
                 sender.sendMessage(Colorize.format("&cThere has been an error reloading the plugin, check the console for details"));
                 throw new RuntimeException(e);

@@ -1,6 +1,7 @@
 package me.s4rtox.mpractice.handlers.gamehandlers;
 
 import lombok.Data;
+import lombok.Setter;
 import me.s4rtox.mpractice.MPractice;
 import me.s4rtox.mpractice.handlers.gamehandlers.chesthandlers.ChestManager;
 

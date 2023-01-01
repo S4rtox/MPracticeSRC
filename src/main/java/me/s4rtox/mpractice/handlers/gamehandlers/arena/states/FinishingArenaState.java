@@ -7,6 +7,8 @@ import me.s4rtox.mpractice.handlers.gamehandlers.arena.Arena;
 import me.s4rtox.mpractice.handlers.gamehandlers.tasks.ArenaFinishingTask;
 import me.s4rtox.mpractice.util.Colorize;
 import org.bukkit.Bukkit;
+import org.bukkit.Material;
+import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.block.BlockBreakEvent;
@@ -70,6 +72,12 @@ public class FinishingArenaState extends ArenaState {
             arena.spectators().clear();
             arena.allPlayers().clear();
             arena.clearChests();
+            arena.spawnLocations().forEach(location -> {
+                Block floor = location.clone().subtract(0,1,0).getBlock();
+                if(floor != null && floor.getType() == Material.AIR){
+                    floor.setType(Material.GLASS);
+                }
+            });
             arena.setArenaState(new WaitingArenaState(gameManager, arena));
         }, 10, winningPlayer).runTaskTimer(plugin, 0, 20);
     }

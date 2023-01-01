@@ -45,4 +45,9 @@ public class ScoreboardManager implements Listener {
     public FastBoard getPlayerScoreboard(Player player){
         return scoreboards.get(player.getUniqueId());
     }
+
+    public void setDefaultScoreboard(Player player){
+        FastBoard scoreboard = scoreboards.get(player.getUniqueId());
+        scoreboard.updateLine(scoreboard.size() - 1, "Test");
+    }
 }

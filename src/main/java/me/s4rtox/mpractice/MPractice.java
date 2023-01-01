@@ -47,7 +47,7 @@ public final class MPractice extends JavaPlugin {
         }
         return this.adventure;
     }
-
+    //TODO: Scoreboards(animated?),test and fix chest system, add chest config reload, add bossbar.
     @Override
     public void onEnable() {
         //AdventureApi SetUp
@@ -66,6 +66,7 @@ public final class MPractice extends JavaPlugin {
             PapiFormatter.setPapiStatus(false);
             getLogger().warning(Colorize.format("&ePlaceholderAPI not detected!, disabling PAPI placeholders."));
         }
+
 
         SlimePlugin slimeWorldManager = (SlimePlugin) Bukkit.getPluginManager().getPlugin("SlimeWorldManager");
 
@@ -120,7 +121,6 @@ public final class MPractice extends JavaPlugin {
 
     public void commandSetup() {
         commandManager.registerCommand(new PracticeCommands(this));
-
     }
 
     public YamlDocument getDefaultConfig() {

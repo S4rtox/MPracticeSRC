@@ -164,8 +164,8 @@ public class Arena {
     // ---------------------- Arena Setup Events --------------------- //
     /////////////////////////////////////////////////////////////////////
     public void fillChests(){
-        gameManager.chestManager().fillChestLocations(islandChests,"islandChest",false);
-        gameManager.chestManager().fillChestLocations(middleChests,"middleChest",false);
+        gameManager.chestManager().fillChestLocations(islandChests,"islandChest",true);
+        gameManager.chestManager().fillChestLocations(middleChests,"middleChest",true);
     }
 
     // Method should become useless on arena reset system, awaiting implementation

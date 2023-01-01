@@ -102,9 +102,6 @@ public class ActiveArenaState extends ArenaState {
     @EventHandler
     private void onPlayerDeath(PlayerDeathEvent event) {
         Player player = event.getEntity();
-        player.sendMessage("This got executed");
-        player.spigot().respawn();
-        killPlayer(player);
         Player killer = player.getKiller();
         if (killer != null) {
             if (killer != player) {
@@ -120,22 +117,24 @@ public class ActiveArenaState extends ArenaState {
             arena.sendPlayersMessage("&6" + player.getName() + " &cwas killed by mystical events.");
             //Code if there is no killer(void)
         }
+        player.spigot().respawn();
+        killPlayer(player);
     }
 
     @EventHandler
     private void onQuit(PlayerQuitEvent event) {
-        killPlayer(event.getPlayer());
-        arena.sendPlayersMessage("&6" + event.getPlayer().getName() + " &cwas killed by mystical events.");
         if (arena.isPlaying(event.getPlayer())) {
+            killPlayer(event.getPlayer());
+            arena.sendPlayersMessage("&6" + event.getPlayer().getName() + " &cwas killed by mystical events.");
             arena.sendToLobby(event.getPlayer());
         }
     }
 
     @EventHandler
     private void onKick (PlayerKickEvent event) {
-        killPlayer(event.getPlayer());
-        arena.sendPlayersMessage("&6" + event.getPlayer().getName() + " &cwas killed by mystical events.");
         if (arena.isPlaying(event.getPlayer())) {
+            killPlayer(event.getPlayer());
+            arena.sendPlayersMessage("&6" + event.getPlayer().getName() + " &cwas killed by mystical events.");
             arena.sendToLobby(event.getPlayer());
         }
     }
