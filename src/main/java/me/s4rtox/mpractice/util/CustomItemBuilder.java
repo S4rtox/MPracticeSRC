@@ -9,10 +9,9 @@ import org.bukkit.inventory.meta.ItemMeta;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ItemBuilder {
+public class CustomItemBuilder {
     public static ItemStack getSpecialItem(ItemStack item, String name, boolean isEnchanted, String customFlag, String... lore) {
         ItemMeta meta = item.getItemMeta();
-
         meta.setDisplayName(Colorize.format(name));
         if (isEnchanted) {
             meta.addEnchant(Enchantment.DURABILITY, 1, true);
@@ -47,9 +46,9 @@ public class ItemBuilder {
         return item;
     }
 
+
     public static ItemStack getItem(ItemStack item, String name, boolean isEnchanted, List<String> lore) {
         ItemMeta meta = item.getItemMeta();
-
         meta.setDisplayName(Colorize.format(name));
         if (isEnchanted) {
             meta.addEnchant(Enchantment.DURABILITY, 1, true);

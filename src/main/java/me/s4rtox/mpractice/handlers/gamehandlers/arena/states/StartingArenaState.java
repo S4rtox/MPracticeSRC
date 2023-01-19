@@ -2,7 +2,6 @@ package me.s4rtox.mpractice.handlers.gamehandlers.arena.states;
 
 import lombok.Getter;
 import me.s4rtox.mpractice.MPractice;
-import me.s4rtox.mpractice.handlers.ScoreboardManager;
 import me.s4rtox.mpractice.handlers.gamehandlers.GameManager;
 import me.s4rtox.mpractice.handlers.gamehandlers.arena.Arena;
 import me.s4rtox.mpractice.handlers.gamehandlers.tasks.ArenaStartingTask;
@@ -10,7 +9,6 @@ import me.s4rtox.mpractice.util.Colorize;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
-import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.block.BlockBreakEvent;
@@ -31,14 +29,7 @@ public class StartingArenaState extends ArenaState {
     @Override
     public void onEnable(MPractice plugin) {
         super.onEnable(plugin);
-        arena.allPlayers().forEach(playerUUID -> gameManager.plugin().getScoreboardManager().setDefaultScoreboard(Bukkit.getPlayer(playerUUID)));
         arenaStartingTask = new ArenaStartingTask(arena, () -> {
-            arena.spawnLocations().forEach(location -> {
-                Block floor = location.clone().subtract(0,1,0).getBlock();
-                if(floor != null && floor.getType() == Material.GLASS){
-                    floor.setType(Material.AIR);
-                }
-            });
             arena.setArenaState(new ActiveArenaState(gameManager, arena));
         }, 10);
         arenaStartingTask.runTaskTimer(plugin, 0, 20);
@@ -46,7 +37,18 @@ public class StartingArenaState extends ArenaState {
     @Override
     public void onPlayerJoin(Player player) {
         super.onPlayerJoin(player);
-        arena.sendAllPlayersMessage("&7[&a+&7] &f" + player.getDisplayName());
+        arena.sendAllMessage("&7[&a+&7] &f" + player.getDisplayName());
+        gameManager.plugin().getScoreboardManager().updateScoreboard(player, "&e&lMSkywars",
+                "",
+                "&fPlayers: &a" + arena.getCurrentPlayers() + "&7/&a" + arena.maxPlayers(),
+                "",
+                "&fStarting in: &7-",
+                "",
+                "&fStatus: &6&lSTARTING!",
+                "&fArena: &a" + arena.displayName(),
+                "&fip.example.com"
+        );
+        arena.updateAllScoreboardsLine(1, "&fPlayers: &a" + arena.getCurrentPlayers() + "&7/&a" + arena.maxPlayers());
     }
 
     @Override
@@ -55,26 +57,43 @@ public class StartingArenaState extends ArenaState {
     }
 
     @Override
+    public GameState getGameStateEnum() {
+        return GameState.STARTING;
+    }
+
+    @Override
     public void onPlayerLeave(Player player) {
         super.onPlayerLeave(player);
-        arena.sendAllPlayersMessage("&7[&c-&7] &f" + player.getDisplayName());
+        arena.sendAllMessage("&7[&c-&7] &f" + player.getDisplayName());
         //Condition to cancell the countdown
         if (arena.players().size() < (arena.maxPlayers() / 2)) {
             this.arenaStartingTask.cancel();
             arena.sendPlayersMessage("&cNot enough players!, Start cancelled");
+            arena.updateAllScoreboards("&e&lMSkywars",
+                    "",
+                    "&fPlayers: &a" + arena.getCurrentPlayers() + "&7/&a" + arena.maxPlayers(),
+                    "",
+                    "&fStarting in: &7-",
+                    "",
+                    "&fStatus: &e&lWAITING",
+                    "&fArena: &a" + arena.displayName(),
+                    "&fip.example.com"
+            );
             arena.setArenaState(new WaitingArenaState(gameManager, arena));
         }
     }
 
     @EventHandler
     public void onQuit(PlayerQuitEvent event) {
+        event.setQuitMessage("");
         if (arena.isPlaying(event.getPlayer())) {
             arena.sendToLobby(event.getPlayer());
         }
     }
 
     @EventHandler
-    private void onKick (PlayerKickEvent event) {
+    private void onKick(PlayerKickEvent event) {
+        event.setLeaveMessage("");
         if (arena.isPlaying(event.getPlayer())) {
             arena.sendToLobby(event.getPlayer());
         }

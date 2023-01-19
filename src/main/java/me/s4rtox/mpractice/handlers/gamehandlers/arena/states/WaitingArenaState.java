@@ -1,5 +1,6 @@
 package me.s4rtox.mpractice.handlers.gamehandlers.arena.states;
 
+import me.s4rtox.mpractice.handlers.ScoreboardManager;
 import me.s4rtox.mpractice.handlers.gamehandlers.GameManager;
 import me.s4rtox.mpractice.handlers.gamehandlers.arena.Arena;
 import me.s4rtox.mpractice.util.Colorize;
@@ -13,22 +14,27 @@ import org.bukkit.event.entity.FoodLevelChangeEvent;
 import org.bukkit.event.player.*;
 
 public class WaitingArenaState extends ArenaState {
+    private final ScoreboardManager scoreboardManager;
 
     public WaitingArenaState(GameManager gameManager, Arena arena) {
         super(gameManager, arena);
+        this.scoreboardManager = gameManager.plugin().getScoreboardManager();
     }
 
     @Override
     public void onPlayerJoin(Player player) {
         super.onPlayerJoin(player);
-        arena.sendAllPlayersMessage("&7[&a+&7] &f" + player.getDisplayName());
-        arena.updateScoreboards(Colorize.format("&e&lMSkywars"),
-                Colorize.format("&fPlayers: &a" + arena.getCurrentPlayers() + "&7/" + arena.maxPlayers()),
+        arena.sendAllMessage("&7[&a+&7] &f" + player.getDisplayName());
+        arena.updateAllScoreboards("&e&lMSkywars",
                 "",
-                Colorize.format("&fStarting in: &e&lWAITING"),
+                "&fPlayers: &a" + arena.getCurrentPlayers() + "&7/&a" + arena.maxPlayers(),
                 "",
-                Colorize.format("&fArena: &a" + arena.displayName()),
-                Colorize.format("&fip.example.com"));
+                "&fStarting in: &7&l-",
+                "",
+                "&fStatus: &e&lWAITING",
+                "&fArena: &a" + arena.displayName(),
+                "&fip.example.com"
+        );
         if (arena.players().size() > (arena.maxPlayers() / 2)) {
             arena.setArenaState(new StartingArenaState(gameManager, arena));
         }
@@ -41,13 +47,19 @@ public class WaitingArenaState extends ArenaState {
     }
 
     @Override
+    public GameState getGameStateEnum() {
+        return GameState.WAITING;
+    }
+
+    @Override
     public void onPlayerLeave(Player player) {
         super.onPlayerLeave(player);
-        arena.sendAllPlayersMessage("&7[&c-&7] &f" + player.getDisplayName());
+        arena.sendAllMessage("&7[&c-&7] &f" + player.getDisplayName());
     }
 
     @EventHandler
     private void onQuit(PlayerQuitEvent event) {
+        event.setQuitMessage("");
         if (arena.isPlaying(event.getPlayer())) {
             arena.removePlayer(event.getPlayer());
         }
@@ -55,6 +67,7 @@ public class WaitingArenaState extends ArenaState {
 
     @EventHandler
     private void onKick (PlayerKickEvent event) {
+        event.setLeaveMessage("");
         if (arena.isPlaying(event.getPlayer())) {
             arena.sendToLobby(event.getPlayer());
         }

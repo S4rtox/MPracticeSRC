@@ -1,14 +1,15 @@
 package me.s4rtox.mpractice.handlers.gamehandlers;
 
+import lombok.NonNull;
 import me.s4rtox.mpractice.handlers.gamehandlers.arena.Arena;
 import org.bukkit.entity.Player;
 
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 public class ArenaManager {
 
     private final List<Arena> arenalist;
+    private final Map<UUID, Arena> playerArena = new HashMap<>();
 
     public ArenaManager(List<Arena> arenalist) {
         this.arenalist = arenalist;
@@ -26,6 +27,13 @@ public class ArenaManager {
         this.arenalist.remove(arena);
     }
 
+    public void setPlayerArena(Player player, Arena arena){
+        playerArena.put(player.getUniqueId(),arena);
+    }
+
+    public void removeFromArena(Player player){
+        playerArena.remove(player.getUniqueId());
+    }
     public Optional<Arena> findArena(String name) {
         if(arenalist.isEmpty() || name == null){
             return Optional.empty();
@@ -34,7 +42,20 @@ public class ArenaManager {
     }
 
     public Optional<Arena> findPlayerArena(Player player) {
-        return arenalist.stream().filter(arena -> arena.isPlaying(player)).findAny();
+        return Optional.ofNullable(playerArena.get(player.getUniqueId()));
+        // return arenalist.stream().filter(arena -> arena.isPlaying(player)).findAny();
+    }
+
+    public Optional<Arena> findSpectatingArena(Player player){
+        return arenalist.stream().filter(arena -> arena.isSpectating(player)).findAny();
+    }
+
+    public boolean isInArena(Player player){
+        return playerArena.containsKey(player.getUniqueId());
+    }
+
+    public void sortArenas(){
+        arenalist.sort(Comparator.comparing((Arena a) -> a.arenaState().getGameStateEnum()).reversed().thenComparingInt((Arena a) -> a.players().size()).reversed());
     }
 
 }

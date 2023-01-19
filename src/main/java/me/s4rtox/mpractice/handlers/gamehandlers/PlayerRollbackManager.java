@@ -1,6 +1,7 @@
 package me.s4rtox.mpractice.handlers.gamehandlers;
 
 import me.s4rtox.mpractice.util.Colorize;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
 import java.util.HashMap;
@@ -25,6 +26,7 @@ public class PlayerRollbackManager {
 
     public void restore(Player player, boolean restoreLocation) {
         if (!savedPlayers.containsKey(player.getUniqueId())){
+            Bukkit.getLogger().info("The player " + player.getName() + " wasn't in the list");
             return;
         }
         player.setFireTicks(0);
@@ -42,9 +44,7 @@ public class PlayerRollbackManager {
         if (savedPlayer.inventoryArmor() != null) {
             player.getInventory().setArmorContents(savedPlayer.inventoryArmor());
         }
-        if (savedPlayer.gameMode() != null) {
-            player.setGameMode(savedPlayer.gameMode());
-        }
+        player.setGameMode(savedPlayer.gameMode());
         player.setFoodLevel(savedPlayer.foodLevel());
         player.setTotalExperience(savedPlayer.totalXP());
         if (restoreLocation) {

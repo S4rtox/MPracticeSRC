@@ -3,7 +3,7 @@ package me.s4rtox.mpractice.handlers.lobbyhandlers;
 import de.tr7zw.changeme.nbtapi.NBTItem;
 import me.s4rtox.mpractice.MPractice;
 import me.s4rtox.mpractice.config.ConfigManager;
-import me.s4rtox.mpractice.util.ItemBuilder;
+import me.s4rtox.mpractice.util.CustomItemBuilder;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
@@ -116,7 +116,7 @@ public class JoinItemsHandler implements Listener {
     private void giveJoinItems(Inventory inv) {
         // EnderButt Enabled
         List<String> lore = Collections.singletonList("1");
-        NBTItem enderButt = new NBTItem(ItemBuilder.getItem(new ItemStack(Material.ENDER_PEARL), "Test", true, lore));
+        NBTItem enderButt = new NBTItem(CustomItemBuilder.getItem(new ItemStack(Material.ENDER_PEARL), "Test", true, lore));
         enderButt.setBoolean("LobbyItem", true);
         enderButt.setBoolean("EnderButt", true);
         inv.setItem(1, enderButt.getItem());

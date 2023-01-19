@@ -5,6 +5,7 @@ import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.title.Title;
+import org.bukkit.entity.Player;
 
 import java.time.Duration;
 
@@ -29,7 +30,6 @@ public class TitleBuilder {
         // Send the title to your audience
         target.showTitle(titulo);
     }
-
 
     public static void showTitle(final @NonNull Audience target, String title, String subtitle, long fadeIn, long stayIn, long fadeOut){
         final Title.Times times = Title.Times.times(Duration.ofMillis(fadeIn * 1000), Duration.ofMillis(stayIn * 1000), Duration.ofMillis(fadeOut * 1000));

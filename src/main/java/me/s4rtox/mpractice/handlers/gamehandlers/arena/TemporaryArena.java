@@ -1,9 +1,11 @@
 package me.s4rtox.mpractice.handlers.gamehandlers.arena;
 
+import com.grinderwolf.swm.api.world.SlimeWorld;
 import lombok.Data;
 import lombok.NonNull;
 import me.s4rtox.mpractice.handlers.gamehandlers.GameManager;
 import org.bukkit.Location;
+import org.bukkit.World;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,6 +19,7 @@ public class TemporaryArena {
     private Location corner1Location;
     private Location corner2Location;
     private Location spectatorSpawnLocation;
+    private SlimeWorld slimeWorld;
     private List<Location> spawnLocations = new ArrayList<>();
     private List<Location> islandChests = new ArrayList<>();
     private List<Location> middleChests = new ArrayList<>();

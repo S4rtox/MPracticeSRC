@@ -4,10 +4,9 @@ import de.tr7zw.changeme.nbtapi.NBTItem;
 import me.s4rtox.mpractice.handlers.gamehandlers.arena.Arena;
 import me.s4rtox.mpractice.handlers.gamehandlers.arena.TemporaryArena;
 import me.s4rtox.mpractice.util.Colorize;
-import me.s4rtox.mpractice.util.ItemBuilder;
+import me.s4rtox.mpractice.util.CustomItemBuilder;
 import net.wesjd.anvilgui.AnvilGUI;
 import org.bukkit.GameMode;
-import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -33,6 +32,7 @@ public class SetupWizardManager implements Listener {
 
     public SetupWizardManager(GameManager gameManager) {
         this.gameManager = gameManager;
+        gameManager.plugin().getServer().getPluginManager().registerEvents(this, gameManager.plugin());
     }
 
     public void startWizard(Player player, Arena arena) {
@@ -61,15 +61,15 @@ public class SetupWizardManager implements Listener {
     private void setWizardItems(Player player) {
         Inventory inventory = player.getInventory();
 
-        inventory.addItem(ItemBuilder.getSpecialItem(new ItemStack(Material.SIGN), "&5Set Name/DisplayName &7{Left Click | Right Click}", true, "SetArenaName", "&7Left click to set name", "&7Right Click to set displayname"));
-        inventory.addItem(ItemBuilder.getSpecialItem(new ItemStack(Material.ANVIL), "&2Set ArenaCenter &7{Right Click}", true, "SetArenaCenter", "&7Right click to set the arena center"));
-        inventory.addItem(ItemBuilder.getSpecialItem(new ItemStack(Material.DIAMOND_AXE), "&6Set ArenaCorners &7{Left Click | Right Click}", true, "SetArenaCorner", "&7Left click to set corner 1", "&7Right Click to set corner 2"));
-        inventory.addItem(ItemBuilder.getSpecialItem(new ItemStack(Material.SKULL_ITEM), "&bSet SpectatorSpawns &7{Right Click}", true, "SetSpectatorSpawn", "&7Right click to set the spectator spawn"));
-        inventory.addItem(ItemBuilder.getSpecialItem(new ItemStack(Material.ARROW), "&4Set Spawns &7{Left Click | Right Click}", true, "SetArenaSpawns", "&7Right click to &aADD &7 a spawn", "&7Left click to &cREMOVE &7 a spawn"));
-        inventory.addItem(ItemBuilder.getSpecialItem(new ItemStack(Material.STICK), "&eSet IslandChests &7{Left Click | Right Click}", true, "SetIslandChests", "&7Right click to &aADD &7 a island chest", "&7Left click to &cREMOVE &7 a island chest"));
-        inventory.addItem(ItemBuilder.getSpecialItem(new ItemStack(Material.BLAZE_ROD), "&eSet MiddleChests &7{Left Click | Right Click}", true, "SetMiddleChests", "&7Right click to &aADD &7 a middle chest", "&7Left click to &cREMOVE &7 a middle chest"));
-        inventory.addItem(ItemBuilder.getSpecialItem(new ItemStack(Material.EMERALD_BLOCK), "&aSave Arena &7{Right Click}", true, "SaveArena", "&7Right click to &asave arena"));
-        inventory.addItem(ItemBuilder.getSpecialItem(new ItemStack(Material.BARRIER), "&cCancel &7{Right Click}", true, "CancelArena", "&7Right click to &ccancel the setup"));
+        inventory.addItem(CustomItemBuilder.getSpecialItem(new ItemStack(Material.SIGN), "&5Set Name/DisplayName &7{Left Click | Right Click}", true, "SetArenaName", "&7Left click to set name", "&7Right Click to set displayname"));
+        inventory.addItem(CustomItemBuilder.getSpecialItem(new ItemStack(Material.ANVIL), "&2Set ArenaCenter &7{Right Click}", true, "SetArenaCenter", "&7Right click to set the arena center"));
+        inventory.addItem(CustomItemBuilder.getSpecialItem(new ItemStack(Material.DIAMOND_AXE), "&6Set ArenaCorners &7{Left Click | Right Click}", true, "SetArenaCorner", "&7Left click to set corner 1", "&7Right Click to set corner 2"));
+        inventory.addItem(CustomItemBuilder.getSpecialItem(new ItemStack(Material.SKULL_ITEM), "&bSet SpectatorSpawns &7{Right Click}", true, "SetSpectatorSpawn", "&7Right click to set the spectator spawn"));
+        inventory.addItem(CustomItemBuilder.getSpecialItem(new ItemStack(Material.ARROW), "&4Set Spawns &7{Left Click | Right Click}", true, "SetArenaSpawns", "&7Right click to &aADD &7 a spawn", "&7Left click to &cREMOVE &7 a spawn"));
+        inventory.addItem(CustomItemBuilder.getSpecialItem(new ItemStack(Material.STICK), "&eSet IslandChests &7{Left Click | Right Click}", true, "SetIslandChests", "&7Right click to &aADD &7 a island chest", "&7Left click to &cREMOVE &7 a island chest"));
+        inventory.addItem(CustomItemBuilder.getSpecialItem(new ItemStack(Material.BLAZE_ROD), "&eSet MiddleChests &7{Left Click | Right Click}", true, "SetMiddleChests", "&7Right click to &aADD &7 a middle chest", "&7Left click to &cREMOVE &7 a middle chest"));
+        inventory.addItem(CustomItemBuilder.getSpecialItem(new ItemStack(Material.EMERALD_BLOCK), "&aSave Arena &7{Right Click}", true, "SaveArena", "&7Right click to &asave arena"));
+        inventory.addItem(CustomItemBuilder.getSpecialItem(new ItemStack(Material.BARRIER), "&cCancel &7{Right Click}", true, "CancelArena", "&7Right click to &ccancel the setup"));
 
     }
 

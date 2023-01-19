@@ -12,6 +12,7 @@ public class GameManager {
     private final ArenaConfigurationManager configManager;
     private final SetupWizardManager setupWizardManager;
     private final PlayerRollbackManager rollbackManager;
+    private final WorldTablistManager worldTablistManager;
     private final ChestManager chestManager;
 
     public GameManager(MPractice plugin) {
@@ -19,11 +20,9 @@ public class GameManager {
         this.rollbackManager = new PlayerRollbackManager();
         this.configManager = new ArenaConfigurationManager(this);
         this.chestManager = new ChestManager(plugin);
+        this.worldTablistManager = new WorldTablistManager(plugin);
         this.arenaManager = new ArenaManager(configManager.loadArenas());
         this.setupWizardManager = new SetupWizardManager(this);
-
-
-        plugin.getServer().getPluginManager().registerEvents(setupWizardManager, plugin);
     }
 
 }

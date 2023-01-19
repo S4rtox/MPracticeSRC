@@ -2,7 +2,6 @@ package me.s4rtox.mpractice.handlers.gamehandlers.arena.states;
 
 import me.s4rtox.mpractice.MPractice;
 import me.s4rtox.mpractice.handlers.gamehandlers.GameManager;
-import me.s4rtox.mpractice.handlers.gamehandlers.PlayerRollbackManager;
 import me.s4rtox.mpractice.handlers.gamehandlers.arena.Arena;
 import me.s4rtox.mpractice.handlers.gamehandlers.tasks.ArenaFinishingTask;
 import me.s4rtox.mpractice.util.Colorize;
@@ -16,14 +15,9 @@ import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.FoodLevelChangeEvent;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
-import org.bukkit.event.player.PlayerChangedWorldEvent;
 import org.bukkit.event.player.PlayerKickEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.scheduler.BukkitRunnable;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
 
 public class FinishingArenaState extends ArenaState {
     private final Player winningPlayer;
@@ -37,12 +31,22 @@ public class FinishingArenaState extends ArenaState {
     public void onEnable(MPractice plugin) {
         super.onEnable(plugin);
         //If there is a player alive don't let them die to the void
+        arena.updateAllScoreboards("&e&lMSkywars",
+                "",
+                "&6WINNER: &f",
+                "",
+                "&fGoing back in:",
+                "",
+                "&fArena: &a" + arena.displayName(),
+                "&fip.example.com"
+        );
         if (winningPlayer != null) {
+            arena.updateAllScoreboardsLine(1,  "&6WINNER: &f" + winningPlayer.getName());
             winningPlayer.setFoodLevel(20);
             new BukkitRunnable() {
                 @Override
                 public void run() {
-                    if (arena == null || !(arena.arenaState() instanceof FinishingArenaState)) {
+                    if (arena == null || arena.arenaState().getGameStateEnum() != GameState.FINISHING) {
                         cancel();
                     }
                     if (winningPlayer.getLocation().getBlockY() <= 0) {
@@ -62,6 +66,7 @@ public class FinishingArenaState extends ArenaState {
             // Yeah probably not happening :)
             PlayerQuitEvent.getHandlerList().unregister(this);
             PlayerKickEvent.getHandlerList().unregister(this);
+            arena.resetScoreboards();
             for (int i = arena.allPlayers().size() - 1; i >= 0 ; --i) {
                 Player player = Bukkit.getPlayer(arena.allPlayers().get(i));
                 if (player != null) {
@@ -90,6 +95,11 @@ public class FinishingArenaState extends ArenaState {
     @Override
     public void onSpectatorJoin(Player player) {
         player.sendMessage(Colorize.format("&cError sending you to the game!, this arena hasn't started yet!"));
+    }
+
+    @Override
+    public GameState getGameStateEnum() {
+        return GameState.FINISHING;
     }
 
     @EventHandler

@@ -26,4 +26,9 @@ public class InitArenaState extends ArenaState {
     public void onSpectatorJoin(Player player) {
         player.sendMessage(Colorize.format("&cError sending you to the game!, this arena hasn't started yet!"));
     }
+
+    @Override
+    public GameState getGameStateEnum() {
+        return GameState.SETUP;
+    }
 }

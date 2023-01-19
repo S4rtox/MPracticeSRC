@@ -7,11 +7,12 @@ import me.s4rtox.mpractice.handlers.gamehandlers.tasks.ActiveArenaEvents;
 import me.s4rtox.mpractice.util.Colorize;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
+import org.bukkit.Material;
+import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
-import org.bukkit.event.player.PlayerChangedWorldEvent;
 import org.bukkit.event.player.PlayerKickEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -33,18 +34,33 @@ public class ActiveArenaState extends ArenaState {
     @Override
     public void onEnable(MPractice plugin) {
         super.onEnable(plugin);
+        // Stuff on start //
+        arena.spawnLocations().forEach(location -> {
+            Block floor = location.clone().subtract(0,1,0).getBlock();
+            if(floor != null && floor.getType() == Material.GLASS){
+                floor.setType(Material.AIR);
+            }
+        });
         arena.fillChests();
         alivePlayers.addAll(arena.players());
+        arena.updateAllScoreboards("&e&lMSkywars",
+                "",
+                "&fAlive: &a" + alivePlayers.size(),
+                "",
+                "&fRefill in: &7&l-",
+                "",
+                "&fArena: &a" + arena.displayName(),
+                "&fip.example.com"
+        );
+        alivePlayers.forEach(playerUUID -> {
+            Player player = Bukkit.getPlayer(playerUUID);
+            if(player != null) player.setPlayerListName(Colorize.format("&7[&aA&7]" + player.getName()));
+        });
+
+        // EVENTS //
         arenaEvents = new ActiveArenaEvents(arena, () -> tryFinishGame(null), 60 * 5, 30, 2);
         arenaEvents.runTaskTimer(gameManager.plugin(),0,20);
-        //Code when they fall to the void
-        // This is just a safeguard, as if for some reason the two threads manage to finish at
-        // The same time it can cause problems.
-        // Dont think it'll be ever be executed, but there is a chance, and I aint making no mistakes
-        // if you are sure this just straight up doesnt work or know smth better just remove and change the finishing arena state.
-        //If the alive arena is empty, meaning that the last players died at the same time(in 8 ticks time)
-        //Meaning we got a tie, also if for some reason the last player ends up being null(Shouldnt happen, just in case
-        BukkitTask arenaStatesChecker = new BukkitRunnable() {
+        new BukkitRunnable() {
             @Override
             public void run() {
                 if (finishingState) {
@@ -92,6 +108,11 @@ public class ActiveArenaState extends ArenaState {
         super.onPlayerLeave(player);
     }
 
+    @Override
+    public GameState getGameStateEnum() {
+        return GameState.ACTIVE;
+    }
+
     public void tryFinishGame(Player winner){
         if(!finishingState){
             finishingState = true;
@@ -101,20 +122,21 @@ public class ActiveArenaState extends ArenaState {
 
     @EventHandler
     private void onPlayerDeath(PlayerDeathEvent event) {
+        event.setDeathMessage("");
         Player player = event.getEntity();
         Player killer = player.getKiller();
         if (killer != null) {
             if (killer != player) {
                 //Code for the killer
-                arena.sendPlayersMessage("&6" + player.getName() + " &cwas killed by " + killer.getName() + "&c.");
+                arena.sendAllMessage("&6" + player.getName() + " &cwas killed by " + killer.getName() + "&c.");
                 killer.setHealth(killer.getMaxHealth());
                 killer.giveExpLevels(3);
             } else {
                 //Code if they commited suicide
-                arena.sendPlayersMessage("&6" + player.getName() + " &cdecided to commit die");
+                arena.sendAllMessage("&6" + player.getName() + " &cdecided to commit die");
             }
         } else {
-            arena.sendPlayersMessage("&6" + player.getName() + " &cwas killed by mystical events.");
+            arena.sendAllMessage("&6" + player.getName() + " &cwas killed by mystical events.");
             //Code if there is no killer(void)
         }
         player.spigot().respawn();
@@ -123,18 +145,20 @@ public class ActiveArenaState extends ArenaState {
 
     @EventHandler
     private void onQuit(PlayerQuitEvent event) {
+        event.setQuitMessage("");
         if (arena.isPlaying(event.getPlayer())) {
             killPlayer(event.getPlayer());
-            arena.sendPlayersMessage("&6" + event.getPlayer().getName() + " &cwas killed by mystical events.");
+            arena.sendAllMessage("&6" + event.getPlayer().getName() + " &cwas killed by mystical events.");
             arena.sendToLobby(event.getPlayer());
         }
     }
 
     @EventHandler
     private void onKick (PlayerKickEvent event) {
+        event.setLeaveMessage("");
         if (arena.isPlaying(event.getPlayer())) {
             killPlayer(event.getPlayer());
-            arena.sendPlayersMessage("&6" + event.getPlayer().getName() + " &cwas killed by mystical events.");
+            arena.sendAllMessage("&6" + event.getPlayer().getName() + " &cwas killed by mystical events.");
             arena.sendToLobby(event.getPlayer());
         }
     }
@@ -163,7 +187,9 @@ public class ActiveArenaState extends ArenaState {
     public void killPlayer(Player player) {
         if (player != null) {
             if (alivePlayers.contains(player.getUniqueId())) {
+                player.setPlayerListName(Colorize.format("&7[&8D&7]" + player.getName()));
                 alivePlayers.remove(player.getUniqueId());
+                arena.updateAllScoreboardsLine(1,  "&fAlive: &a" + alivePlayers.size());
                 player.setGameMode(GameMode.SPECTATOR);
                 player.teleport(arena.spectatorSpawnLocation());
             }

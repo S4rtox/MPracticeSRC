@@ -2,6 +2,7 @@ package me.s4rtox.mpractice.handlers;
 
 import fr.mrmicky.fastboard.FastBoard;
 import me.s4rtox.mpractice.MPractice;
+import me.s4rtox.mpractice.util.Colorize;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -9,10 +10,7 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerKickEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 public class ScoreboardManager implements Listener {
     private final Map<UUID, FastBoard> scoreboards = new HashMap<>();
@@ -46,8 +44,29 @@ public class ScoreboardManager implements Listener {
         return scoreboards.get(player.getUniqueId());
     }
 
-    public void setDefaultScoreboard(Player player){
+
+    public void updateScoreboard(Player player, String title, String... lines){
         FastBoard scoreboard = scoreboards.get(player.getUniqueId());
-        scoreboard.updateLine(scoreboard.size() - 1, "Test");
+        List<String> coloredLines = new ArrayList<>();
+        for (String line : lines){
+            coloredLines.add(Colorize.format(line));
+        }
+        scoreboard.updateTitle(Colorize.format(title));
+        scoreboard.updateLines(coloredLines);
+    }
+
+    public void updateScoreboard(Player player, String title, Collection<String> lines){
+        FastBoard scoreboard = scoreboards.get(player.getUniqueId());
+        scoreboard.updateTitle(title);
+        scoreboard.updateLines(lines);
+    }
+
+    public void updateLine(Player player, int line, String text){
+        text = Colorize.format(text);
+       scoreboards.get(player.getUniqueId()).updateLine(line, text);
+    }
+
+    public void resetScoreboard(Player player){
+        scoreboards.replace(player.getUniqueId(), new FastBoard(player));
     }
 }

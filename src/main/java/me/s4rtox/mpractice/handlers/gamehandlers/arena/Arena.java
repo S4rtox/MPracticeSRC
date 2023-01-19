@@ -1,15 +1,18 @@
 package me.s4rtox.mpractice.handlers.gamehandlers.arena;
 
+import com.grinderwolf.swm.api.world.SlimeWorld;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
 import me.s4rtox.mpractice.handlers.gamehandlers.GameManager;
 import me.s4rtox.mpractice.handlers.gamehandlers.arena.states.*;
 import me.s4rtox.mpractice.util.Colorize;
+import me.s4rtox.mpractice.util.CustomItemBuilder;
 import me.s4rtox.mpractice.util.TitleBuilder;
 import net.kyori.adventure.audience.Audience;
 import org.bukkit.*;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -58,6 +61,8 @@ public class Arena {
     private final List<UUID> allPlayers;
     @Getter
     private ArenaState arenaState;
+    private SlimeWorld originalWorld;
+
 
     public Arena(
             @NonNull GameManager gameManager,
@@ -151,10 +156,10 @@ public class Arena {
     }
 
     public int getCurrentPlayers(){
-        if(this.arenaState instanceof ActiveArenaState){
+        if(this.arenaState.getGameStateEnum() == GameState.ACTIVE){
             ActiveArenaState activeArenaState = (ActiveArenaState) this.arenaState;
             return activeArenaState.getAlivePlayers().size();
-        }else if(this.arenaState instanceof FinishingArenaState){
+        }else if(this.arenaState.getGameStateEnum() == GameState.FINISHING){
             return 1;
         }else{
             return this.players.size();
@@ -187,7 +192,7 @@ public class Arena {
     }
 
     //Includes spectators
-    public void sendAllPlayersMessage(String message) {
+    public void sendAllMessage(String message) {
         message = Colorize.format(message);
         for (UUID playerUUID : this.allPlayers) {
             Player player = Bukkit.getPlayer(playerUUID);
@@ -195,14 +200,22 @@ public class Arena {
         }
     }
 
-    public void sendArenaTitle(String title, String subTitle, long fadein, long stayin ,long fadeout) {
+    public void sendPlayersTitle(String title, String subTitle, long fadein, long stayin ,long fadeout) {
         for (UUID playerUUID : this.players) {
             Audience audience = gameManager.plugin().adventure().player(playerUUID);
             TitleBuilder.showTitle(audience,title,subTitle,fadein,stayin,fadeout);
         }
     }
 
-    public void sendPlayingSound(Sound sound, float volume, float pitch) {
+    public void sendAllTitle(String title, String subTitle, long fadein, long stayin ,long fadeout) {
+        for (UUID playerUUID : this.allPlayers) {
+            Audience audience = gameManager.plugin().adventure().player(playerUUID);
+            TitleBuilder.showTitle(audience,title,subTitle,fadein,stayin,fadeout);
+        }
+    }
+
+
+    public void sendPlayersSound(Sound sound, float volume, float pitch) {
         for (UUID playerUUID : this.players) {
             Player player = Bukkit.getPlayer(playerUUID);
             if (player != null) {
@@ -211,22 +224,7 @@ public class Arena {
         }
     }
 
-    public void updateScoreboards(String title, String... lines){
-        for (UUID playerUUID : this.players) {
-            Player player = Bukkit.getPlayer(playerUUID);
-            if (player != null) {
-                if(title != null){
-                    gameManager.plugin().getScoreboardManager().getPlayerScoreboard(player).updateTitle(title);
-                }
-                if(lines != null){
-                    gameManager.plugin().getScoreboardManager().getPlayerScoreboard(player).updateLines(lines);
-                }
-
-            }
-        }
-    }
-
-    public void sendPlayersSound(Sound sound, float volume, float pitch) {
+    public void sendAllSound(Sound sound, float volume, float pitch) {
         for (UUID playerUUID : this.allPlayers) {
             Player player = Bukkit.getPlayer(playerUUID);
             if (player != null) {
@@ -235,22 +233,69 @@ public class Arena {
         }
     }
 
+
+    public void updatePlayersScoreboards(String title, String... lines){
+        for (UUID playerUUID : this.players) {
+            Player player = Bukkit.getPlayer(playerUUID);
+            if (player != null) {
+                gameManager.plugin().getScoreboardManager().updateScoreboard(player, title, lines);
+            }
+        }
+    }
+
+    public void updateAllScoreboards(String title, String... lines){
+        for (UUID playerUUID : this.allPlayers) {
+            Player player = Bukkit.getPlayer(playerUUID);
+            if (player != null) {
+                gameManager.plugin().getScoreboardManager().updateScoreboard(player, title, lines);
+            }
+        }
+    }
+
+    public void updatePlayerScoreboardsLine(int line, String text){
+        for (UUID playerUUID : this.players) {
+            Player player = Bukkit.getPlayer(playerUUID);
+            if (player != null) {
+                gameManager.plugin().getScoreboardManager().updateLine(player, line, text);
+            }
+        }
+    }
+
+    public void updateAllScoreboardsLine(int line, String text){
+        for (UUID playerUUID : this.allPlayers) {
+            Player player = Bukkit.getPlayer(playerUUID);
+            if (player != null) {
+            gameManager.plugin().getScoreboardManager().updateLine(player,line,text);
+            }
+        }
+    }
+
+    public void resetScoreboards(){
+        for (UUID playerUUID : this.allPlayers) {
+            Player player = Bukkit.getPlayer(playerUUID);
+            if (player != null) {
+                gameManager.plugin().getScoreboardManager().resetScoreboard(player);
+            }
+        }
+    }
+
+
     ////////////////////////////////////////////////////////////////////////
     // ---------------------- Arena status changers --------------------- //
     ////////////////////////////////////////////////////////////////////////
 
     public boolean cancelArena() {
-        if (!(this.arenaState instanceof ActiveArenaState)) {
+        if (!(this.arenaState.getGameStateEnum() == GameState.ACTIVE)) {
             return false;
         }
-        sendAllPlayersMessage("&c&lGAME CANCELLED BY AN ADMINISTRATOR");
+        sendAllMessage("&c&lGAME CANCELLED BY AN ADMINISTRATOR");
         this.setArenaState(new FinishingArenaState(gameManager, this, null));
         return true;
     }
 
     public boolean forceStartArena() {
-        if (this.arenaState instanceof WaitingArenaState || this.arenaState instanceof StartingArenaState) {
-            if (this.arenaState() instanceof StartingArenaState) {
+        if (this.arenaState.getGameStateEnum() == GameState.WAITING || this.arenaState.getGameStateEnum() == GameState.STARTING) {
+            if (this.arenaState().getGameStateEnum() == GameState.STARTING) {
                 StartingArenaState state = (StartingArenaState) this.arenaState();
                 state.arenaStartingTask().cancel();
             }
@@ -263,7 +308,7 @@ public class Arena {
     }
 
     public boolean startArena() {
-        if (this.arenaState instanceof WaitingArenaState) {
+        if (this.arenaState.getGameStateEnum() == GameState.WAITING) {
             this.setArenaState(new StartingArenaState(gameManager, this));
             sendPlayersMessage("&c&lCOUNTDOWN FORCEFULLY STARTED BY AN ADMINISTRATOR");
             return true;
@@ -272,4 +317,24 @@ public class Arena {
         }
     }
 
+    ////////////////////////////////////////////////////////////////////////
+    // ---------------------- Arena misc getters --------------------- //
+    ////////////////////////////////////////////////////////////////////////
+
+    public ItemStack getMaterial(){
+        switch(arenaState.getGameStateEnum()){
+            case SETUP:
+                return CustomItemBuilder.getItem(new ItemStack(Material.STAINED_CLAY,1,(short) 15), "&9&lSetting Up",false,  "&a" + players.size() + "&7/&a" + maxPlayers, "&7Arena: &f" + displayName);
+            case WAITING:
+                return CustomItemBuilder.getItem(new ItemStack(Material.STAINED_CLAY,1,(short) 5), "&a&lWaiting",false,  "&a" + players.size() + "&7/&a" + maxPlayers, "&7Arena: &f" + displayName);
+            case STARTING:
+                return CustomItemBuilder.getItem(new ItemStack(Material.STAINED_CLAY,1,(short) 4), "&e&lStarting",false,  "&a" + players.size() + "&7/&a" + maxPlayers, "&7Arena: &f" + displayName);
+            case ACTIVE:
+                return CustomItemBuilder.getItem(new ItemStack(Material.STAINED_CLAY,1,(short) 14), "&c&lOngoing",false,  "&a" + ((ActiveArenaState) arenaState).getAlivePlayers().size() + "&7/&a" + maxPlayers , "&7Arena: &f" + displayName);
+            case FINISHING:
+                return CustomItemBuilder.getItem(new ItemStack(Material.STAINED_CLAY,1,(short) 8), "&7&lFinishing",false,  "&a" + players.size() + "&7/&a" + maxPlayers , "&7Arena: &f" + displayName);
+            default:
+                return CustomItemBuilder.getItem(new ItemStack(Material.STAINED_CLAY,1,(short) 7), "&8&lRestarting",false,  "&a" + players.size() + "&7/&a" + maxPlayers, "&7Arena: &f" + displayName);
+        }
+    }
 }

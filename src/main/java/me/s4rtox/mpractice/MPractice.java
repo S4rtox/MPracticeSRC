@@ -27,7 +27,7 @@ import java.io.IOException;
 
 public final class MPractice extends JavaPlugin {
 
-    public final String version = "1.0.0";
+    public static final String version = "1.1.0";
     private BukkitAudiences adventure;
     private ConfigManager configManager;
     private SpawnSetter spawnSetter;
