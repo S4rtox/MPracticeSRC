@@ -1,7 +1,8 @@
-name: MPractice
+name: MMHunt
 version: '${project.version}'
-main: me.s4rtox.mpractice.MPractice
+main: me.s4rtox.mmhunt.MMHunt
+api-version: 1.19
 softdepend: [ PlaceholderAPI , Multiverse-Core]
-depend: [SlimeWorldManager]
+depend: []
 authors: [ S4rtox ]
 description: Me la recontra pelas le voy a poner config igual.

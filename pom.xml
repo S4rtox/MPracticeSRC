@@ -5,11 +5,11 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>me.s4rtox</groupId>
-    <artifactId>mpractice</artifactId>
+    <artifactId>mmhunt</artifactId>
     <version>1.0-SNAPSHOT</version>
     <packaging>jar</packaging>
 
-    <name>MPractice</name>
+    <name>MMHunt</name>
 
     <description>Me la recontra pelas le voy a poner config igual.</description>
     <properties>
@@ -24,8 +24,9 @@
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>3.8.1</version>
                 <configuration>
-                    <source>${java.version}</source>
-                    <target>${java.version}</target>
+                    <release>17</release>
+                    <source>16</source>
+                    <target>16</target>
                     <compilerArgs>
                         <arg>-parameters</arg>
                     </compilerArgs>
@@ -36,33 +37,33 @@
                 <artifactId>maven-shade-plugin</artifactId>
                 <version>3.3.0</version>
                 <configuration>
-                    <outputFile>C:\Users\juand\OneDrive\Escritorio\TestServer\plugins\MPE.jar</outputFile>
+                    <outputFile>C:\Users\Ultim\OneDrive\Escritorio\TestServer\1.19 server\plugins\MMHunt.jar</outputFile>
                     <dependencyReducedPomLocation>${project.build.directory}/dependency-reduced-pom.xml</dependencyReducedPomLocation>
                     <relocations>
                         <relocation>
                             <pattern>fr.mrmicky.fastboard</pattern>
                             <!-- Replace 'com.yourpackage' with the package of your plugin ! -->
-                            <shadedPattern>me.s4rtox.mpractice.lib.fastboard</shadedPattern>
+                            <shadedPattern>me.s4rtox.mmhunt.lib.fastboard</shadedPattern>
                         </relocation>
                         <relocation>
                             <pattern>co.aikar.commands</pattern>
-                            <shadedPattern>me.s4rtox.mpractice.lib.acf</shadedPattern> <!-- Replace this -->
+                            <shadedPattern>me.s4rtox.mmhunt.lib.acf</shadedPattern> <!-- Replace this -->
                         </relocation>
                         <relocation>
                             <pattern>co.aikar.locales</pattern>
-                            <shadedPattern>me.s4rtox.mpractice.lib.locales</shadedPattern> <!-- Replace this -->
+                            <shadedPattern>me.s4rtox.mmhunt.lib.locales</shadedPattern> <!-- Replace this -->
                         </relocation>
                         <relocation>
                             <pattern>dev.triumphteam.gui</pattern>
-                            <shadedPattern>me.s4rtox.mpractice.lib.gui</shadedPattern>
+                            <shadedPattern>me.s4rtox.mmhunt.lib.gui</shadedPattern>
                         </relocation>
                         <relocation>
                             <pattern>dev.dejvokep.boostedyaml</pattern>
-                            <shadedPattern>me.s4rtox.mpractice.lib</shadedPattern>
+                            <shadedPattern>me.s4rtox.mmhunt.lib</shadedPattern>
                         </relocation>
                         <relocation>
                             <pattern>de.tr7zw.changeme.nbtapi</pattern>
-                            <shadedPattern>me.s4rtox.mpractice.lib</shadedPattern>
+                            <shadedPattern>me.s4rtox.mmhunt.lib</shadedPattern>
                         </relocation>
                     </relocations>
                 </configuration>
@@ -95,7 +96,7 @@
         </repository>
         <repository>
             <id>papermc</id>
-            <url>https://papermc.io/repo/service/rest/repository/browse/maven-public</url>
+            <url>https://repo.papermc.io/repository/maven-public/</url>
         </repository>
         <repository>
             <id>sonatype</id>
@@ -149,11 +150,6 @@
             <version>2.11.1</version>
         </dependency>
         <dependency>
-            <groupId>net.kyori</groupId>
-            <artifactId>adventure-platform-bukkit</artifactId>
-            <version>4.2.0</version>
-        </dependency>
-        <dependency>
             <groupId>com.grinderwolf</groupId>
             <artifactId>slimeworldmanager-api</artifactId>
             <version>2.2.1</version>
@@ -174,9 +170,9 @@
             <version>3.1.4</version>
         </dependency>
         <dependency>
-            <groupId>org.github.paperspigot</groupId>
-            <artifactId>paperspigot-api</artifactId>
-            <version>1.8.8-R0.1-SNAPSHOT</version>
+            <groupId>io.papermc.paper</groupId>
+            <artifactId>paper-api</artifactId>
+            <version>1.19.3-R0.1-SNAPSHOT</version>
             <scope>provided</scope>
         </dependency>
     </dependencies>
