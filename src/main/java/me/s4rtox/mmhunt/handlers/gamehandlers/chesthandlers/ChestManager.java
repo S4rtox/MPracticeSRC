@@ -9,6 +9,7 @@ import org.bukkit.Material;
 import org.bukkit.block.Chest;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
@@ -69,6 +70,19 @@ public class ChestManager {
             Chest chest = (Chest) chestLocation.getBlock().getState();
             fillChest(chest.getInventory(), chestType, clearChestsInventories);
         }
+    }
+
+
+    /**
+     * Filters the chests by chance
+     * @param chance Chance for the chest to appear(0-100)
+     * @param chestLocation Location for the chest
+     */
+    public void filterChest(int chance, Location chestLocation){
+            ThreadLocalRandom random = ThreadLocalRandom.current();
+            if(random.nextInt(0,100) >= chance){
+                chestLocation.getBlock().setType(Material.AIR);
+            }
     }
 
     public void clearChestsInventories(List<Location> chestLocations){

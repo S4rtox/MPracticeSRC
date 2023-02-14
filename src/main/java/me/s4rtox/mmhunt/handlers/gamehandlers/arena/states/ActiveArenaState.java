@@ -36,51 +36,15 @@ public class ActiveArenaState extends ArenaState {
         super.onEnable(plugin);
         // Stuff on start //
         arena.fillChests();
-        alivePlayers.addAll(arena.getHunters());
-        arena.updateAllScoreboards("&e&lMSkywars",
-                "",
-                "&fAlive: &a" + alivePlayers.size(),
-                "",
-                "&fRefill in: &7&l-",
-                "",
-                "&fArena: &a" + arena.getDisplayName(),
-                "&fip.example.com"
-        );
-        alivePlayers.forEach(playerUUID -> {
-            Player player = Bukkit.getPlayer(playerUUID);
-            if(player != null) player.setPlayerListName(Colorize.format("&7[&aA&7]" + player.getName()));
-        });
+        setDefaultPlayersStates();
 
         // EVENTS //
         arenaEvents = new ActiveArenaEvents(arena, () -> tryFinishGame(null), 60 * 5, 30, 2);
         arenaEvents.runTaskTimer(gameManager.getPlugin(),0,20);
-        new BukkitRunnable() {
-            @Override
-            public void run() {
-                if (finishingState) {
-                    cancel();
-                }
-                if (alivePlayers.size() <= 1) {
-                    // This is just a safeguard, as if for some reason the two threads manage to finish at
-                    // The same time it can cause problems.
-                    // Dont think it'll be ever be executed, but there is a chance, and I aint making no mistakes
-                    // if you are sure this just straight up doesnt work or know smth better just remove and change the finishing arena state.
-                    //If the alive arena is empty, meaning that the last players died at the same time(in 8 ticks time)
-                    //Meaning we got a tie, also if for some reason the last player ends up being null(Shouldnt happen, just in case)
-                    if (!finishingState) {
-                        arenaEvents.cancel();
-                    }
-                    if (alivePlayers.isEmpty()) {
-                        tryFinishGame(null);
-                    } else {
-                        Player lastAlivePlayer = Bukkit.getPlayer(alivePlayers.get(0));
-                        tryFinishGame(lastAlivePlayer);
-                    }
-                    cancel();
-                }
-            }
-        }.runTaskTimer(plugin, 0, 8);
+
     }
+
+
 
     @Override
     public void onPlayerJoin(Player player) {
@@ -100,7 +64,20 @@ public class ActiveArenaState extends ArenaState {
 
     @Override
     public void setDefaultPlayersStates() {
-
+        alivePlayers.addAll(arena.getHunters());
+        arena.updateAllScoreboards("&e&lMSkywars",
+                "",
+                "&fAlive: &a" + alivePlayers.size(),
+                "",
+                "&fRefill in: &7&l-",
+                "",
+                "&fArena: &a" + arena.getDisplayName(),
+                "&fip.example.com"
+        );
+        alivePlayers.forEach(playerUUID -> {
+            Player player = Bukkit.getPlayer(playerUUID);
+            if(player != null) player.setPlayerListName(Colorize.format("&7[&aA&7]" + player.getName()));
+        });
     }
 
     @Override
