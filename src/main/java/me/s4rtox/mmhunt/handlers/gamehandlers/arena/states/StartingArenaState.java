@@ -5,7 +5,7 @@ import lombok.Getter;
 import me.s4rtox.mmhunt.MMHunt;
 import me.s4rtox.mmhunt.handlers.gamehandlers.GameManager;
 import me.s4rtox.mmhunt.handlers.gamehandlers.arena.Arena;
-import me.s4rtox.mmhunt.handlers.gamehandlers.tasks.ArenaStartingTask;
+import me.s4rtox.mmhunt.handlers.gamehandlers.arena.states.tasks.ArenaStartingTask;
 import me.s4rtox.mmhunt.util.CItemBuilder;
 import me.s4rtox.mmhunt.util.Colorize;
 import org.bukkit.Bukkit;
@@ -162,7 +162,7 @@ public class StartingArenaState extends ArenaState {
 
     @Override
     public void setDefaultPlayersStates() {
-        arena.updateAllScoreboards( "&e&lMSkywars",
+        arena.updateAllScoreboards( "&e&lMMHunt",
                 "",
                 "&fPlayers: &a" + arena.getCurrentPlayers() + "&7/&a",
                 "",
@@ -183,7 +183,7 @@ public class StartingArenaState extends ArenaState {
     }
     @Override
     public void setDefaultPlayerState(Player player){
-        arena.updatePlayerScoreboard(player,"&e&lMSkywars",
+        arena.updatePlayerScoreboard(player,"&e&lMMHunt",
                 "",
                 "&fPlayers: &a" + arena.getCurrentPlayers() + "&7/&a",
                 "",

@@ -10,7 +10,6 @@ import me.s4rtox.mmhunt.util.Colorize;
 import org.bukkit.*;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.scheduler.BukkitTask;
 
 import java.util.*;
 import java.util.function.Consumer;
@@ -186,6 +185,13 @@ public class Arena {
 
     public void doPlayerAction(Consumer<Player> playerConsumer){
         for (UUID playerUUID : this.getPlayers()) {
+            Player player = Bukkit.getPlayer(playerUUID);
+            if (player != null) playerConsumer.accept(player);
+        }
+    }
+
+    public void doHunterAction(Consumer<Player> playerConsumer){
+        for (UUID playerUUID : this.getHunters()) {
             Player player = Bukkit.getPlayer(playerUUID);
             if (player != null) playerConsumer.accept(player);
         }

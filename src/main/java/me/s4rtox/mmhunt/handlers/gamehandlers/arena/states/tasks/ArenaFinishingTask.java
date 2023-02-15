@@ -1,4 +1,4 @@
-package me.s4rtox.mmhunt.handlers.gamehandlers.tasks;
+package me.s4rtox.mmhunt.handlers.gamehandlers.arena.states.tasks;
 
 import me.s4rtox.mmhunt.handlers.gamehandlers.arena.Arena;
 import org.bukkit.entity.Player;

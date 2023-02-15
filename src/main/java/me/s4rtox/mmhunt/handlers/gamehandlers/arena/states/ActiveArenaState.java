@@ -1,22 +1,18 @@
 package me.s4rtox.mmhunt.handlers.gamehandlers.arena.states;
 
-import io.papermc.paper.event.player.AsyncChatEvent;
 import me.s4rtox.mmhunt.MMHunt;
+import me.s4rtox.mmhunt.config.ConfigManager;
 import me.s4rtox.mmhunt.handlers.gamehandlers.GameManager;
 import me.s4rtox.mmhunt.handlers.gamehandlers.arena.Arena;
-import me.s4rtox.mmhunt.handlers.gamehandlers.tasks.ActiveArenaEvents;
+import me.s4rtox.mmhunt.handlers.gamehandlers.arena.states.tasks.ActiveArenaEvents;
 import me.s4rtox.mmhunt.util.Colorize;
-import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
-import org.bukkit.Material;
-import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.event.player.PlayerKickEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
-import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,6 +22,11 @@ public class ActiveArenaState extends ArenaState {
     private final List<UUID> alivePlayers = new ArrayList<>();
     private ActiveArenaEvents arenaEvents;
     private boolean finishingState = false;
+    public static final String RUNNER = "&7[&aR&7]&f ";
+    public static final String HUNTER = "&7[&cH&7]&f ";
+    public static final String DEAD = "&7[&0D&7]&f ";
+    public static final String SPECTATOR = "&7[SPEC]&f ";
+
 
     public ActiveArenaState(GameManager gameManager, Arena arena) {
         super(gameManager, arena);
@@ -39,17 +40,11 @@ public class ActiveArenaState extends ArenaState {
         setDefaultPlayersStates();
 
         // EVENTS //
-        arenaEvents = new ActiveArenaEvents(arena, () -> tryFinishGame(null), 60 * 5, 30, 2);
+        arenaEvents = new ActiveArenaEvents(this);
         arenaEvents.runTaskTimer(gameManager.getPlugin(),0,20);
 
     }
 
-
-
-    @Override
-    public void onPlayerJoin(Player player) {
-        player.sendMessage(Colorize.format("&cError sending you to the game!, this arena has already started!"));
-    }
 
     @Override
     public void onPlayerLeave(Player player) {
@@ -57,40 +52,29 @@ public class ActiveArenaState extends ArenaState {
         super.onPlayerLeave(player);
     }
 
-    @Override
-    public GameState getGameStateEnum() {
-        return GameState.ACTIVE;
-    }
 
     @Override
     public void setDefaultPlayersStates() {
         alivePlayers.addAll(arena.getHunters());
-        arena.updateAllScoreboards("&e&lMSkywars",
+        arena.updateAllScoreboards("&e&lMMHunt",
                 "",
                 "&fAlive: &a" + alivePlayers.size(),
                 "",
-                "&fRefill in: &7&l-",
-                "",
+                "&fNext Event:",
+                "&fIn:",
                 "&fArena: &a" + arena.getDisplayName(),
-                "&fip.example.com"
+                "&f" + ConfigManager.serverIP
         );
-        alivePlayers.forEach(playerUUID -> {
-            Player player = Bukkit.getPlayer(playerUUID);
-            if(player != null) player.setPlayerListName(Colorize.format("&7[&aA&7]" + player.getName()));
-        });
+        arena.doHunterAction(player -> player.setPlayerListName(Colorize.format(ActiveArenaState.HUNTER + player.getName())));
+        arena.doRunnerAction(player -> player.setPlayerListName(Colorize.format(ActiveArenaState.RUNNER + player.getName())));
     }
 
     @Override
     public void setDefaultPlayerState(Player player) {
-
+        alivePlayers.add(player.getUniqueId());
+        arena.doHunterAction(p -> p.setPlayerListName(Colorize.format(ActiveArenaState.HUNTER + p.getName())));
     }
 
-    public void tryFinishGame(Player winner){
-        if(!finishingState){
-            finishingState = true;
-            arena.setArenaState(new FinishingArenaState(gameManager, arena, winner));
-        }
-    }
 
     @EventHandler
     private void onPlayerDeath(PlayerDeathEvent event) {
@@ -114,6 +98,18 @@ public class ActiveArenaState extends ArenaState {
         player.spigot().respawn();
         killPlayer(player);
     }
+
+    public void killPlayer(Player player) {
+        if (player != null) {
+            if (alivePlayers.contains(player.getUniqueId())) {
+                player.setPlayerListName(Colorize.format(ActiveArenaState.DEAD + player.getName()));
+                alivePlayers.remove(player.getUniqueId());
+                player.setGameMode(GameMode.SPECTATOR);
+                player.teleport(arena.getSpectatorSpawnLocation());
+            }
+        }
+    }
+
 
     @EventHandler
     private void onQuit(PlayerQuitEvent event) {
@@ -140,35 +136,33 @@ public class ActiveArenaState extends ArenaState {
         Player player = event.getPlayer();
         if (arena.isInGame(player)) {
             event.getRecipients().clear();
-            arena.getEveryone().forEach(playerUUID -> {
-                Player arenaPlayer = Bukkit.getPlayer(playerUUID);
-                if(arenaPlayer != null){
-                    event.getRecipients().add(arenaPlayer);
-                }
-            });
-            if (alivePlayers.contains(player.getUniqueId())) {
-                event.setFormat(Colorize.format("&7[&aALIVE&7]&f " + player.getDisplayName() + "&7:&f ") + event.getMessage());
-            } else if (arena.isPlaying(player)) {
-                event.setFormat(Colorize.format("&7[DEAD]&f " + player.getDisplayName() + "&7:&f ") + event.getMessage());
-            } else if (arena.isSpectating(player)) {
-                event.setFormat(Colorize.format("&7[SPECTATING]&f " + player.getDisplayName() + "&7:&f ") + event.getMessage());
+            arena.doAllAction(player1 -> event.getRecipients().add(player1));
+            if(arena.isSpectating(player)){
+                event.setFormat(Colorize.format(ActiveArenaState.SPECTATOR + player.getDisplayName() + "&7:&7 ") + event.getMessage());
+            }else if(!alivePlayers.contains(player.getUniqueId())){
+                event.setFormat(Colorize.format(ActiveArenaState.DEAD + player.getDisplayName() + "&7:&7 ") + event.getMessage());
+
+            }else if(arena.isRunner(player)){
+                event.setFormat(Colorize.format(ActiveArenaState.RUNNER + player.getDisplayName() + "&7:&f ") + event.getMessage());
+            }else{
+                event.setFormat(Colorize.format(ActiveArenaState.HUNTER + player.getDisplayName() + "&7: ") + event.getMessage());
             }
         }
     }
 
-    public void killPlayer(Player player) {
-        if (player != null) {
-            if (alivePlayers.contains(player.getUniqueId())) {
-                player.setPlayerListName(Colorize.format("&7[&8D&7]" + player.getName()));
-                alivePlayers.remove(player.getUniqueId());
-                arena.updateAllScoreboardsLine(1,  "&fAlive: &a" + alivePlayers.size());
-                player.setGameMode(GameMode.SPECTATOR);
-                player.teleport(arena.getSpectatorSpawnLocation());
-            }
+    public void tryFinishGame(){
+        if(!finishingState){
+            finishingState = true;
+            arena.setArenaState(new FinishingArenaState(gameManager, arena));
         }
     }
 
     public List<UUID> getAlivePlayers() {
         return alivePlayers;
+    }
+
+    @Override
+    public GameState getGameStateEnum() {
+        return GameState.ACTIVE;
     }
 }

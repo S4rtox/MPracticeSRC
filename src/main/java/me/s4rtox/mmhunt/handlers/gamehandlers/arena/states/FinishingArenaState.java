@@ -3,11 +3,9 @@ package me.s4rtox.mmhunt.handlers.gamehandlers.arena.states;
 import me.s4rtox.mmhunt.MMHunt;
 import me.s4rtox.mmhunt.handlers.gamehandlers.GameManager;
 import me.s4rtox.mmhunt.handlers.gamehandlers.arena.Arena;
-import me.s4rtox.mmhunt.handlers.gamehandlers.tasks.ArenaFinishingTask;
+import me.s4rtox.mmhunt.handlers.gamehandlers.arena.states.tasks.ArenaFinishingTask;
 import me.s4rtox.mmhunt.util.Colorize;
 import org.bukkit.Bukkit;
-import org.bukkit.Material;
-import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.block.BlockBreakEvent;
@@ -23,18 +21,16 @@ import java.util.Iterator;
 import java.util.UUID;
 
 public class FinishingArenaState extends ArenaState {
-    private final Player winningPlayer;
 
-    public FinishingArenaState(GameManager gameManager, Arena arena, Player winningPlayer) {
+    public FinishingArenaState(GameManager gameManager, Arena arena) {
         super(gameManager, arena);
-        this.winningPlayer = winningPlayer;
     }
 
     @Override
     public void onEnable(MMHunt plugin) {
         super.onEnable(plugin);
         //If there is a player alive don't let them die to the void
-        arena.updateAllScoreboards("&e&lMSkywars",
+        arena.updateAllScoreboards("&e&lMMHunt",
                 "",
                 "&6WINNER: &f",
                 "",

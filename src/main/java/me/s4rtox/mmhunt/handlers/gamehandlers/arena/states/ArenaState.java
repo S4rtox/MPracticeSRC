@@ -1,5 +1,6 @@
 package me.s4rtox.mmhunt.handlers.gamehandlers.arena.states;
 
+import lombok.Getter;
 import me.s4rtox.mmhunt.MMHunt;
 import me.s4rtox.mmhunt.handlers.gamehandlers.GameManager;
 import me.s4rtox.mmhunt.handlers.gamehandlers.arena.Arena;
@@ -11,6 +12,7 @@ import org.bukkit.event.Listener;
 
 public abstract class ArenaState implements Listener {
     protected final GameManager gameManager;
+    @Getter
     protected final Arena arena;
 
     protected ArenaState(GameManager gameManager, Arena arena) {

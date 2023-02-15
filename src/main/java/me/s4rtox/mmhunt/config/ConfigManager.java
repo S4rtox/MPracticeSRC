@@ -12,6 +12,7 @@ public class ConfigManager {
     private final YamlDocument config;
     private final YamlDocument messages;
 
+    public final static String serverIP = "mineguards.com";
     /* Config Settings */
     //World Section
     @Getter

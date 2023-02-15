@@ -36,15 +36,15 @@ public class BungeeWrapper implements PluginMessageListener {
     // Set of servers.
     private Set<String> servers = new HashSet<>();
     // Map of player uuid's for the Key, and their IP for the value.
-    private Map<UUID, String> playerIps = new HashMap<>();
+    private final Map<UUID, String> playerIps = new HashMap<>();
     // Map of server names for the Key, and player count for the value.
-    private Map<String, Integer> playerCount = new HashMap<>();
+    private final Map<String, Integer> playerCount = new HashMap<>();
     // Map of server names for the Key, and player names for the value.
-    private Map<String, String[]> playerList = new HashMap<>();
+    private final Map<String, String[]> playerList = new HashMap<>();
     // Map of server names for the Key, and the server IP for the value.
-    private Map<String, String> serverIp = new HashMap<>();
+    private final Map<String, String> serverIp = new HashMap<>();
     // Map of player names for the Key, and player UUIDs for the value.
-    private Map<String, UUID> playerIds = new HashMap<>();
+    private final Map<String, UUID> playerIds = new HashMap<>();
 
     /**
      * Initiate the bungee com, and register channels.

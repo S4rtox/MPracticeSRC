@@ -178,7 +178,7 @@ public class WaitingArenaState extends ArenaState {
 
     @Override
     public void setDefaultPlayersStates() {
-        arena.updateAllScoreboards("&e&lMSkywars",
+        arena.updateAllScoreboards("&e&lMMHunt",
                 "",
                 "&fPlayers: &a" + arena.getCurrentPlayers(),
                 "",
@@ -193,7 +193,7 @@ public class WaitingArenaState extends ArenaState {
 
     @Override
     public void setDefaultPlayerState(Player player){
-        arena.updatePlayerScoreboard(player,"&e&lMSkywars",
+        arena.updatePlayerScoreboard(player,"&e&lMMHunt",
                 "",
                 "&fPlayers: &a" + arena.getCurrentPlayers(),
                 "",
