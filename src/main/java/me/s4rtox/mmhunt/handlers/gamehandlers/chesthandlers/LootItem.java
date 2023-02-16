@@ -20,13 +20,7 @@ public class LootItem {
     private final boolean allowDuplicates;
 
     public LootItem(Section section){
-        Material material;
-        try{
-            material = Material.valueOf(section.getString("material").toUpperCase().replace('-','_'));
-        }catch (IllegalArgumentException exception){
-            material = Material.AIR;
-        }
-        this.material = material;
+        material = Material.valueOf(section.getString("material", "AIR").toUpperCase().replace('-','_'));
         this.customName = section.getString("name", material.name());
         if(section.isList("enchantments")){
             List<String> enchantmentList = section.getStringList("enchantments");
@@ -48,7 +42,7 @@ public class LootItem {
         this.chance = section.getDouble("chance", 0.1);
         this.minAmount = section.getInt("minAmount", 1);
         this.maxAmount =  section.getInt("maxAmount", 1);
-        this.allowDuplicates = section.getBoolean("allowDuplicates", false);
+        this.allowDuplicates = section.getBoolean("allowDuplicates", true);
     }
 
     public boolean shouldFill(Random random){
@@ -78,6 +72,10 @@ public class LootItem {
         }
         item.setItemMeta(itemMeta);
         return item;
+    }
+
+    public double getChance(){
+        return chance;
     }
 
 }

@@ -4,11 +4,9 @@ import com.google.common.base.Preconditions;
 import de.tr7zw.changeme.nbtapi.NBT;
 import dev.triumphteam.gui.components.GuiAction;
 import dev.triumphteam.gui.guis.GuiItem;
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.Color;
-import org.bukkit.Material;
+import org.bukkit.*;
 import org.bukkit.enchantments.Enchantment;
+import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
@@ -16,10 +14,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.LeatherArmorMeta;
 import org.bukkit.material.MaterialData;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 
 public class CItemBuilder {
     private final ItemStack item;
@@ -177,5 +172,15 @@ public class CItemBuilder {
 
     public ItemStack build() {
         return this.item.clone();
+    }
+
+    public static void tryAdding(Player player, Collection<ItemStack> itemStacks){
+        Location loc = player.getLocation().add(0,1,0);
+        World world = loc.getWorld();
+        for (ItemStack item : itemStacks){
+            world.dropItem(loc,item);
+        }
+        player.sendMessage("&cCouldn't add items to your inventory because its full! \n" +
+                "&cThey have been dropped to the ground");
     }
 }

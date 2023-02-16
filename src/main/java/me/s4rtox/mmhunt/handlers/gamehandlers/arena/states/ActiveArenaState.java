@@ -23,9 +23,9 @@ public class ActiveArenaState extends ArenaState {
     private ActiveArenaEvents arenaEvents;
     private boolean finishingState = false;
     public static final String RUNNER = "&7[&aR&7]&f ";
-    public static final String HUNTER = "&7[&cH&7]&f ";
-    public static final String DEAD = "&7[&0D&7]&f ";
-    public static final String SPECTATOR = "&7[SPEC]&f ";
+    public static final String HUNTER = "&7[&cH&7]&7 ";
+    public static final String DEAD = "&7[&0D&7]&7 ";
+    public static final String SPECTATOR = "&7[&fSPEC]&7 ";
 
 
     public ActiveArenaState(GameManager gameManager, Arena arena) {
@@ -36,11 +36,11 @@ public class ActiveArenaState extends ArenaState {
     public void onEnable(MMHunt plugin) {
         super.onEnable(plugin);
         // Stuff on start //
-        arena.fillChests();
+        arena.firstFillChests();
         setDefaultPlayersStates();
 
         // EVENTS //
-        arenaEvents = new ActiveArenaEvents(this);
+        arenaEvents = new ActiveArenaEvents(arena,gameManager);
         arenaEvents.runTaskTimer(gameManager.getPlugin(),0,20);
 
     }
@@ -61,7 +61,8 @@ public class ActiveArenaState extends ArenaState {
                 "&fAlive: &a" + alivePlayers.size(),
                 "",
                 "&fNext Event:",
-                "&fIn:",
+                "",
+                "&fMatch duration: &a",
                 "&fArena: &a" + arena.getDisplayName(),
                 "&f" + ConfigManager.serverIP
         );
@@ -155,6 +156,10 @@ public class ActiveArenaState extends ArenaState {
             finishingState = true;
             arena.setArenaState(new FinishingArenaState(gameManager, arena));
         }
+    }
+
+    public void cancelArenaEvents(){
+        arenaEvents.cancel();
     }
 
     public List<UUID> getAlivePlayers() {

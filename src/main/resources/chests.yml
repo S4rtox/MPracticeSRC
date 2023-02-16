@@ -1,7 +1,10 @@
 file-version: 2
 
+chest-appearance-chance: 0.2
 chestItems:
   islandChest:
+    empty:
+      chance: 0.2
     0:
       material: IRON_SWORD
       name: '&cFire sword'
@@ -21,6 +24,8 @@ chestItems:
       maxAmount: 1
       allowDuplicates: false
   middleChest:
+    empty:
+      chance: 0.2
     0:
       material: IRON_SWORD
       name: '&cFire sword'

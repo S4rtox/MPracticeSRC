@@ -15,6 +15,7 @@ import java.util.*;
 import java.util.function.Consumer;
 
 public class Arena {
+    @Getter
     private final GameManager gameManager;
     @Getter
     @Setter
@@ -170,6 +171,9 @@ public class Arena {
     /////////////////////////////////////////////////////////////////////
     // ---------------------- Arena Setup Events --------------------- //
     /////////////////////////////////////////////////////////////////////
+    public void firstFillChests(){
+        gameManager.getChestManager().firstFillChests(chests,"islandChest",true);
+    }
     public void fillChests() {
         gameManager.getChestManager().fillChestLocations(chests, "islandChest", true);
     }
@@ -321,7 +325,7 @@ public class Arena {
             return false;
         }
         sendAllMessage("&c&lGAME CANCELLED BY AN ADMINISTRATOR");
-        this.setArenaState(new FinishingArenaState(gameManager, this, null));
+        this.setArenaState(new FinishingArenaState(gameManager, this));
         return true;
     }
 
