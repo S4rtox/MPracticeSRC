@@ -325,6 +325,7 @@ public class Arena {
             return false;
         }
         sendAllMessage("&c&lGAME CANCELLED BY AN ADMINISTRATOR");
+        ((ActiveArenaState) this.arenaState).cancelArenaEvents();
         this.setArenaState(new FinishingArenaState(gameManager, this));
         return true;
     }

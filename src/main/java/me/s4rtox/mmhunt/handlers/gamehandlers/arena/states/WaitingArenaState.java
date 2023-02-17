@@ -33,7 +33,7 @@ public class WaitingArenaState extends ArenaState {
     public void onPlayerJoin(Player player) {
         super.onPlayerJoin(player);
         arena.sendAllMessage("&7[&a+&7] &f" + player.getDisplayName());
-       giveAdminItems(player);
+       setDefaultPlayerState(player);
        player.teleport(arena.getWaitingLobby());
     }
 
@@ -99,14 +99,14 @@ public class WaitingArenaState extends ArenaState {
             NBTItem itemFlag = new NBTItem(item);
             if(!itemFlag.hasCustomNbtData()) return;
             if(itemFlag.hasTag("RunnerSelector")){
-                selectRunner(event.getPlayer());
+                selectRunner((Player) event.getRightClicked());
             }
         }
     }
 
     private void selectRunner(Player runner){
         arena.setRunner(runner.getUniqueId());
-        arena.sendAllMessage("Runner is:" + arena.getRunner().getName());
+        arena.sendAllMessage("Runner is: " + arena.getRunner().getName());
     }
     @EventHandler
     private void onQuit(PlayerQuitEvent event) {
@@ -188,6 +188,7 @@ public class WaitingArenaState extends ArenaState {
                 "&fArena: &a" + arena.getDisplayName(),
                 "&fip.example.com"
         );
+        arena.doAllAction(this::giveAdminItems);
     }
 
 
@@ -202,6 +203,6 @@ public class WaitingArenaState extends ArenaState {
                 "&fStatus: &e&lWAITING",
                 "&fArena: &a" + arena.getDisplayName(),
                 "&fip.example.com");
-        arena.doAllAction(this::giveAdminItems);
+        giveAdminItems(player);
     }
 }

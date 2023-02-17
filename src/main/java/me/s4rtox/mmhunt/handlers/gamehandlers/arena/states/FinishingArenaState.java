@@ -39,21 +39,6 @@ public class FinishingArenaState extends ArenaState {
                 "&fArena: &a" + arena.getDisplayName(),
                 "&fip.example.com"
         );
-        if (winningPlayer != null) {
-            arena.updateAllScoreboardsLine(1,  "&6WINNER: &f" + winningPlayer.getName());
-            winningPlayer.setFoodLevel(20);
-            new BukkitRunnable() {
-                @Override
-                public void run() {
-                    if (arena == null || arena.getArenaState().getGameStateEnum() != GameState.FINISHING) {
-                        cancel();
-                    }
-                    if (winningPlayer.getLocation().getBlockY() <= 0) {
-                        winningPlayer.teleport(arena.getCenterLocation().clone().add(0, 1, 0));
-                    }
-                }
-            }.runTaskTimer(plugin, 0, 8);
-        }
         //Start the task to make it go to arena
         new ArenaFinishingTask(arena, () -> {
             // Ugly unregister event as if it gets teleported it just pulls a iterator error as the list gets
@@ -77,7 +62,7 @@ public class FinishingArenaState extends ArenaState {
             arena.getEveryone().clear();
             arena.clearChests();
             arena.setArenaState(new WaitingArenaState(gameManager, arena));
-        }, 10, winningPlayer).runTaskTimer(plugin, 0, 20);
+        }, 10).runTaskTimer(plugin, 0, 20);
     }
 
     @Override
@@ -129,9 +114,7 @@ public class FinishingArenaState extends ArenaState {
                     event.getRecipients().add(arenaPlayer);
                 }
             });
-            if (winningPlayer.equals(player)) {
-                event.setFormat(Colorize.format("&7[&6WINNER&7]&f " + player.getDisplayName() + "&7:&f ") + event.getMessage());
-            } else if (arena.isPlaying(player)) {
+            if (arena.isPlaying(player)) {
                 event.setFormat(Colorize.format("&7[DEAD]&f " + player.getDisplayName() + "&7:&f ") + event.getMessage());
             } else if (arena.isSpectating(player)) {
                 event.setFormat(Colorize.format("&7[SPECTATING]&f "+ player.getDisplayName() + "&7:&f ") + event.getMessage());

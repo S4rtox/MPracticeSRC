@@ -34,7 +34,6 @@ public class StartingArenaState extends ArenaState {
         setDefaultPlayersStates();
         arenaStartingTask = new ArenaStartingTask(arena, () -> arena.setArenaState(new ActiveArenaState(gameManager, arena)), 10);
         arenaStartingTask.runTaskTimer(plugin, 0, 20);
-        setDefaultPlayersStates();
     }
     @Override
     public void onPlayerJoin(Player player) {
@@ -71,14 +70,14 @@ public class StartingArenaState extends ArenaState {
             if (!itemFlag.hasCustomNbtData()) return;
             if (itemFlag.hasTag("GameStarter")) {
                 event.setCancelled(true);
+                cancelStartup();
             }
         }
     }
 
-    private void cancelStartup(Player player){
+    private void cancelStartup(){
         this.arenaStartingTask.cancel();
         arena.sendPlayersMessage("&cStartup cancelled");
-       player.getInventory().setItem(4, CItemBuilder.of(Material.EMERALD_BLOCK).name("&aStart Game").setLore("&7Right Click to start game").dummyEnchant().addBooleanNbtData("GameStarter",true).build());
         arena.setArenaState(new WaitingArenaState(gameManager, arena));
     }
 
@@ -172,6 +171,7 @@ public class StartingArenaState extends ArenaState {
                 "&fArena: &a" + arena.getDisplayName(),
                 "&fip.example.com"
         );
+        arena.doAllAction(this::giveAdminItems);
     }
 
     private void giveAdminItems(Player test){
@@ -193,6 +193,6 @@ public class StartingArenaState extends ArenaState {
                 "&fArena: &a" + arena.getDisplayName(),
                 "&fip.example.com"
         );
-        arena.doAllAction(this::giveAdminItems);
+        giveAdminItems(player);
     }
 }
