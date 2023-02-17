@@ -5,9 +5,13 @@ import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.potion.PotionEffect;
+
+import java.util.Collection;
 
 @Getter
 public class SavedPlayer {
+    private final Collection<PotionEffect> potions;
     private final ItemStack[] inventoryItems;
     private final ItemStack[] inventoryArmor;
     private final GameMode gameMode;
@@ -22,5 +26,6 @@ public class SavedPlayer {
         this.foodLevel = player.getFoodLevel();
         this.totalXP = player.getTotalExperience();
         this.location = player.getLocation().clone();
+        this.potions = player.getActivePotionEffects();
     }
 }

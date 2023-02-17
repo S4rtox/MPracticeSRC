@@ -9,12 +9,7 @@ import java.util.UUID;
 
 public class PlayerRollbackManager {
 
-    private final Map<UUID, SavedPlayer> savedPlayers;
-
-    public PlayerRollbackManager(){
-        savedPlayers = new HashMap<>();
-    }
-
+    private final Map<UUID, SavedPlayer> savedPlayers = new HashMap<>();
     public void save(Player player) {
         if (savedPlayers.containsKey(player.getUniqueId())) {
             savedPlayers.replace(player.getUniqueId(), new SavedPlayer(player));
@@ -42,6 +37,9 @@ public class PlayerRollbackManager {
         }
         if (savedPlayer.getInventoryArmor() != null) {
             player.getInventory().setArmorContents(savedPlayer.getInventoryArmor());
+        }
+        if(!savedPlayer.getPotions().isEmpty()){
+            player.addPotionEffects(savedPlayer.getPotions());
         }
         player.setGameMode(savedPlayer.getGameMode());
         player.setFoodLevel(savedPlayer.getFoodLevel());

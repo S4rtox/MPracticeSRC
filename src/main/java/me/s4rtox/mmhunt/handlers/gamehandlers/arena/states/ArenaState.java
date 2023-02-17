@@ -62,7 +62,6 @@ public abstract class ArenaState implements Listener {
      * Player leaving the arena
      */
     public void onSpectatorJoin(Player player){
-        player.setPlayerListName(Colorize.format("&7[&fS&7]" + player.getName()));
         arena.getSpectators().add(player.getUniqueId());
         setSpectatorJoinState(player);
     }
@@ -80,10 +79,11 @@ public abstract class ArenaState implements Listener {
         player.getInventory();
         player.getEquipment().setArmorContents(null);
         player.setGameMode(GameMode.SURVIVAL);
+        player.setFireTicks(0);
         player.setFoodLevel(20);
         player.setHealth(player.getMaxHealth());
+        player.getActivePotionEffects().clear();
         gameManager.getPlugin().getLobbyHandler().removeLobbyPlayer(player);
-        player.setPlayerListName(Colorize.format("&7[&eW&7]&f" + player.getName()));
     }
 
     private void setSpectatorJoinState(Player player){
@@ -91,6 +91,7 @@ public abstract class ArenaState implements Listener {
         player.teleport(arena.getSpectatorSpawnLocation());
         player.getInventory().clear();
         player.getEquipment().clear();
+        player.getActivePotionEffects().clear();
         player.setGameMode(GameMode.SPECTATOR);
         gameManager.getPlugin().getLobbyHandler().removeLobbyPlayer(player);
     }

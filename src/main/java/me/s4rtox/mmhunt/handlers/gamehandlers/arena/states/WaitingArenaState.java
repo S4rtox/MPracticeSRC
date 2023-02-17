@@ -204,5 +204,6 @@ public class WaitingArenaState extends ArenaState {
                 "&fArena: &a" + arena.getDisplayName(),
                 "&fip.example.com");
         giveAdminItems(player);
+        player.setPlayerListName(Colorize.format("&7[&eW&7]&f" + player.getName()));
     }
 }

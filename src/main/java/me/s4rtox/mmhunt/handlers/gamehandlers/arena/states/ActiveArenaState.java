@@ -18,7 +18,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-public class ActiveArenaState extends ArenaState {
+public class ActiveArenaState extends PlayableArenaState {
     private final List<UUID> alivePlayers = new ArrayList<>();
     private ActiveArenaEvents arenaEvents;
     private boolean finishingState = false;
@@ -73,7 +73,6 @@ public class ActiveArenaState extends ArenaState {
     @Override
     public void setDefaultPlayerState(Player player) {
         alivePlayers.add(player.getUniqueId());
-        arena.doHunterAction(p -> p.setPlayerListName(Colorize.format(ActiveArenaState.HUNTER + p.getName())));
     }
 
 
@@ -111,6 +110,26 @@ public class ActiveArenaState extends ArenaState {
         }
     }
 
+    public boolean revivePlayer(Player player){
+        if(arena.getPlayers().contains(player.getUniqueId()) && !alivePlayers.contains(player.getUniqueId())){
+            player.setGameMode(GameMode.SURVIVAL);
+            alivePlayers.add(player.getUniqueId());
+            return true;
+        }
+        return false;
+    }
+
+    @Override
+    public void onPlayerJoin(Player player) {
+        super.onPlayerJoin(player);
+        player.teleport(arena.getSpawnLocation());
+    }
+
+    @Override
+    public void onSpectatorJoin(Player player) {
+        super.onSpectatorJoin(player);
+        player.setPlayerListName(Colorize.format("&7[&fS&7]" + player.getName()));
+    }
 
     @EventHandler
     private void onQuit(PlayerQuitEvent event) {
@@ -132,24 +151,6 @@ public class ActiveArenaState extends ArenaState {
         }
     }
 
-    @EventHandler
-    private void activeChatFormat(AsyncPlayerChatEvent event) {
-        Player player = event.getPlayer();
-        if (arena.isInGame(player)) {
-            event.getRecipients().clear();
-            arena.doAllAction(player1 -> event.getRecipients().add(player1));
-            if(arena.isSpectating(player)){
-                event.setFormat(Colorize.format(ActiveArenaState.SPECTATOR + player.getDisplayName() + "&7:&7 ") + event.getMessage());
-            }else if(!alivePlayers.contains(player.getUniqueId())){
-                event.setFormat(Colorize.format(ActiveArenaState.DEAD + player.getDisplayName() + "&7:&7 ") + event.getMessage());
-
-            }else if(arena.isRunner(player)){
-                event.setFormat(Colorize.format(ActiveArenaState.RUNNER + player.getDisplayName() + "&7:&f ") + event.getMessage());
-            }else{
-                event.setFormat(Colorize.format(ActiveArenaState.HUNTER + player.getDisplayName() + "&7: ") + event.getMessage());
-            }
-        }
-    }
 
     public void tryFinishGame(){
         if(!finishingState){

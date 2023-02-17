@@ -126,10 +126,14 @@ public class ActiveArenaEvents extends BukkitRunnable {
                             CItemBuilder.of(Material.COMPASS).name("&bRunner Tracker").build()
                     ).values());
                 });
-                nextEvent = "DeathMatch";
+                nextEvent = "Revive all";
                 timeUntill = 50 * 60 - matchDuration;
             }
             case 50 * 60 -> {
+                nextEvent = "DeathMatch";
+                timeUntill = 60 * 60 - matchDuration;
+            }
+            case 60 * 60 -> {
                 arena.setArenaState(new DeathmatchArenaState(gameManager, arena));
                 cancel();
             }
