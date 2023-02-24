@@ -16,6 +16,7 @@ import me.s4rtox.mmhunt.handlers.gamehandlers.GameManager;
 import me.s4rtox.mmhunt.handlers.lobbyhandlers.JoinItemsHandler;
 import me.s4rtox.mmhunt.handlers.lobbyhandlers.LobbyHandler;
 import me.s4rtox.mmhunt.handlers.lobbyhandlers.SpawnSetter;
+import me.s4rtox.mmhunt.util.BungeeWrapper;
 import me.s4rtox.mmhunt.util.Colorize;
 import me.s4rtox.mmhunt.util.PapiFormatter;
 import org.bukkit.Bukkit;
@@ -57,9 +58,6 @@ public final class MMHunt extends JavaPlugin {
             getLogger().warning(Colorize.format("&ePlaceholderAPI not detected!, disabling PAPI placeholders."));
         }
 
-
-        SlimePlugin slimeWorldManager = (SlimePlugin) Bukkit.getPluginManager().getPlugin("SlimeWorldManager");
-
         commandManager = new PaperCommandManager(this);
 
         configSetup();
@@ -88,18 +86,18 @@ public final class MMHunt extends JavaPlugin {
 
     public void configSetup() {
         try {
-            config = YamlDocument.create(new File(getDataFolder(), "config.yml"), getResource("config.yml"), GeneralSettings.DEFAULT, LoaderSettings.builder().setAutoUpdate(true).build(), DumperSettings.DEFAULT, UpdaterSettings.builder().setVersioning(new BasicVersioning("file-version")).build());
-            spawnConfig = YamlDocument.create(new File(getDataFolder(), "spawn.yml"), getResource("spawn.yml"), GeneralSettings.DEFAULT, LoaderSettings.builder().setAutoUpdate(true).build(), DumperSettings.DEFAULT, UpdaterSettings.builder().setVersioning(new BasicVersioning("file-version")).build());
-            messagesConfig = YamlDocument.create(new File(getDataFolder(), "messages.yml"), getResource("messages.yml"), GeneralSettings.DEFAULT, LoaderSettings.builder().setAutoUpdate(true).build(), DumperSettings.DEFAULT, UpdaterSettings.builder().setVersioning(new BasicVersioning("file-version")).build());
+            config = YamlDocument.create(new File(getDataFolder(), "config.yml"), getResource("config.yml"), GeneralSettings.builder().setUseDefaults(false).build(), LoaderSettings.builder().setAutoUpdate(true).build(), DumperSettings.DEFAULT, UpdaterSettings.builder().setVersioning(new BasicVersioning("file-version")).build());
+            spawnConfig = YamlDocument.create(new File(getDataFolder(), "spawn.yml"), getResource("spawn.yml"), GeneralSettings.builder().setUseDefaults(false).build(), LoaderSettings.builder().setAutoUpdate(true).build(), DumperSettings.DEFAULT, UpdaterSettings.builder().setVersioning(new BasicVersioning("file-version")).build());
+            messagesConfig = YamlDocument.create(new File(getDataFolder(), "messages.yml"), getResource("messages.yml"), GeneralSettings.builder().setUseDefaults(false).build(), LoaderSettings.builder().setAutoUpdate(true).build(), DumperSettings.DEFAULT, UpdaterSettings.builder().setVersioning(new BasicVersioning("file-version")).build());
             arenaConfig = YamlDocument.create(new File(getDataFolder(), "arenas.yml"));
-            chestConfig = YamlDocument.create(new File(getDataFolder(), "chests.yml"), getResource("chests.yml"), GeneralSettings.DEFAULT, LoaderSettings.builder().setAutoUpdate(true).build(), DumperSettings.DEFAULT, UpdaterSettings.builder().setVersioning(new BasicVersioning("file-version")).build());
+            chestConfig = YamlDocument.create(new File(getDataFolder(), "chests.yml"), getResource("chests.yml"), GeneralSettings.builder().setUseDefaults(false).build(), LoaderSettings.builder().setAutoUpdate(true).build(), DumperSettings.DEFAULT, UpdaterSettings.builder().setVersioning(new BasicVersioning("file-version")).build());
         } catch (IOException ex) {
             ex.printStackTrace();
         }
     }
 
     public void handlerSetup() {
-
+        new BungeeWrapper(this);
         lobbyHandler = new LobbyHandler(this);
         new JoinItemsHandler(this);
         gameManager = new GameManager(this);

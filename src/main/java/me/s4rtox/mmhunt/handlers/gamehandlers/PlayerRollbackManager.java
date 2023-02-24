@@ -18,6 +18,7 @@ public class PlayerRollbackManager {
         }
     }
 
+
     public void restore(Player player, boolean restoreLocation) {
         if (!savedPlayers.containsKey(player.getUniqueId())){
             Bukkit.getLogger().info("The player " + player.getName() + " wasn't in the list");

@@ -1,4 +1,4 @@
-package me.s4rtox.mhub.util;
+package me.s4rtox.mmhunt.util;
 
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Sets;

@@ -45,7 +45,7 @@ public class SpawnSetter implements Listener {
 
     @EventHandler
     public void onPlayerRespawn(PlayerRespawnEvent event) {
-        if (spawn != null) {
+        if (spawn != null && !plugin.getGameManager().getArenaManager().isInArena(event.getPlayer())) {
             event.setRespawnLocation(spawn);
         }
     }
@@ -56,7 +56,6 @@ public class SpawnSetter implements Listener {
             Player player = event.getPlayer();
             player.teleport(spawn);
         }
-        Bukkit.getLogger().info("This executed " + spawn.toString());
     }
 
     public void teleport(Player player) {

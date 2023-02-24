@@ -153,6 +153,7 @@ public class Arena {
         return spectators.contains(player.getUniqueId());
     }
 
+
     public boolean isInGame(Player player) {
         return getEveryone().contains(player.getUniqueId());
     }
@@ -176,6 +177,12 @@ public class Arena {
     }
     public void fillChests() {
         gameManager.getChestManager().fillChestLocations(chests, "islandChest", true);
+    }
+
+    public void restoreChests(){
+        for(Location chest : chests){
+            chest.getBlock().setType(Material.CHEST);
+        }
     }
 
     // Method should become useless on arena reset system, awaiting implementation
@@ -233,14 +240,14 @@ public class Arena {
     public void sendPlayersTitle(String title, String subTitle, int fadein, int stayin ,int fadeout) {
         for (UUID playerUUID : this.getPlayers()) {
             Player player = Bukkit.getPlayer(playerUUID);
-            if(player!= null) player.sendTitle(title,subTitle,fadein,stayin,fadeout);
+            if(player!= null) player.sendTitle(Colorize.format(title),Colorize.format(subTitle),fadein,stayin,fadeout);
         }
     }
 
     public void sendAllTitle(String title, String subTitle, int fadein, int stayin ,int fadeout) {
         for (UUID playerUUID : this.getEveryone()) {
             Player audience = Bukkit.getPlayer(playerUUID);
-            if(audience != null) audience.sendTitle(title,subTitle,fadein,stayin,fadeout);
+            if(audience != null) audience.sendTitle(Colorize.format(title),Colorize.format(subTitle),fadein,stayin,fadeout);
         }
     }
 
@@ -337,7 +344,7 @@ public class Arena {
                 state.getArenaStartingTask().cancel();
             }
             sendPlayersMessage("&c&lGAME FORCEFULLY STARTED BY AN ADMINISTRATOR");
-            this.setArenaState(new ActiveArenaState(gameManager, this));
+            this.setArenaState(new RunnerOutArenaState(gameManager, this));
             return true;
         } else {
             return false;

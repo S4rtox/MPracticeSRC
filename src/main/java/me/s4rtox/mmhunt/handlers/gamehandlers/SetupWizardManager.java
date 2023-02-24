@@ -6,13 +6,17 @@ import me.s4rtox.mmhunt.handlers.gamehandlers.arena.TemporaryArena;
 import me.s4rtox.mmhunt.util.CItemBuilder;
 import me.s4rtox.mmhunt.util.Colorize;
 import net.wesjd.anvilgui.AnvilGUI;
+import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
+import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.inventory.InventoryCreativeEvent;
 import org.bukkit.event.player.PlayerChangedWorldEvent;
@@ -22,6 +26,7 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
 
+import java.nio.Buffer;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -67,7 +72,7 @@ public class SetupWizardManager implements Listener {
         inventory.addItem(CItemBuilder.of(Material.PLAYER_HEAD).name("&bSet SpectatorSpawn &7{Right Click}").setLore("&7Right click to set the spectator spawn").dummyEnchant().addBooleanNbtData("SetSpectatorSpawn", true).build());
         inventory.addItem(CItemBuilder.of(Material.BEACON).name("&bSet Spawn Location &7{Right Click}").setLore("&7Right click to set the main spawn").dummyEnchant().addBooleanNbtData("SetMainSpawn", true).build());
         inventory.addItem(CItemBuilder.of(Material.GLOWSTONE).name("&bSet Waiting Lobby Location &7{Right Click}").setLore("&7Right click to set the waiting lobby").dummyEnchant().addBooleanNbtData("SetWaitingLobby", true).build());
-        inventory.addItem(CItemBuilder.of(Material.BLAZE_ROD).name("&bSet Chests Lobby Location &7{Right Click | Right Click}").setLore("&7Right click to set the waiting lobby").dummyEnchant().addBooleanNbtData("SetChests", true).build());
+        inventory.addItem(CItemBuilder.of(Material.CHEST).name("&bSet Chests Lobby Location &7{Right Click | Right Click}").setLore("&7Right click to set the waiting lobby").dummyEnchant().addBooleanNbtData("SetChests", true).build());
         inventory.addItem(CItemBuilder.of(Material.EMERALD_BLOCK).name("&aSave Arena &7{Right Click}").setLore("&7Right click to &asave arena").dummyEnchant().addBooleanNbtData("SaveArena", true).build());
         inventory.addItem(CItemBuilder.of(Material.BARRIER).name("&cCancel &7{Right Click}").setLore("&7Right click to &ccancel the setup").dummyEnchant().addBooleanNbtData("CancelArena", true).build());
 
@@ -83,11 +88,35 @@ public class SetupWizardManager implements Listener {
     }
 
     @EventHandler
-    public void onSetupModeInteract(PlayerInteractEvent event) {
-        if (inWizard(event.getPlayer())) {
-            event.setCancelled(true);
+    public void BlockBreak(BlockPlaceEvent event) {
+        Player player = event.getPlayer();
+        if (!inWizard(player)) return;
+        if (!event.getItemInHand().hasItemMeta()) return;
+        NBTItem itemFlag = new NBTItem(event.getItemInHand());
+        TemporaryArena arena = inWizard.get(player.getUniqueId());
+        if (itemFlag.getBoolean("SetChests")) {
+            Location loc = event.getBlock().getLocation();
+            arena.addchest(loc);
+            loc.getBlock().setType(Material.CHEST);
+            player.sendMessage(Colorize.format("&aAdded &eisland chest &anumber: &6" + arena.getChest().size()));
         }
     }
+
+    @EventHandler
+    public void BlockBreak(BlockBreakEvent event) {
+        Player player = event.getPlayer();
+        if (!inWizard(player)) return;
+        Location loc = event.getBlock().getLocation();
+        TemporaryArena arena = inWizard.get(player.getUniqueId());
+        event.setCancelled(true);
+            if(arena.getChest().contains(loc)){
+                arena.getChest().remove(loc);
+                loc.getBlock().setType(Material.AIR);
+                player.sendMessage(Colorize.format("&cRemoved chest"));
+            }
+
+    }
+
 
     @EventHandler
     public void onSetupModeDrop(PlayerDropItemEvent event) {
@@ -138,6 +167,7 @@ public class SetupWizardManager implements Listener {
         if (event.getAction() == Action.RIGHT_CLICK_AIR || event.getAction() == Action.RIGHT_CLICK_BLOCK) {
             // Arena displayname setter 
             if (itemFlag.getBoolean("SetArenaName")) {
+                event.setCancelled(true);
                 new AnvilGUI.Builder()
                         .plugin(gameManager.getPlugin())
                         .title("Enter the arena displayname")
@@ -149,7 +179,7 @@ public class SetupWizardManager implements Listener {
                         }).open(player);
                 // Island Chest remover
             } else if (itemFlag.getBoolean("SetArenaCenter")) {
-
+                event.setCancelled(true);
                 if (event.getAction() == Action.RIGHT_CLICK_BLOCK) {
                     arena.setCenterLocation(event.getClickedBlock().getLocation());
                 } else {
@@ -159,7 +189,7 @@ public class SetupWizardManager implements Listener {
 
                 // Arena Corner1 setter
             } else if (itemFlag.getBoolean("SetSpectatorSpawn")) {
-
+                event.setCancelled(true);
                 if (event.getAction() == Action.RIGHT_CLICK_BLOCK) {
                     arena.setSpectatorSpawnLocation(event.getClickedBlock().getLocation());
                 } else {
@@ -169,31 +199,27 @@ public class SetupWizardManager implements Listener {
 
                 // Arena Island Chests setters
             } else if (itemFlag.getBoolean("SetMainSpawn")) {
+                event.setCancelled(true);
                 Vector lookingAt = player.getLocation().getDirection();
                 arena.setSpawnLocation(player.getLocation().clone().getBlock().getLocation().add(0.5, 0, 0.5).setDirection(lookingAt));
                 player.sendMessage(Colorize.format("&aSet the &espawn"));
 
                 // Arena Island Chests setters
             } else if (itemFlag.getBoolean("SetWaitingLobby")) {
+                event.setCancelled(true);
                 Vector lookingAt = player.getLocation().getDirection();
                 arena.setWaitingLobby(player.getLocation().clone().getBlock().getLocation().add(0.5, 0, 0.5).setDirection(lookingAt));
                 player.sendMessage(Colorize.format("&aSet the &espawn"));
 
                 // Arena Island Chests setters
-            } else if (itemFlag.getBoolean("SetChests")) {
-                if (event.getAction() != Action.RIGHT_CLICK_BLOCK) return;
-                if ((event.getClickedBlock().getType() != Material.CHEST && event.getClickedBlock().getType() != Material.TRAPPED_CHEST))
-                    return;
-                arena.addchest(event.getClickedBlock().getLocation());
-                player.sendMessage(Colorize.format("&aAdded &eisland chest &anumber: &6" + arena.getChest().size()));
-
-                // Arena Middle Chests Setter
             } else if (itemFlag.getBoolean("SetRadius")) {
-                arena.setWorldBorderRadius(200);
+                event.setCancelled(true);
+                arena.setWorldBorderRadius(1500);
                 player.sendMessage(Colorize.format("&aSet the radius to 200"));
 
                 // Arena Middle Chests Setter
             } else if (itemFlag.getBoolean("SaveArena")) {
+                event.setCancelled(true);
 
                 if (arena.getName() == null || arena.getName().isEmpty()) {
                     player.sendMessage(Colorize.format("&cPlease set the name of the arena"));
@@ -225,12 +251,14 @@ public class SetupWizardManager implements Listener {
                 player.sendMessage(Colorize.format("&a&lArena succesfully created!"));
                 stopWizard(player);
             } else if (itemFlag.getBoolean("CancelArena")) {
+                event.setCancelled(true);
                 stopWizard(player);
             }
             //else if the action is any of the left clicks.
         } else if (event.getAction() != Action.PHYSICAL) {
             //  Removes the last Spawns/Chests if the item is left clicked instead of rightClicked
             if (itemFlag.getBoolean("SetArenaName")) {
+                event.setCancelled(true);
                 new AnvilGUI.Builder()
                         .plugin(gameManager.getPlugin())
                         .itemLeft(new ItemStack(Material.PAPER))
@@ -245,14 +273,12 @@ public class SetupWizardManager implements Listener {
                             return AnvilGUI.Response.close();
                         }).open(player);
                 // Arena centerLocation
-            } else if (itemFlag.getBoolean("SetChests")) {
-                arena.removeChest();
-                player.sendMessage(Colorize.format("&cRemoved &echest &cnumber: &6" + (arena.getChest().size() + 1)));
-                // Middle Chest Remover
             }
 
 
         }
 
     }
+
+
 }

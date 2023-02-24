@@ -51,6 +51,7 @@ public abstract class ArenaState implements Listener {
         gameManager.getArenaManager().removeFromArena(player);
         arena.getHunters().remove(player.getUniqueId());
         arena.getSpectators().remove(player.getUniqueId());
+        arena.setRunner(null);
         gameManager.getRollbackManager().restore(player, false);
         gameManager.getPlugin().getScoreboardManager().resetScoreboard(player);
     }

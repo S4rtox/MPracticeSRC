@@ -32,7 +32,7 @@ public class StartingArenaState extends ArenaState {
     public void onEnable(MMHunt plugin) {
         super.onEnable(plugin);
         setDefaultPlayersStates();
-        arenaStartingTask = new ArenaStartingTask(arena, () -> arena.setArenaState(new ActiveArenaState(gameManager, arena)), 10);
+        arenaStartingTask = new ArenaStartingTask(arena, () -> arena.setArenaState(new RunnerOutArenaState(gameManager, arena)), 10);
         arenaStartingTask.runTaskTimer(plugin, 0, 20);
     }
     @Override
@@ -41,7 +41,7 @@ public class StartingArenaState extends ArenaState {
         arena.sendAllMessage("&7[&a+&7] &f" + player.getDisplayName());
         giveAdminItems(player);
         setDefaultPlayerState(player);
-        arena.updateAllScoreboardsLine(1, "&fPlayers: &a" + arena.getCurrentPlayers() + "&7/&a");
+        arena.updateAllScoreboardsLine(1, "&fPlayers: &a" + arena.getCurrentPlayers());
     }
 
     @Override
@@ -149,27 +149,18 @@ public class StartingArenaState extends ArenaState {
             event.setFormat(Colorize.format("&7[&eWaiting&7]&f " + player.getDisplayName() + "&7:&f ") + event.getMessage());
         }
     }
-    @EventHandler
-    public void freezePlayersInplace(PlayerMoveEvent event) {
-        Player player = event.getPlayer();
-        if (!arena.isPlaying(player)) return;
-        if (event.getFrom().getX() == event.getTo().getX() &&
-                event.getFrom().getY() == event.getTo().getY() &&
-                event.getFrom().getZ() == event.getTo().getZ()) return;
-        event.setTo(event.getFrom());
-    }
 
     @Override
     public void setDefaultPlayersStates() {
         arena.updateAllScoreboards( "&e&lMMHunt",
                 "",
-                "&fPlayers: &a" + arena.getCurrentPlayers() + "&7/&a",
+                "&fPlayers: &a" + arena.getCurrentPlayers(),
                 "",
                 "&fStarting in: &7-",
                 "",
                 "&fStatus: &6&lSTARTING!",
-                "&fArena: &a" + arena.getDisplayName(),
-                "&fip.example.com"
+                "",
+                "&fmineguards.com"
         );
         arena.doAllAction(this::giveAdminItems);
     }
@@ -190,8 +181,8 @@ public class StartingArenaState extends ArenaState {
                 "&fStarting in: &7-",
                 "",
                 "&fStatus: &6&lSTARTING!",
-                "&fArena: &a" + arena.getDisplayName(),
-                "&fip.example.com"
+                "",
+                "&fmineguards.com"
         );
         giveAdminItems(player);
     }

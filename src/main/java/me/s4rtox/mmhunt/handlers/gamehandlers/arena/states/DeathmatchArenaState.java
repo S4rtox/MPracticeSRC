@@ -4,9 +4,12 @@ import me.s4rtox.mmhunt.handlers.gamehandlers.GameManager;
 import me.s4rtox.mmhunt.handlers.gamehandlers.arena.Arena;
 import org.bukkit.entity.Player;
 
-public class DeathmatchArenaState extends ArenaState{
-    public DeathmatchArenaState(GameManager gameManager, Arena arena) {
-        super(gameManager, arena);
+import java.util.List;
+import java.util.UUID;
+
+public class DeathmatchArenaState extends PlayableArenaState{
+    public DeathmatchArenaState(GameManager gameManager, Arena arena, List<UUID> alivePlayers) {
+        super(gameManager, arena, alivePlayers);
     }
 
     @Override
@@ -16,6 +19,11 @@ public class DeathmatchArenaState extends ArenaState{
 
     @Override
     public void setDefaultPlayersStates() {
+
+    }
+
+    @Override
+    public void cancelArenaEvents() {
 
     }
 

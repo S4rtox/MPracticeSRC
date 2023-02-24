@@ -2,6 +2,7 @@ package me.s4rtox.mmhunt.handlers.gamehandlers.chesthandlers;
 
 import dev.dejvokep.boostedyaml.block.implementation.Section;
 import me.s4rtox.mmhunt.util.Colorize;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemStack;
@@ -21,7 +22,7 @@ public class LootItem {
 
     public LootItem(Section section){
         material = Material.valueOf(section.getString("material", "AIR").toUpperCase().replace('-','_'));
-        this.customName = section.getString("name", material.name());
+        this.customName = section.getString("name", "");
         if(section.isList("enchantments")){
             List<String> enchantmentList = section.getStringList("enchantments");
             for (String enchantment : enchantmentList){
@@ -61,16 +62,16 @@ public class LootItem {
             amount = minAmount;
         }
         ItemStack item = new ItemStack(material, amount);
-        ItemMeta itemMeta = item.getItemMeta();
+        item.editMeta(itemMeta -> {
+            itemMeta.setDisplayName(Colorize.format(customName));
 
-        itemMeta.setDisplayName(Colorize.format(customName));
-
-        if (!enchantementToLevelMap.isEmpty()) {
-            for (Map.Entry<Enchantment, Integer> enchantEntry : enchantementToLevelMap.entrySet()) {
-                itemMeta.addEnchant(enchantEntry.getKey(), enchantEntry.getValue(), true);
+            if (!enchantementToLevelMap.isEmpty()) {
+                for (Map.Entry<Enchantment, Integer> enchantEntry : enchantementToLevelMap.entrySet()) {
+                    itemMeta.addEnchant(enchantEntry.getKey(), enchantEntry.getValue(), true);
+                }
             }
-        }
-        item.setItemMeta(itemMeta);
+        });
+
         return item;
     }
 

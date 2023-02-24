@@ -1,6 +1,6 @@
 file-version: 2
 
-chest-appearance-chance: 0.2
+chest-appearance-chance: 70
 chestItems:
   islandChest:
     empty:

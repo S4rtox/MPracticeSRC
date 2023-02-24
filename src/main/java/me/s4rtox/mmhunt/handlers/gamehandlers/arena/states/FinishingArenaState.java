@@ -32,12 +32,12 @@ public class FinishingArenaState extends ArenaState {
         //If there is a player alive don't let them die to the void
         arena.updateAllScoreboards("&e&lMMHunt",
                 "",
-                "&6WINNER: &f",
                 "",
+                "&aHunters win!",
                 "&fGoing back in:",
                 "",
-                "&fArena: &a" + arena.getDisplayName(),
-                "&fip.example.com"
+                "",
+                "&fmineguards.com"
         );
         //Start the task to make it go to arena
         new ArenaFinishingTask(arena, () -> {
@@ -48,8 +48,6 @@ public class FinishingArenaState extends ArenaState {
             // Will do tomorrow
             // Probably
             // Yeah probably not happening :)
-            PlayerQuitEvent.getHandlerList().unregister(this);
-            PlayerKickEvent.getHandlerList().unregister(this);
             arena.resetScoreboards();
             for (Iterator<UUID> i = arena.getEveryone().iterator(); i.hasNext();) {
                 Player player = Bukkit.getPlayer(i.next());
@@ -59,9 +57,10 @@ public class FinishingArenaState extends ArenaState {
             }
             arena.getHunters().clear();
             arena.getSpectators().clear();
-            arena.getEveryone().clear();
+            arena.setRunner(null);
             arena.clearChests();
-            arena.setArenaState(new WaitingArenaState(gameManager, arena));
+            arena.restoreChests();
+            arena.setArenaState(new InitArenaState(gameManager, arena));
         }, 10).runTaskTimer(plugin, 0, 20);
     }
 
@@ -115,7 +114,7 @@ public class FinishingArenaState extends ArenaState {
                 }
             });
             if (arena.isPlaying(player)) {
-                event.setFormat(Colorize.format("&7[DEAD]&f " + player.getDisplayName() + "&7:&f ") + event.getMessage());
+                event.setFormat(Colorize.format("&7[&6W]&f " + player.getDisplayName() + "&7:&f ") + event.getMessage());
             } else if (arena.isSpectating(player)) {
                 event.setFormat(Colorize.format("&7[SPECTATING]&f "+ player.getDisplayName() + "&7:&f ") + event.getMessage());
             }

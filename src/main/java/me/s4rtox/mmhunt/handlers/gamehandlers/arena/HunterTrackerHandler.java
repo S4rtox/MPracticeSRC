@@ -15,7 +15,12 @@ public class HunterTrackerHandler implements Listener {
     private final Map<UUID, UUID> targetLocation = new HashMap<>();
 
     public void setTarget(@NotNull Player player, @NotNull Player target){
-        targetLocation.put(player.getUniqueId(),target.getUniqueId());
+        try {
+            targetLocation.put(player.getUniqueId(),target.getUniqueId());
+        }catch (Exception ignored){
+
+        }
+
     }
     private Location getCompassTargetLocation(@NotNull Player player){
         Player target =  Bukkit.getPlayer(targetLocation.get(player.getUniqueId()));

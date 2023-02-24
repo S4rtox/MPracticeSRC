@@ -21,11 +21,9 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.permissions.Permission;
 
 public class WaitingArenaState extends ArenaState {
-    private final ScoreboardManager scoreboardManager;
 
     public WaitingArenaState(GameManager gameManager, Arena arena) {
         super(gameManager, arena);
-        this.scoreboardManager = gameManager.getPlugin().getScoreboardManager();
         setDefaultPlayersStates();
     }
 
@@ -143,21 +141,6 @@ public class WaitingArenaState extends ArenaState {
     }
 
     @EventHandler
-    private void WaitingChatFormat(AsyncPlayerChatEvent event) {
-        Player player = event.getPlayer();
-        if (arena.isInGame(player)) {
-            event.getRecipients().clear();
-            arena.getEveryone().forEach(playerUUID -> {
-                Player arenaPlayer = Bukkit.getPlayer(playerUUID);
-                if(arenaPlayer != null){
-                    event.getRecipients().add(arenaPlayer);
-                }
-            });
-            event.setFormat(Colorize.format("&7[&eWaiting&7]&f " + player.getDisplayName() + "&7:&f ") + event.getMessage());
-        }
-    }
-
-    @EventHandler
     private void onBlockPlace(BlockPlaceEvent event) {
         Player player = event.getPlayer();
         if (arena.isPlaying(player)) {
@@ -176,6 +159,21 @@ public class WaitingArenaState extends ArenaState {
         }
     }
 
+    @EventHandler
+    private void WaitingChatFormat(AsyncPlayerChatEvent event) {
+        Player player = event.getPlayer();
+        if (arena.isInGame(player)) {
+            event.getRecipients().clear();
+            arena.getEveryone().forEach(playerUUID -> {
+                Player arenaPlayer = Bukkit.getPlayer(playerUUID);
+                if(arenaPlayer != null){
+                    event.getRecipients().add(arenaPlayer);
+                }
+            });
+            event.setFormat(Colorize.format("&7[&eWaiting&7]&f " + player.getDisplayName() + "&7:&f ") + event.getMessage());
+        }
+    }
+
     @Override
     public void setDefaultPlayersStates() {
         arena.updateAllScoreboards("&e&lMMHunt",
@@ -185,8 +183,8 @@ public class WaitingArenaState extends ArenaState {
                 "&fStarting in: &7-",
                 "",
                 "&fStatus: &e&lWAITING",
-                "&fArena: &a" + arena.getDisplayName(),
-                "&fip.example.com"
+                "",
+                "&fmineguards.com"
         );
         arena.doAllAction(this::giveAdminItems);
     }
@@ -201,8 +199,8 @@ public class WaitingArenaState extends ArenaState {
                 "&fStarting in: &7-",
                 "",
                 "&fStatus: &e&lWAITING",
-                "&fArena: &a" + arena.getDisplayName(),
-                "&fip.example.com");
+                "",
+                "&fmineguards.com");
         giveAdminItems(player);
         player.setPlayerListName(Colorize.format("&7[&eW&7]&f" + player.getName()));
     }

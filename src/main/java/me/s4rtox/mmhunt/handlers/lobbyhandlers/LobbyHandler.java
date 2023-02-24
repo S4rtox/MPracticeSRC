@@ -2,7 +2,9 @@ package me.s4rtox.mmhunt.handlers.lobbyhandlers;
 
 import me.s4rtox.mmhunt.MMHunt;
 import me.s4rtox.mmhunt.config.ConfigManager;
+import me.s4rtox.mmhunt.util.BungeeWrapper;
 import me.s4rtox.mmhunt.util.Colorize;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
@@ -29,7 +31,8 @@ public class LobbyHandler implements Listener {
         Bukkit.getPluginManager().registerEvents(this, plugin);
         this.plugin = plugin;
         config = plugin.getConfigManager();
-        setInitalWorldsGamerules();
+        Bukkit.getScheduler().runTaskLater(plugin, this::setInitalWorldsGamerules,30*20);
+        new DisplaysDataRefresher(plugin);
     }
 
     @EventHandler
@@ -117,7 +120,20 @@ public class LobbyHandler implements Listener {
     @EventHandler(priority = EventPriority.MONITOR)
     public void onPlayerJoin(PlayerJoinEvent event){
         lobbyPlayers.add(event.getPlayer().getUniqueId());
+        event.getPlayer().sendPlayerListHeaderAndFooter(Component.text(Colorize.format(
+                "&7&l&m============================================================" + "\n" + "\n"
+                + "&6&lMINE&b&lGUARDS" + "\n"
+                + "&7(Te encuentras en MANHUNT)" + "\n" + "\n" +
+                "&fActualmente hay &b" + BungeeWrapper.getPlayerCount("ALL") + "&f jugadores Conectados" + "\n")), Component.text(Colorize.format(
+                        """
+
+                        &6&lDis&b&lcord&7:&f discord.gg/n6XuXxGRP
+                        &6&lTie&b&lnda&7: &ftienda.mineguards.com
+                        &6&lTwi&b&ltter&7: &f@MineguardsNET
+
+                        &7&l&m============================================================""")));
     }
+
 
     @EventHandler(priority = EventPriority.MONITOR)
     public void onPlayerLeave(PlayerQuitEvent event){
@@ -148,6 +164,20 @@ public class LobbyHandler implements Listener {
             event.setFormat(Colorize.format("&f" + player.getDisplayName() + "&7:&f ") + event.getMessage());
         }
     }
+
+    public void updateAllTablist(String header, String footer){
+        for (Player player : Bukkit.getServer().getOnlinePlayers()){
+            player.sendPlayerListHeaderAndFooter(Component.text(Colorize.format(header)), Component.text(Colorize.format(footer)));
+        }
+    }
+
+    public void updateAllTablist(Component header, Component footer){
+        for (Player player : Bukkit.getServer().getOnlinePlayers()){
+            player.sendPlayerListHeaderAndFooter(header, footer);
+        }
+    }
+
+
 
     @EventHandler
     public void disableJoinMessage(PlayerJoinEvent event){

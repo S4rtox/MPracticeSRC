@@ -20,6 +20,7 @@ public class InitArenaState extends ArenaState {
         WorldBorder arenaBorder = arena.getWorld().getWorldBorder();
         arenaBorder.setCenter(arena.getCenterLocation());
         arenaBorder.setSize(arena.getWorldBorderRadius());
+        arena.setRunner(null);
         //Code for startup, only executed once.
         arena.setArenaState(new WaitingArenaState(gameManager, arena));
     }

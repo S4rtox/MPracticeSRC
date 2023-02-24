@@ -2,41 +2,89 @@ package me.s4rtox.mmhunt.handlers.gamehandlers.arena.states;
 
 import me.s4rtox.mmhunt.handlers.gamehandlers.GameManager;
 import me.s4rtox.mmhunt.handlers.gamehandlers.arena.Arena;
+import me.s4rtox.mmhunt.handlers.gamehandlers.arena.states.tasks.RunnerOutOfCageEvent;
 import me.s4rtox.mmhunt.util.Colorize;
 import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.entity.FoodLevelChangeEvent;
+import org.bukkit.event.player.PlayerMoveEvent;
 
-public class RunnerOutArenaState extends ArenaState{
-    protected RunnerOutArenaState(GameManager gameManager, Arena arena) {
+public class RunnerOutArenaState extends PlayableArenaState{
+    private RunnerOutOfCageEvent event;
+    public RunnerOutArenaState(GameManager gameManager, Arena arena) {
         super(gameManager, arena);
-
+        arena.doHunterAction(player -> {
+            addAlivePlayer(player.getUniqueId());
+            player.getInventory().clear();
+            player.teleport(arena.getSpawnLocation());
+        });
+        event = new RunnerOutOfCageEvent(gameManager,this,20);
+        event.runTaskTimer(gameManager.getPlugin(),0,20);
     }
 
     @Override
     public void onPlayerJoin(Player player) {
         super.onPlayerJoin(player);
-        arena.sendAllMessage("&7[&a+&7] &f" + player.getDisplayName());
-        setDefaultPlayerState(player);
-        arena.updateAllScoreboardsLine(1, "&fPlayers: &a" + arena.getCurrentPlayers() + "&7/&a");
-        player.teleport(arena.getWaitingLobby());
     }
 
     @Override
-    public void onSpectatorJoin(Player player) {
-        player.sendMessage(Colorize.format("&cError sending you to the game!, this arena hasn't started yet!"));
+    public void cancelArenaEvents() {
+        event.cancel();
     }
 
-    @Override
-    public GameState getGameStateEnum() {
-        return GameState.ACTIVE;
+    @EventHandler
+    public void freezePlayersInplace(PlayerMoveEvent event) {
+        Player player = event.getPlayer();
+        if (!arena.isPlaying(player)) return;
+        if(arena.isRunner(player)) return;
+        if (event.getFrom().getX() == event.getTo().getX() &&
+                event.getFrom().getY() == event.getTo().getY() &&
+                event.getFrom().getZ() == event.getTo().getZ()) return;
+        event.setTo(event.getFrom());
     }
 
-    @Override
-    public void setDefaultPlayersStates() {
+    @EventHandler
+    private void onDamage(EntityDamageEvent event) {
+        if (event.getEntity() instanceof Player) {
+            Player player = (Player) event.getEntity();
+            if (arena.isPlaying(player)) {
+                if(arena.isRunner(player)) return;
+                event.setCancelled(true);
+            }
+        }
+    }
+
+    @EventHandler
+    private void onBlockBreak(BlockBreakEvent event) {
+        Player player = event.getPlayer();
+        if (arena.isPlaying(player)) {
+            if(arena.isRunner(player)) return;
+            event.setCancelled(true);
+        }
+    }
+
+    @EventHandler
+    private void onBlockPlace(BlockPlaceEvent event) {
+        Player player = event.getPlayer();
+        if (arena.isPlaying(player)) {
+            if(arena.isRunner(player)) return;
+            event.setCancelled(true);
+        }
 
     }
 
-    @Override
-    public void setDefaultPlayerState(Player player) {
-
+    @EventHandler
+    private void onHungerChange(FoodLevelChangeEvent event) {
+        if (event.getEntity() instanceof Player) {
+            Player player = (Player) event.getEntity();
+            if (arena.isPlaying(player)) {
+                if(arena.isRunner(player)) return;
+                event.setCancelled(true);
+            }
+        }
     }
+
 }

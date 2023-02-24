@@ -11,8 +11,8 @@ public class ChestLoot {
     private final List<LootItem> items;
     private final List<Double> cumulativeWeights;
 
-    public ChestLoot() {
-        this.items = new ArrayList<>();
+    public ChestLoot(List<LootItem> items) {
+        this.items = items;
         this.cumulativeWeights = new ArrayList<>();
         initCumulativeWeights();
     }
