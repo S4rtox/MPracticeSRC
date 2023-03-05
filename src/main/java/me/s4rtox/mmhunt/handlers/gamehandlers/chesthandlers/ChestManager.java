@@ -16,7 +16,6 @@ import java.util.concurrent.ThreadLocalRandom;
 public class ChestManager {
     private final YamlDocument chestConfig;
     private final HashMap<String, ChestLoot> chestItems = new HashMap<>();
-    //TODO: reload for chests
 
     public ChestManager(MMHunt plugin) {
         this.chestConfig = plugin.getChestConfig();

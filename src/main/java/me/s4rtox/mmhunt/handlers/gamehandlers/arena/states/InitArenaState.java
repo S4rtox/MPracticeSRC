@@ -3,7 +3,9 @@ package me.s4rtox.mmhunt.handlers.gamehandlers.arena.states;
 import me.s4rtox.mmhunt.MMHunt;
 import me.s4rtox.mmhunt.handlers.gamehandlers.GameManager;
 import me.s4rtox.mmhunt.handlers.gamehandlers.arena.Arena;
+import me.s4rtox.mmhunt.handlers.gamehandlers.chesthandlers.tasks.PopulateChests;
 import me.s4rtox.mmhunt.util.Colorize;
+import org.bukkit.Bukkit;
 import org.bukkit.WorldBorder;
 import org.bukkit.entity.Player;
 
@@ -21,8 +23,11 @@ public class InitArenaState extends ArenaState {
         arenaBorder.setCenter(arena.getCenterLocation());
         arenaBorder.setSize(arena.getWorldBorderRadius());
         arena.setRunner(null);
-        //Code for startup, only executed once.
-        arena.setArenaState(new WaitingArenaState(gameManager, arena));
+        Bukkit.getScheduler().runTaskAsynchronously(plugin,new PopulateChests(plugin,arena.getWorld(),100,100, chestLocations ->{
+            arena.getChests().clear();
+            arena.getChests().addAll(chestLocations);
+            arena.setArenaState(new WaitingArenaState(gameManager, arena));
+        }));
     }
 
     @Override

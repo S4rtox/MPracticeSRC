@@ -161,7 +161,7 @@ public abstract class PlayableArenaState extends ArenaState implements Listener 
     public void avoidTeamDamage(EntityDamageByEntityEvent event){
         if(event.getEntity() instanceof Player player && event.getDamager() instanceof Player damager){
             if(arena.isInGame(player) && arena.isInGame(damager)){
-                if(!arena.isRunner(player) && !arena.isRunner(damager)){
+                if(arena.isHunter(player) && arena.isHunter(damager)){
                     event.setCancelled(true);
                 }
             }

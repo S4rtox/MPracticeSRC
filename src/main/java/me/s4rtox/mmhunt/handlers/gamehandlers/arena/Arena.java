@@ -145,6 +145,9 @@ public class Arena {
     public boolean isRunner(Player player){
         return runner == player.getUniqueId();
     }
+    public boolean isHunter(Player player){
+        return hunters.contains(player.getUniqueId());
+    }
     public boolean isPlaying(Player player) {
         return getPlayers().contains(player.getUniqueId());
     }
