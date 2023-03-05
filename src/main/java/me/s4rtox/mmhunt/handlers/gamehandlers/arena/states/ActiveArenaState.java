@@ -1,14 +1,11 @@
 package me.s4rtox.mmhunt.handlers.gamehandlers.arena.states;
 
-import lombok.Getter;
 import me.s4rtox.mmhunt.MMHunt;
 import me.s4rtox.mmhunt.config.ConfigManager;
 import me.s4rtox.mmhunt.handlers.gamehandlers.GameManager;
 import me.s4rtox.mmhunt.handlers.gamehandlers.arena.Arena;
 import me.s4rtox.mmhunt.handlers.gamehandlers.arena.states.tasks.ActiveArenaEvents;
-import me.s4rtox.mmhunt.handlers.gamehandlers.arena.states.tasks.ReviveAllTask;
 import org.bukkit.entity.Player;
-import org.bukkit.event.entity.PlayerDeathEvent;
 
 import java.util.List;
 import java.util.UUID;

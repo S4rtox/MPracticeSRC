@@ -1,4 +1,4 @@
-package me.s4rtox.mmhunt.handlers.gamehandlers.arena.states.animations;
+package me.s4rtox.mmhunt.handlers.gamehandlers.arena.states.events.animations;
 
 import org.bukkit.*;
 import org.bukkit.entity.EntityType;
@@ -16,7 +16,7 @@ public class FireworksDownAnimation extends BukkitRunnable {
     private final Location animLocation;
     private final Runnable onEnd;
     private final int duration;
-    private List<Object[]> frames = new ArrayList<>();
+    private final List<Object[]> frames = new ArrayList<>();
     private int currentFrame = 0;
     private int totalFrames = 0;
 
@@ -47,7 +47,7 @@ public class FireworksDownAnimation extends BukkitRunnable {
         Color secondaryColor = (Color) frame[1];
         FireworkEffect.Type type = (FireworkEffect.Type) frame[2];
         spawnFirework(animLocation, primaryColor, secondaryColor, type);
-        animLocation.add(0,-1,0);
+        animLocation.add(0,-0.25,0);
         currentFrame++;
         totalFrames++;
     }

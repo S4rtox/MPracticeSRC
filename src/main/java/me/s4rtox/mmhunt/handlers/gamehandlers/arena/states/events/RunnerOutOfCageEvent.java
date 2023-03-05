@@ -1,4 +1,4 @@
-package me.s4rtox.mmhunt.handlers.gamehandlers.arena.states.tasks;
+package me.s4rtox.mmhunt.handlers.gamehandlers.arena.states.events;
 
 import lombok.Getter;
 import me.s4rtox.mmhunt.handlers.gamehandlers.GameManager;

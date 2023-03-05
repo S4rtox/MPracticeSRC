@@ -2,8 +2,7 @@ package me.s4rtox.mmhunt.handlers.gamehandlers.arena.states;
 
 import me.s4rtox.mmhunt.handlers.gamehandlers.GameManager;
 import me.s4rtox.mmhunt.handlers.gamehandlers.arena.Arena;
-import me.s4rtox.mmhunt.handlers.gamehandlers.arena.states.tasks.RunnerOutOfCageEvent;
-import me.s4rtox.mmhunt.util.Colorize;
+import me.s4rtox.mmhunt.handlers.gamehandlers.arena.states.events.RunnerOutOfCageEvent;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.block.BlockBreakEvent;

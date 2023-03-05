@@ -1,11 +1,10 @@
 package me.s4rtox.mmhunt.handlers.gamehandlers.arena.states.tasks;
 
-import lombok.Getter;
 import me.s4rtox.mmhunt.config.ConfigManager;
 import me.s4rtox.mmhunt.handlers.gamehandlers.GameManager;
 import me.s4rtox.mmhunt.handlers.gamehandlers.arena.Arena;
 import me.s4rtox.mmhunt.handlers.gamehandlers.arena.states.ActiveArenaState;
-import me.s4rtox.mmhunt.handlers.gamehandlers.arena.states.DeathmatchArenaState;
+import me.s4rtox.mmhunt.handlers.gamehandlers.arena.states.events.ReviveAllTask;
 import me.s4rtox.mmhunt.util.CItemBuilder;
 import org.bukkit.Material;
 import org.bukkit.Sound;
