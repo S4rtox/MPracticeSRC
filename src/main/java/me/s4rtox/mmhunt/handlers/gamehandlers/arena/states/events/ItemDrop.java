@@ -15,12 +15,11 @@ import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.ThreadLocalRandom;
 
-public class ItemDrop implements Runnable{
+public class ItemDrop {
     private final ActiveArenaState state;
     private final Arena arena;
     private final List<UUID> alivePlayers;
-    private Location dropLocation;
-    private int frames = 0;
+    private final Location dropLocation;
 
     public ItemDrop(ActiveArenaState state) {
         this.state = state;
@@ -29,8 +28,7 @@ public class ItemDrop implements Runnable{
         this.dropLocation = getDropLocation();
     }
 
-    @Override
-    public void run() {
+    public void newDrop() {
         arena.sendPlayersMessage("&a&lUN DROP HA CAIDO EN " + dropLocation.getBlockX() + " - " + dropLocation.getBlockZ());
         new FireworksDownAnimation(arena.getGameManager().getPlugin(), dropLocation.clone().add(0,20,0),20*4,() ->{
 
