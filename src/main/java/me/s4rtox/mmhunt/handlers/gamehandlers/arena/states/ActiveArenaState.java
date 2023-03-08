@@ -4,6 +4,7 @@ import me.s4rtox.mmhunt.MMHunt;
 import me.s4rtox.mmhunt.config.ConfigManager;
 import me.s4rtox.mmhunt.handlers.gamehandlers.GameManager;
 import me.s4rtox.mmhunt.handlers.gamehandlers.arena.Arena;
+import me.s4rtox.mmhunt.handlers.gamehandlers.arena.states.events.DropsManager;
 import me.s4rtox.mmhunt.handlers.gamehandlers.arena.states.tasks.ActiveArenaEvents;
 import org.bukkit.entity.Player;
 
@@ -11,10 +12,13 @@ import java.util.List;
 import java.util.UUID;
 
 public class ActiveArenaState extends PlayableArenaState {
-    private ActiveArenaEvents arenaEvents;
+    private final ActiveArenaEvents arenaEvents;
+    private final DropsManager dropsManager;
 
     public ActiveArenaState(GameManager gameManager, Arena arena, List<UUID> alivePlayers) {
         super(gameManager, arena, alivePlayers);
+        dropsManager = new DropsManager(this);
+        arenaEvents = new ActiveArenaEvents(this,gameManager);
     }
 
     //TODO: arreglar que al morir no cancela el arenaevents
@@ -27,7 +31,6 @@ public class ActiveArenaState extends PlayableArenaState {
         // Stuff on start //
         setDefaultPlayersStates();
         // EVENTS //
-        arenaEvents = new ActiveArenaEvents(this,gameManager);
         arenaEvents.runTaskTimer(gameManager.getPlugin(),0,20);;
     }
 
@@ -55,5 +58,9 @@ public class ActiveArenaState extends PlayableArenaState {
     public void onPlayerJoin(Player player) {
         super.onPlayerJoin(player);
         player.teleport(arena.getSpawnLocation());
+    }
+
+    public void newDrop(){
+        dropsManager.newDrop();
     }
 }

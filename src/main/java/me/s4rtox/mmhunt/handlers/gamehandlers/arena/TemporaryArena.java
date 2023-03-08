@@ -51,6 +51,6 @@ public class TemporaryArena {
 
 
     public Arena toArena() {
-        return new Arena(gameManager, this.name, this.displayName,this.worldBorderRadius, this.centerLocation, this.spectatorSpawnLocation, this.spawnLocation, this.waitingLobby, this.chest);
+        return new Arena(gameManager, this.name, this.displayName,this.worldBorderRadius, this.centerLocation, this.spectatorSpawnLocation, this.spawnLocation, this.waitingLobby, this.chest,null);
     }
 }

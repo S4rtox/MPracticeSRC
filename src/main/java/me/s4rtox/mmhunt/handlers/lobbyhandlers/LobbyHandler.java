@@ -120,18 +120,18 @@ public class LobbyHandler implements Listener {
     @EventHandler(priority = EventPriority.MONITOR)
     public void onPlayerJoin(PlayerJoinEvent event){
         lobbyPlayers.add(event.getPlayer().getUniqueId());
-        event.getPlayer().sendPlayerListHeaderAndFooter(Component.text(Colorize.format(
+        event.getPlayer().setPlayerListHeaderFooter(Colorize.format(
                 "&7&l&m============================================================" + "\n" + "\n"
                 + "&6&lMINE&b&lGUARDS" + "\n"
                 + "&7(Te encuentras en MANHUNT)" + "\n" + "\n" +
-                "&fActualmente hay &b" + BungeeWrapper.getPlayerCount("ALL") + "&f jugadores Conectados" + "\n")), Component.text(Colorize.format(
+                "&fActualmente hay &b" + BungeeWrapper.getPlayerCount("ALL") + "&f jugadores Conectados" + "\n"), Colorize.format(
                         """
 
                         &6&lDis&b&lcord&7:&f discord.gg/n6XuXxGRP
                         &6&lTie&b&lnda&7: &ftienda.mineguards.com
                         &6&lTwi&b&ltter&7: &f@MineguardsNET
 
-                        &7&l&m============================================================""")));
+                        &7&l&m============================================================"""));
     }
 
 
@@ -167,15 +167,10 @@ public class LobbyHandler implements Listener {
 
     public void updateAllTablist(String header, String footer){
         for (Player player : Bukkit.getServer().getOnlinePlayers()){
-            player.sendPlayerListHeaderAndFooter(Component.text(Colorize.format(header)), Component.text(Colorize.format(footer)));
+            player.setPlayerListHeaderFooter(Colorize.format(header), Colorize.format(footer));
         }
     }
 
-    public void updateAllTablist(Component header, Component footer){
-        for (Player player : Bukkit.getServer().getOnlinePlayers()){
-            player.sendPlayerListHeaderAndFooter(header, footer);
-        }
-    }
 
 
 

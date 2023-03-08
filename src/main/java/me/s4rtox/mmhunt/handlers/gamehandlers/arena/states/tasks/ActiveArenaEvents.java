@@ -17,6 +17,8 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 
+import java.util.concurrent.ThreadLocalRandom;
+
 public class ActiveArenaEvents extends BukkitRunnable {
     private final Arena arena;
     private final ActiveArenaState state;
@@ -214,11 +216,14 @@ public class ActiveArenaEvents extends BukkitRunnable {
                 cancel();
             }
         }
-        try{
             arena.doHunterAction(player -> gameManager.getTrackerHandler().setCompassToTarget(player));
-        }catch (Exception ignored){
-
+        if(matchDuration % 120 == 0 && matchDuration != 5 * 60){
+            if(ThreadLocalRandom.current().nextBoolean()){
+                state.newDrop();
+            }
         }
+
+
 
         //Code to be executed every second
         arena.updateAllScoreboards("&e&lMMHunt",
