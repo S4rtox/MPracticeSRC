@@ -39,6 +39,7 @@ public class HunterTrackerHandler implements Listener {
     }
     public void setCompassToTarget(Player player){
         Location target = getCompassTargetLocation(player);
+        if(target == null) return;
         if(target.getWorld() == player.getWorld()){
             player.setCompassTarget(target);
         }

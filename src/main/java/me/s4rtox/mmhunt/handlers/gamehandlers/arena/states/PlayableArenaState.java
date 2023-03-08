@@ -60,7 +60,7 @@ public abstract class PlayableArenaState extends ArenaState implements Listener 
     }
 
     public boolean revivePlayer(Player player){
-        if(arena.getPlayers().contains(player.getUniqueId()) && !alivePlayers.contains(player.getUniqueId())){
+        if(arena.getPlayers().contains(player.getUniqueId())){
             player.setGameMode(GameMode.SURVIVAL);
             addAlivePlayer(player.getUniqueId());
             return true;

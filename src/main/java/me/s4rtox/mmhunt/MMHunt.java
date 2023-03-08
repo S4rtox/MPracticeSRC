@@ -8,6 +8,7 @@ import dev.dejvokep.boostedyaml.settings.dumper.DumperSettings;
 import dev.dejvokep.boostedyaml.settings.general.GeneralSettings;
 import dev.dejvokep.boostedyaml.settings.loader.LoaderSettings;
 import dev.dejvokep.boostedyaml.settings.updater.UpdaterSettings;
+import lombok.Getter;
 import lombok.NonNull;
 import me.s4rtox.mmhunt.commands.PracticeCommands;
 import me.s4rtox.mmhunt.config.ConfigManager;
@@ -19,6 +20,7 @@ import me.s4rtox.mmhunt.handlers.lobbyhandlers.SpawnSetter;
 import me.s4rtox.mmhunt.util.BungeeWrapper;
 import me.s4rtox.mmhunt.util.Colorize;
 import me.s4rtox.mmhunt.util.PapiFormatter;
+import me.s4rtox.mmhunt.util.WorkloadRunnable;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -39,6 +41,8 @@ public final class MMHunt extends JavaPlugin {
     private ScoreboardManager scoreboardManager;
     private GameManager gameManager;
     private LobbyHandler lobbyHandler;
+    @Getter
+    private final WorkloadRunnable workloadRunnable = new WorkloadRunnable();
 
     //TODO: Scoreboards(animated?),test and fix chest system, add chest config reload, add bossbar.
     @Override
@@ -70,6 +74,8 @@ public final class MMHunt extends JavaPlugin {
         Bukkit.getLogger().info(Colorize.format("&a     [MPE] correctly loaded!"));
         Bukkit.getLogger().info(Colorize.format("&a         made by: S4rtox"));
         Bukkit.getLogger().info(Colorize.format("&a <----------------------------->"));
+
+        Bukkit.getScheduler().runTaskTimer(this, this.workloadRunnable, 1, 1);
     }
 
     @Override

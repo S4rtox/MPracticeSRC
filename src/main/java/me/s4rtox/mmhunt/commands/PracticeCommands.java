@@ -11,6 +11,7 @@ import me.s4rtox.mmhunt.config.ConfigManager;
 import me.s4rtox.mmhunt.handlers.gamehandlers.ArenaManager;
 import me.s4rtox.mmhunt.handlers.gamehandlers.GameManager;
 import me.s4rtox.mmhunt.handlers.gamehandlers.arena.Arena;
+import me.s4rtox.mmhunt.handlers.gamehandlers.arena.states.ActiveArenaState;
 import me.s4rtox.mmhunt.handlers.gamehandlers.arena.states.GameState;
 import me.s4rtox.mmhunt.util.CItemBuilder;
 import me.s4rtox.mmhunt.util.Colorize;
@@ -350,6 +351,40 @@ public class PracticeCommands extends BaseCommand {
                     player.sendMessage(Colorize.format("&aSuccesfully terminated arena game: " + arena.getName()));
                 } else {
                     player.sendMessage(Colorize.format("&cFailed to terminate arena game, game is currently not running."));
+                }
+            }
+        }
+
+        @Subcommand("spawnDrop")
+        @CommandAlias("cancel")
+        @Description("Cancels the countdown of the game")
+        public void onForceDropCommand(Player player, String[] args) {
+            if (args.length == 0) {
+                Optional<Arena> optionalArena = arenaManager.findPlayerArena(player);
+                if (!optionalArena.isPresent()) {
+                    player.sendMessage(Colorize.format("&cYou're not currently in a game!"));
+                    return;
+                }
+                Arena arena = optionalArena.get();
+                if(arena.getArenaState() instanceof ActiveArenaState state){
+                    state.newDrop();
+                    player.sendMessage(Colorize.format("&aSuccesfully made a drop in the arena"));
+                }else{
+                    player.sendMessage(Colorize.format("&Invalid Arena"));
+                }
+            } else {
+                String arenaName = args[0];
+                Optional<Arena> optionalArena = arenaManager.findArena(arenaName);
+                if (!optionalArena.isPresent()) {
+                    player.sendMessage(Colorize.format("&cThat arena doesnt exist"));
+                    return;
+                }
+                Arena arena = optionalArena.get();
+                if(arena.getArenaState() instanceof ActiveArenaState state){
+                    state.newDrop();
+                    player.sendMessage(Colorize.format("&aSuccesfully made a drop in the arena"));
+                }else{
+                    player.sendMessage(Colorize.format("&Invalid Arena"));
                 }
             }
         }

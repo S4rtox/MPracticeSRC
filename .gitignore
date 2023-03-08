@@ -1,7 +1,7 @@
 # User-specific stuff
 .idea/
 .vscode/
-
+.paper-nms
 *.iml
 *.ipr
 *.iws

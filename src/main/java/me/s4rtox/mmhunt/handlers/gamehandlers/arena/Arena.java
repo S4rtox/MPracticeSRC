@@ -5,8 +5,10 @@ import lombok.NonNull;
 import lombok.Setter;
 import me.s4rtox.mmhunt.handlers.gamehandlers.GameManager;
 import me.s4rtox.mmhunt.handlers.gamehandlers.arena.states.*;
+
 import me.s4rtox.mmhunt.util.CItemBuilder;
 import me.s4rtox.mmhunt.util.Colorize;
+import me.s4rtox.mmhunt.util.FastBlockPlacer;
 import org.bukkit.*;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -61,8 +63,8 @@ public class Arena {
             @NonNull Location waitingLobby,
             List<Location> chests
     ) {
-        this.gameManager = gameManager;
 
+        this.gameManager = gameManager;
         this.name = name;
         this.displayName = displayName;
         this.worldBorderRadius = worldBorderRadius;
@@ -75,9 +77,40 @@ public class Arena {
         this.hunters = new HashSet<>();
         this.spectators = new HashSet<>();
         this.runner = null;
-        this.arenaState = new InitArenaState(gameManager, this);
+        this.arenaState = new InitArenaState(gameManager,this);
         this.arenaState.onEnable(gameManager.getPlugin());
     }
+
+    public Arena(
+            @NonNull GameManager gameManager,
+            @NonNull String name,
+            @NonNull String displayName,
+            @NonNull Integer worldBorderRadius,
+            @NonNull Location centerLocation,
+            @NonNull Location spectatorSpawnLocation,
+            @NonNull Location spawnLocation,
+            @NonNull Location waitingLobby,
+            List<Location> chests,
+            ArenaState arenaState
+    ) {
+        this.gameManager = gameManager;
+        this.name = name;
+        this.displayName = displayName;
+        this.worldBorderRadius = worldBorderRadius;
+        this.centerLocation = centerLocation;
+        this.world = centerLocation.getWorld();
+        this.spectatorSpawnLocation = spectatorSpawnLocation;
+        this.spawnLocation = spawnLocation;
+        this.waitingLobby = waitingLobby;
+        this.chests = chests;
+        this.hunters = new HashSet<>();
+        this.spectators = new HashSet<>();
+        this.runner = null;
+        //This is so horrible placed an thought but I cant be fucked I've been 5 hours fixing gradle/maven shit so fuck you if you care :)))))
+        this.arenaState = new StartupArenaState(gameManager,this);
+        this.arenaState.onEnable(gameManager.getPlugin());
+    }
+
 
     public void setArenaState(ArenaState arenaState) {
         this.arenaState.onDisable(gameManager.getPlugin());
@@ -184,7 +217,8 @@ public class Arena {
 
     public void restoreChests(){
         for(Location chest : chests){
-            chest.getBlock().setType(Material.CHEST);
+            FastBlockPlacer.rapidSetBlock((net.minecraft.world.level.World) world,FastBlockPlacer.fromMaterial(Material.CHEST) ,chest.getBlockX(),chest.getBlockY(),chest.getBlockZ());
+
         }
     }
 

@@ -25,9 +25,9 @@ public class FireworksDownAnimation extends BukkitRunnable {
         this.animLocation = animLocation.clone();
         this.duration = duration;
         this.onEnd = onEnd;
-        frames.add(new Object[] { Color.RED, Color.WHITE, FireworkEffect.Type.BALL_LARGE });
-        frames.add(new Object[] { Color.BLUE, Color.YELLOW, FireworkEffect.Type.BALL });
-        frames.add(new Object[] { Color.GREEN, Color.PURPLE, FireworkEffect.Type.STAR });
+        frames.add(new Object[] { Color.RED, Color.RED, FireworkEffect.Type.BALL_LARGE });
+        frames.add(new Object[] { Color.BLUE, Color.PURPLE, FireworkEffect.Type.BALL });
+        frames.add(new Object[] { Color.GREEN, Color.YELLOW, FireworkEffect.Type.STAR });
         frames.add(new Object[] { Color.ORANGE, Color.YELLOW, FireworkEffect.Type.BURST });
 
     }
@@ -47,14 +47,13 @@ public class FireworksDownAnimation extends BukkitRunnable {
         Color secondaryColor = (Color) frame[1];
         FireworkEffect.Type type = (FireworkEffect.Type) frame[2];
         spawnFirework(animLocation, primaryColor, secondaryColor, type);
-        animLocation.add(0,-0.25,0);
+        animLocation.add(0,-1,0);
         currentFrame++;
         totalFrames++;
     }
 
     private void spawnFirework(Location location, Color primaryColor, Color secondaryColor, FireworkEffect.Type type) {
         World world = location.getWorld();
-        ThreadLocalRandom random = ThreadLocalRandom.current();
 
         Firework firework = (Firework) world.spawnEntity(location, EntityType.FIREWORK);
         FireworkMeta meta = firework.getFireworkMeta();
@@ -67,11 +66,10 @@ public class FireworksDownAnimation extends BukkitRunnable {
         meta.addEffect(effect);
 
         // Set the firework's power and randomize it
-        meta.setPower(random.nextInt(2) + 1);
+        meta.setPower(0);
         firework.setFireworkMeta(meta);
-
-        // Spawn the firework
-        world.spawnParticle(Particle.FIREWORKS_SPARK, location, 5);
+        firework.detonate();
+        // Spawn the firewor
     }
 
     public void start() {

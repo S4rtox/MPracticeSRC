@@ -23,11 +23,7 @@ public class InitArenaState extends ArenaState {
         arenaBorder.setCenter(arena.getCenterLocation());
         arenaBorder.setSize(arena.getWorldBorderRadius());
         arena.setRunner(null);
-        Bukkit.getScheduler().runTaskAsynchronously(plugin,new PopulateChests(plugin,arena.getWorld(),100,100, chestLocations ->{
-            arena.getChests().clear();
-            arena.getChests().addAll(chestLocations);
-            arena.setArenaState(new WaitingArenaState(gameManager, arena));
-        }));
+        arena.setArenaState(new WaitingArenaState(gameManager, arena));
     }
 
     @Override

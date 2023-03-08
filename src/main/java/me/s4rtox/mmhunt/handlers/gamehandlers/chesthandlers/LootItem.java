@@ -62,15 +62,15 @@ public class LootItem {
             amount = minAmount;
         }
         ItemStack item = new ItemStack(material, amount);
-        item.editMeta(itemMeta -> {
-            itemMeta.setDisplayName(Colorize.format(customName));
+        ItemMeta itemMeta = item.getItemMeta();
+        itemMeta.setDisplayName(Colorize.format(customName));
 
-            if (!enchantementToLevelMap.isEmpty()) {
-                for (Map.Entry<Enchantment, Integer> enchantEntry : enchantementToLevelMap.entrySet()) {
-                    itemMeta.addEnchant(enchantEntry.getKey(), enchantEntry.getValue(), true);
-                }
+        if (!enchantementToLevelMap.isEmpty()) {
+            for (Map.Entry<Enchantment, Integer> enchantEntry : enchantementToLevelMap.entrySet()) {
+                itemMeta.addEnchant(enchantEntry.getKey(), enchantEntry.getValue(), true);
             }
-        });
+        }
+        item.setItemMeta(itemMeta);
 
         return item;
     }
