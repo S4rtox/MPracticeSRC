@@ -6,7 +6,6 @@ import me.s4rtox.mmhunt.handlers.gamehandlers.arena.states.events.animations.Fir
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.Chest;
 import org.bukkit.inventory.Inventory;
@@ -24,7 +23,7 @@ public class ItemDrop implements Runnable{
 
     public ItemDrop(ActiveArenaState state) {
         this.state = state;
-        this.alivePlayers = this.state.getAlivePlayers();
+        this.alivePlayers = this.state.getRespawningPlayers();
         this.arena = state.getArena();
         this.dropLocation = getDropLocation();
     }

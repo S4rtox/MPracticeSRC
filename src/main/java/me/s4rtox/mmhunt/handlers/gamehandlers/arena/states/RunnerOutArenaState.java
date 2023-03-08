@@ -16,8 +16,8 @@ public class RunnerOutArenaState extends PlayableArenaState{
     public RunnerOutArenaState(GameManager gameManager, Arena arena) {
         super(gameManager, arena);
         arena.doHunterAction(player -> {
-            addAlivePlayer(player.getUniqueId());
             player.getInventory().clear();
+            player.getActivePotionEffects().clear();
             player.teleport(arena.getSpawnLocation());
         });
         event = new RunnerOutOfCageEvent(gameManager,this,20);

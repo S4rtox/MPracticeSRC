@@ -151,7 +151,7 @@ public class ActiveArenaEvents extends BukkitRunnable {
                 timeUntill = 13 * 60 - matchDuration;
             }
             case 13 * 60 -> {
-                arena.fillChests();
+                arena.refillChests();
                 arena.sendAllTitle("&aChest has been refilled","",20,20,20);
                 arena.sendAllSound(Sound.BLOCK_CHEST_CLOSE,1f,1f);
                 nextEvent = "Hunter Item";
@@ -173,7 +173,7 @@ public class ActiveArenaEvents extends BukkitRunnable {
                 timeUntill = 28 * 60 - matchDuration;
             }
             case 28 * 60 -> {
-                arena.fillChests();
+                arena.refillChests();
                 arena.sendAllTitle("&aChest has been refilled","",20,20,20);
                 arena.sendAllSound(Sound.BLOCK_CHEST_CLOSE,1f,1f);
                 nextEvent = "Border Shrink";
@@ -205,13 +205,8 @@ public class ActiveArenaEvents extends BukkitRunnable {
                             CItemBuilder.of(Material.COMPASS).name("&bRunner Tracker").build()
                     ).values());
                 });
-                nextEvent = "Revive all";
-                timeUntill = 50 * 60 - matchDuration;
-            }
-            case 50 * 60 -> {
                 nextEvent = "DeathMatch(Border Closer)";
                 timeUntill = 60 * 60 - matchDuration;
-                arena.doHunterAction(state::revivePlayer);
             }
             case 60 * 60 -> {
                 nextEvent = "&7-";
@@ -228,7 +223,7 @@ public class ActiveArenaEvents extends BukkitRunnable {
         //Code to be executed every second
         arena.updateAllScoreboards("&e&lMMHunt",
                 "",
-                "&fAlive: &a" + state.getAlivePlayers().size(),
+                "&fAlive: &a" + state.getRespawningPlayers().size(),
                 "",
                 "&fNext Event: &a" + nextEvent + " &7&l→&a " + (timeUntill < 60 ? timeUntill : timeUntill / 60 + ":" + timeUntill % 60),
                 "",
@@ -236,10 +231,12 @@ public class ActiveArenaEvents extends BukkitRunnable {
                 "",
                 "&f" + ConfigManager.serverIP
         );
-        if(state.getAlivePlayers().isEmpty()){
+        /*
+        if(state.getRespawningPlayers().isEmpty()){
             reviveAllTask = new ReviveAllTask(state,10);
             reviveAllTask.run();
         }
+         */
         //Messages to be broadcasted each x seconds
         if(timeUntill > 0){
             timeUntill--;

@@ -25,7 +25,6 @@ public class ActiveArenaState extends PlayableArenaState {
     public void onEnable(MMHunt plugin) {
         super.onEnable(plugin);
         // Stuff on start //
-        arena.firstFillChests();
         setDefaultPlayersStates();
         // EVENTS //
         arenaEvents = new ActiveArenaEvents(this,gameManager);
@@ -42,7 +41,7 @@ public class ActiveArenaState extends PlayableArenaState {
         super.setDefaultPlayersStates();
         arena.updateAllScoreboards("&e&lMMHunt",
                 "",
-                "&fAlive: &a" + alivePlayers.size(),
+                "&fAlive: &a" + respawningPlayers.size(),
                 "",
                 "&fNext Event:",
                 "",

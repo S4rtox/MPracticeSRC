@@ -6,20 +6,43 @@ import me.s4rtox.mmhunt.MMHunt;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.block.Block;
 import org.bukkit.block.Chest;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 
-public class ChestManager {
+public class ChestManager  implements Listener {
     private final YamlDocument chestConfig;
     private final HashMap<String, ChestLoot> chestItems = new HashMap<>();
+    private final Set<Location> openedChests = new HashSet<>();
 
     public ChestManager(MMHunt plugin) {
         this.chestConfig = plugin.getChestConfig();
         loadChests();
+        plugin.getServer().getPluginManager().registerEvents(this, plugin);
+    }
+
+    @EventHandler
+    public void onChestOpen(PlayerInteractEvent event){
+        if(event.getAction().isRightClick()){
+        if(event.hasBlock()){
+            Block chest = event.getClickedBlock();
+            if(openedChests.contains(chest.getLocation())) return;
+            Inventory chestInv = ((Chest)chest.getState()).getBlockInventory();
+            fillChest(chestInv,"islandChest",true, ThreadLocalRandom.current());
+            openedChests.add(chest.getLocation());
+        }
+        }
+    }
+
+    public void refillChests(){
+        openedChests.clear();
     }
 
     public void loadChests() {
@@ -61,27 +84,6 @@ public class ChestManager {
     }
 
 
-    public void firstFillChests(List<Location> chestLocations,String chestType, boolean clearChestsInventories){
-        if(chestLocations.isEmpty()) return;
-        ThreadLocalRandom random = ThreadLocalRandom.current();
-        for (Location chestLocation : chestLocations){
-            if(filterChest(chestLocation,random)) continue;
-            if(chestLocation.getBlock().getType() != Material.CHEST) continue;
-            Chest chest = (Chest) chestLocation.getBlock().getState();
-            fillChest(chest.getInventory(), chestType, clearChestsInventories,random);
-        }
-    }
-
-    public void fillChestLocations(List<Location> chestLocations,String chestType, boolean clearChestsInventories){
-        if(chestLocations.isEmpty()) return;
-        ThreadLocalRandom random = ThreadLocalRandom.current();
-        for (Location chestLocation : chestLocations){
-            if(chestLocation.getBlock().getType() != Material.CHEST) continue;
-            Chest chest = (Chest) chestLocation.getBlock().getState();
-            fillChest(chest.getInventory(), chestType, clearChestsInventories,random);
-        }
-    }
-
     public void filterAllChests(List<Location> chestLocations){
         if(chestLocations.isEmpty()) return;
         ThreadLocalRandom random = ThreadLocalRandom.current();
@@ -104,15 +106,6 @@ public class ChestManager {
         }
 
         return false;
-    }
-
-    public void clearChestsInventories(List<Location> chestLocations){
-        if(chestLocations.isEmpty()) return;
-        for (Location chestLocation : chestLocations){
-            if(chestLocation.getBlock().getType() != Material.CHEST) continue;
-            Chest chest = (Chest) chestLocation.getBlock().getState();
-            chest.getInventory().clear();
-        }
     }
 
 

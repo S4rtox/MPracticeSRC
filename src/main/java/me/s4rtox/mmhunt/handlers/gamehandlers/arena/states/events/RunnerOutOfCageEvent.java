@@ -1,6 +1,5 @@
 package me.s4rtox.mmhunt.handlers.gamehandlers.arena.states.events;
 
-import lombok.Getter;
 import me.s4rtox.mmhunt.handlers.gamehandlers.GameManager;
 import me.s4rtox.mmhunt.handlers.gamehandlers.arena.Arena;
 import me.s4rtox.mmhunt.handlers.gamehandlers.arena.states.ActiveArenaState;
@@ -29,7 +28,7 @@ public class RunnerOutOfCageEvent extends BukkitRunnable {
         if (timeUntilStart <= 0) {
             arena.sendAllSound(Sound.ENTITY_ENDER_DRAGON_GROWL,1,1);
             arena.sendAllTitle(Colorize.format("&HUNTERS RELEASED!"), "", 20, 20 , 20);
-            arena.setArenaState(new ActiveArenaState(gameManager,arena,state.getAlivePlayers()));
+            arena.setArenaState(new ActiveArenaState(gameManager,arena,state.getRespawningPlayers()));
             cancel();
             return;
         }

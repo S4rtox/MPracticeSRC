@@ -2,8 +2,8 @@ package me.s4rtox.mmhunt.handlers.gamehandlers.arena.states;
 
 import me.s4rtox.mmhunt.handlers.gamehandlers.GameManager;
 import me.s4rtox.mmhunt.handlers.gamehandlers.arena.Arena;
+import me.s4rtox.mmhunt.handlers.gamehandlers.arena.states.events.OnPlayerDeathEvent;
 import me.s4rtox.mmhunt.util.Colorize;
-import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
@@ -20,37 +20,36 @@ import java.util.List;
 import java.util.UUID;
 
 public abstract class PlayableArenaState extends ArenaState implements Listener {
-    protected final List<UUID> alivePlayers;
+    protected final List<UUID> respawningPlayers;
     public static final String RUNNER = "&7[&aR&7]&f ";
     public static final String HUNTER = "&7[&cH&7]&7 ";
     public static final String DEAD = "&7[&0D&7]&7 ";
     public static final String SPECTATOR = "&7[&fSPEC]&7 ";
     protected PlayableArenaState(GameManager gameManager, Arena arena, List<UUID> alivePlayers) {
         super(gameManager, arena);
-        this.alivePlayers = alivePlayers;
+        this.respawningPlayers = alivePlayers;
     }
 
     protected PlayableArenaState(GameManager gameManager, Arena arena) {
         super(gameManager, arena);
-        this.alivePlayers = new ArrayList<>();
+        this.respawningPlayers = new ArrayList<>();
     }
 
     @Override
     public void setDefaultPlayerState(Player player) {
-        addAlivePlayer(player.getUniqueId());
         player.setPlayerListName(Colorize.format(HUNTER + player.getName()));
         gameManager.getTrackerHandler().setTarget(player, arena.getRunner());
+        player.teleport(arena.getSpawnLocation());
+        player.setGameMode(GameMode.SURVIVAL);
     }
 
 
     public void killPlayer(Player player) {
         if (player != null) {
-            if (alivePlayers.contains(player.getUniqueId())) {
-                player.setPlayerListName(Colorize.format(ActiveArenaState.DEAD + player.getName()));
-                player.setGameMode(GameMode.SPECTATOR);
-                player.teleport(arena.getSpectatorSpawnLocation());
-                alivePlayers.remove(player.getUniqueId());
-                if(arena.isRunner(player)){
+            if (!respawningPlayers.contains(player.getUniqueId())) {
+                if(arena.isHunter(player)) {
+                 new OnPlayerDeathEvent(this,player);
+                }else if(arena.isRunner(player)){
                     arena.sendAllSound(Sound.ENTITY_ENDER_DRAGON_DEATH,1,1);
                     arena.sendAllTitle("&aHunters WIN!", "", 20, 20*5 , 20);
                     tryFinishGame();
@@ -59,14 +58,18 @@ public abstract class PlayableArenaState extends ArenaState implements Listener 
         }
     }
 
+    /* Removed due players always reviving
     public boolean revivePlayer(Player player){
-        if(arena.getPlayers().contains(player.getUniqueId()) && !alivePlayers.contains(player.getUniqueId())){
+        if(arena.getPlayers().contains(player.getUniqueId())){
             player.setGameMode(GameMode.SURVIVAL);
+            player.teleport(arena.getSpawnLocation());
+
             addAlivePlayer(player.getUniqueId());
             return true;
         }
         return false;
     }
+     */
 
 
     public void tryFinishGame(){
@@ -109,6 +112,7 @@ public abstract class PlayableArenaState extends ArenaState implements Listener 
     public void onPlayerJoin(Player player) {
         super.onPlayerJoin(player);
         setDefaultPlayerState(player);
+        new OnPlayerDeathEvent(this,player);
     }
 
     @Override
@@ -146,10 +150,12 @@ public abstract class PlayableArenaState extends ArenaState implements Listener 
             arena.doAllAction(player1 -> event.getRecipients().add(player1));
             if(arena.isSpectating(player)){
                 event.setFormat(Colorize.format(SPECTATOR + player.getDisplayName() + "&7:&7 ") + event.getMessage());
-            }else if(!alivePlayers.contains(player.getUniqueId())){
+            }
+            /* else if(!alivePlayers.contains(player.getUniqueId())){
                 // event.setFormat(Colorize.format(DEAD + player.getDisplayName() + "&7:&7 ") + event.getMessage());
                 event.setCancelled(true);
-            }else if(arena.isRunner(player)){
+            } */
+            else if(arena.isRunner(player)){
                 event.setFormat(Colorize.format(RUNNER + player.getDisplayName() + "&7:&f ") + event.getMessage());
             }else{
                 event.setFormat(Colorize.format(HUNTER + player.getDisplayName() + "&7: ") + event.getMessage());
@@ -178,11 +184,14 @@ public abstract class PlayableArenaState extends ArenaState implements Listener 
         arena.doRunnerAction(player -> player.setPlayerListName(Colorize.format(ActiveArenaState.RUNNER + player.getName())));
     }
 
+    /*
     public void addAlivePlayer(UUID player){
         if(!alivePlayers.contains(player)){
             alivePlayers.add(player);
         }
     }
+
+     */
 
     public abstract void cancelArenaEvents();
 
@@ -191,8 +200,8 @@ public abstract class PlayableArenaState extends ArenaState implements Listener 
         return GameState.ACTIVE;
     }
 
-    public List<UUID> getAlivePlayers() {
-        return alivePlayers;
+    public List<UUID> getRespawningPlayers() {
+        return respawningPlayers;
     }
 
 }

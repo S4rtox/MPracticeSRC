@@ -164,7 +164,7 @@ public class Arena {
     public int getCurrentPlayers() {
         if (this.arenaState.getGameStateEnum() == GameState.ACTIVE) {
             ActiveArenaState activeArenaState = (ActiveArenaState) this.arenaState;
-            return activeArenaState.getAlivePlayers().size();
+            return activeArenaState.getRespawningPlayers().size();
         } else if (this.arenaState.getGameStateEnum() == GameState.FINISHING) {
             return 1;
         } else {
@@ -175,11 +175,8 @@ public class Arena {
     /////////////////////////////////////////////////////////////////////
     // ---------------------- Arena Setup Events --------------------- //
     /////////////////////////////////////////////////////////////////////
-    public void firstFillChests(){
-        gameManager.getChestManager().firstFillChests(chests,"islandChest",true);
-    }
-    public void fillChests() {
-        gameManager.getChestManager().fillChestLocations(chests, "islandChest", true);
+    public void refillChests() {
+        gameManager.getChestManager().refillChests();
     }
 
     public void restoreChests(){
@@ -188,10 +185,6 @@ public class Arena {
         }
     }
 
-    // Method should become useless on arena reset system, awaiting implementation
-    public void clearChests() {
-        gameManager.getChestManager().clearChestsInventories(chests);
-    }
 
     //////////////////////////////////////////////////////////////////////
     // ---------------------- Arena Player Events --------------------- //

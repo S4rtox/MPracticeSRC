@@ -58,7 +58,7 @@ public class FinishingArenaState extends ArenaState {
             arena.getHunters().clear();
             arena.getSpectators().clear();
             arena.setRunner(null);
-            arena.clearChests();
+            arena.refillChests();
             arena.restoreChests();
             arena.setArenaState(new InitArenaState(gameManager, arena));
         }, 10).runTaskTimer(plugin, 0, 20);

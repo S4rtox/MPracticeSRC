@@ -32,7 +32,7 @@ public class ReviveAllTask extends BukkitRunnable {
         if (timeUntilStart <= 0) {
             arena.sendAllSound(Sound.ENTITY_ENDER_DRAGON_GROWL,1,1);
             arena.sendAllTitle("&aREVIVED!", "", 20, 20 , 20);
-            arena.doPlayerAction(state::revivePlayer);
+            //arena.doPlayerAction(state::revivePlayer);
             cancel();
             return;
         }
