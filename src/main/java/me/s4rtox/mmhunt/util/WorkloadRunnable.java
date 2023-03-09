@@ -1,5 +1,7 @@
 package me.s4rtox.mmhunt.util;
 
+import org.bukkit.Bukkit;
+
 import java.util.ArrayDeque;
 import java.util.Deque;
 
@@ -29,6 +31,8 @@ public class WorkloadRunnable implements Runnable {
         while (System.nanoTime() <= stopTime && (nextLoad = this.workloadDeque.poll()) != null) {
             nextLoad.compute();
         }
+        if(workloadDeque.size() != 0)
+            Bukkit.getLogger().info("Elementos por procesar: " + workloadDeque.size());
     }
 
 }

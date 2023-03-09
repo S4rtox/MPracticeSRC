@@ -4,6 +4,7 @@ import me.s4rtox.mmhunt.handlers.gamehandlers.GameManager;
 import me.s4rtox.mmhunt.handlers.gamehandlers.arena.Arena;
 import me.s4rtox.mmhunt.handlers.gamehandlers.arena.states.events.OnPlayerDeathEvent;
 import me.s4rtox.mmhunt.util.Colorize;
+import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
@@ -167,9 +168,10 @@ public abstract class PlayableArenaState extends ArenaState implements Listener 
     public void avoidTeamDamage(EntityDamageByEntityEvent event){
         if(event.getEntity() instanceof Player player && event.getDamager() instanceof Player damager){
             if(arena.isInGame(player) && arena.isInGame(damager)){
-                if(arena.isHunter(player) && arena.isHunter(damager)){
-                    event.setCancelled(true);
+                if(arena.isRunner(player) || arena.isRunner(damager)){
+                    return;
                 }
+                event.setCancelled(true);
             }
         }
     }
@@ -178,7 +180,7 @@ public abstract class PlayableArenaState extends ArenaState implements Listener 
     public void setDefaultPlayersStates() {
         arena.doHunterAction(player -> {
             player.setPlayerListName(Colorize.format(ActiveArenaState.HUNTER + player.getName()));
-            addAlivePlayer(player.getUniqueId());
+            //addAlivePlayer(player.getUniqueId());
             gameManager.getTrackerHandler().setTarget(player, arena.getRunner());
         });
         arena.doRunnerAction(player -> player.setPlayerListName(Colorize.format(ActiveArenaState.RUNNER + player.getName())));

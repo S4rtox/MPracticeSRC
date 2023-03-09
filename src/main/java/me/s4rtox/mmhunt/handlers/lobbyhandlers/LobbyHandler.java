@@ -57,7 +57,8 @@ public class LobbyHandler implements Listener {
     public void disableFallDamage(EntityDamageEvent event) {
         if (!config.getC_LOBBYWORLD_ENABLEDWORLDS().contains(event.getEntity().getWorld().getName())) return;
         if (!config.isC_LOBBYWORLD_DISABLE_FALLDAMAGE()) return;
-        if (!(event.getEntity() instanceof Player)) return;
+        if (!(event.getEntity() instanceof Player player)) return;
+        if(plugin.getGameManager().getArenaManager().isInArena(player)) return;
         if (event.getCause() == EntityDamageEvent.DamageCause.FALL) {
             event.setCancelled(true);
         }
@@ -111,9 +112,9 @@ public class LobbyHandler implements Listener {
     @EventHandler
     public void pvpDisabler(EntityDamageByEntityEvent event) {
         if (!config.isC_LOBBYWORLD_DISABLE_PVP()) return;
-        if (!(event.getEntity() instanceof Player)) return;
+        if (!(event.getEntity() instanceof Player player)) return;
         if (!config.getC_LOBBYWORLD_ENABLEDWORLDS().contains(event.getEntity().getWorld().getName())) return;
-        if (!(event.getDamager() instanceof Player)) return;
+        if(plugin.getGameManager().getArenaManager().isInArena(player)) return;
         event.setCancelled(true);
     }
 

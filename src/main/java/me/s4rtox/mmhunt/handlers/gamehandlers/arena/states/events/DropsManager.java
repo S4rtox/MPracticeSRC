@@ -15,19 +15,22 @@ import org.bukkit.inventory.ItemStack;
 
 import javax.annotation.Nullable;
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class DropsManager {
     private final ActiveArenaState state;
     private final Arena arena;
-    private final List<UUID> alivePlayers;
+    private final List<UUID> hunters;
 
     public DropsManager(ActiveArenaState state) {
         this.state = state;
-        this.alivePlayers = this.state.getRespawningPlayers();
         this.arena = state.getArena();
+        this.hunters = new ArrayList<>();
+        hunters.addAll(arena.getHunters());
     }
 
     public void newDrop() {
@@ -38,12 +41,12 @@ public class DropsManager {
     }
 
     private Location getDropLocation(){
-        int i = ThreadLocalRandom.current().nextInt(0, this.alivePlayers.size());
+        int i = ThreadLocalRandom.current().nextInt(0, this.hunters.size());
         if(i == 0){
             Location playerLoc = arena.getCenterLocation();
             return variateLocation(playerLoc);
         }
-        Location playerLoc = Bukkit.getPlayer(alivePlayers.get(i)).getLocation();
+        Location playerLoc = Bukkit.getPlayer(hunters.get(i)).getLocation();
         return variateLocation(playerLoc);
     }
     private Location variateLocation(Location location){
@@ -62,11 +65,12 @@ public class DropsManager {
         Bukkit.getLogger().info(location.toString());
         Inventory chestInventory = ((Chest) chest.getState()).getInventory();
         chestInventory.setContents(getRandomDropItems());
+        arena.getGameManager().getChestManager().addLockedChests(location);
     }
 
     @Nullable
     private ItemStack[] getRandomDropItems() {
-        File f = new File(arena.getGameManager().getPlugin().getDataFolder().getAbsolutePath() + "\\Drops");
+        File f = new File(arena.getGameManager().getPlugin().getDataFolder().getAbsolutePath() + "/Drops");
         if(!f.exists()){
             f.mkdir();
         }

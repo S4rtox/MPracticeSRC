@@ -6,7 +6,6 @@ import me.s4rtox.mmhunt.MMHunt;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.block.Block;
 import org.bukkit.block.Chest;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -21,6 +20,7 @@ public class ChestManager  implements Listener {
     private final YamlDocument chestConfig;
     private final HashMap<String, ChestLoot> chestItems = new HashMap<>();
     private final Set<Location> openedChests = new HashSet<>();
+    private final Set<Location> lockedChests = new HashSet<>();
 
     public ChestManager(MMHunt plugin) {
         this.chestConfig = plugin.getChestConfig();
@@ -30,15 +30,14 @@ public class ChestManager  implements Listener {
 
     @EventHandler
     public void onChestOpen(PlayerInteractEvent event){
-        if(event.getAction().isRightClick()){
-        if(event.hasBlock()){
-            Block chest = event.getClickedBlock();
-            if(openedChests.contains(chest.getLocation())) return;
-            Inventory chestInv = ((Chest)chest.getState()).getBlockInventory();
-            fillChest(chestInv,"islandChest",true, ThreadLocalRandom.current());
-            openedChests.add(chest.getLocation());
-        }
-        }
+            if(!event.getAction().isRightClick()) return;
+            if(!event.hasBlock()) return;
+            if(event.getClickedBlock().getType() != Material.CHEST) return;
+            if(openedChests.contains(event.getClickedBlock().getLocation()) || lockedChests.contains(event.getClickedBlock().getLocation())) return;
+            Chest chest = (Chest)event.getClickedBlock().getState();
+            if(chest.hasLootTable()) return;
+            fillChest(chest.getBlockInventory(), "islandChest", true, ThreadLocalRandom.current());
+                openedChests.add(chest.getLocation());
     }
 
     public void refillChests(){
@@ -108,5 +107,12 @@ public class ChestManager  implements Listener {
         return false;
     }
 
+    public void addLockedChests(Location location){
+        lockedChests.add(location);
+    }
+
+    public void clearLockedChests(){
+        lockedChests.clear();
+    }
 
 }

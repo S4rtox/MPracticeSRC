@@ -19,7 +19,10 @@ public class StartupArenaState extends ArenaState {
     @Override
     public void onEnable(MMHunt plugin) {
         super.onEnable(plugin);
-        Bukkit.getScheduler().runTask(plugin,new PopulateChests(plugin,arena.getWorld(),50,100, chestLocations ->{
+        WorldBorder arenaBorder = arena.getWorld().getWorldBorder();
+        arenaBorder.setCenter(arena.getCenterLocation());
+        arenaBorder.setSize(arena.getWorldBorderRadius());
+        Bukkit.getScheduler().runTask(plugin,new PopulateChests(plugin,arena.getWorld(),75,25, chestLocations ->{
             arena.getChests().clear();
             arena.getChests().addAll(chestLocations);
             arena.setArenaState(new InitArenaState(gameManager, arena));

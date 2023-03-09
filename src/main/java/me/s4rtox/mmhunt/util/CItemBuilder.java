@@ -111,6 +111,9 @@ public class CItemBuilder {
 
     public CItemBuilder setLore(Collection<String> l) {
         ItemMeta meta = this.item.getItemMeta();
+        if (meta == null) {
+            meta = Bukkit.getItemFactory().getItemMeta(this.item.getType());
+        }
         List<String> lore = l.stream().map(part -> ChatColor.translateAlternateColorCodes('&', part)).toList();
         meta.setLore(lore);
         this.item.setItemMeta(meta);
@@ -119,6 +122,9 @@ public class CItemBuilder {
 
     public CItemBuilder setLore(String... l) {
         ItemMeta meta = this.item.getItemMeta();
+        if (meta == null) {
+            meta = Bukkit.getItemFactory().getItemMeta(this.item.getType());
+        }
         List<String> lore = Arrays.stream(l).map(part -> ChatColor.translateAlternateColorCodes('&', part)).toList();
         meta.setLore(lore);
         this.item.setItemMeta(meta);

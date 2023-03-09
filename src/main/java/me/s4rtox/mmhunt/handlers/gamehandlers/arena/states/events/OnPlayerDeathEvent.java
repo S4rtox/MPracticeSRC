@@ -8,9 +8,10 @@ import org.bukkit.GameMode;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.entity.Player;
+import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.NotNull;
 
-public class OnPlayerDeathEvent implements Runnable {
+public class OnPlayerDeathEvent extends BukkitRunnable {
     private final PlayableArenaState state;
     private final Arena arena;
 
@@ -21,7 +22,7 @@ public class OnPlayerDeathEvent implements Runnable {
         this.state = state;
         this.arena = state.getArena();
         this.player = player;
-        arena.getGameManager().getPlugin().getServer().getScheduler().runTaskTimer(arena.getGameManager().getPlugin(), this,0,20);
+        this.runTaskTimer(arena.getGameManager().getPlugin(), 0,20);
     }
     @Override
     public void run() {
@@ -41,6 +42,7 @@ public class OnPlayerDeathEvent implements Runnable {
             state.setDefaultPlayerState(player);
             player.sendTitle(Colorize.format("&aRespawned!"), "");
             state.getRespawningPlayers().remove(player.getUniqueId());
+            this.cancel();
         }
         timer --;
     }
